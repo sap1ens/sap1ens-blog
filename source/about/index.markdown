@@ -2,8 +2,8 @@
 layout: page
 title: "About"
 date: 2013-11-24 20:08
-comments: true
-sharing: true
+comments: false
+sharing: false
 footer: true
 ---
 Hey, my name is Yaroslav Tkachenko and I'm Software Engineer from Russia, currently living in Vancouver, Canada.
