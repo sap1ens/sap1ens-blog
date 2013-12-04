@@ -300,7 +300,7 @@ class PageParser(listParser: ActorRef) extends Actor with ActorLogging with Pars
 ### Important things
 
 1. Error handling is a very important. That's why every Future has *onFailure* block, which sends clean-up messages to parent actors.
-2. You can find **ListParser** and **PageParser** similar: they both have 2 same types of inner variables, same actions (add item to process, remove item from processing queue, save results). It means we can extend actors hierarchy multiple times, and it's a good practice to have different actors for every level of hierarchy, because we can set up different [supervisors](http://doc.akka.io/docs/akka/2.2.3/scala/fault-tolerance.html).
+2. You can find **ListParser** and **PageParser** similar: they both have 2 same types of inner variables, same actions (add item to process, remove item from processing queue, save results). It means we can extend actors hierarchy multiple times, but it's a good practice to have different actors for every level of hierarchy, because we can set up different [supervisors](http://doc.akka.io/docs/akka/2.2.3/scala/fault-tolerance.html). So, it's worth thinking how to reuse this behaviour.
 
 ## Summary
 I like the results: it takes about 4 minutes on my MBP to find, fetch, parse and save about 10k ads.
