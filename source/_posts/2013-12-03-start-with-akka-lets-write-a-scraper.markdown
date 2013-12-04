@@ -25,7 +25,7 @@ So, my task was to find some ads on Craigslist website, extract data from these 
 
 [Typesafe Activator](http://typesafe.com/activator) is a beautiful tool to start Typesafe stack projects. It's [very easy](http://typesafe.com/platform/getstarted) to install.
 
-So, I've started project with Activator (just chose Scala + Akka template) and I've got completed application with Sbt, Scala, Akka and ability to run the app with another beautiful tool - [Typesafe Console](http://typesafe.com/platform/runtime/console).
+So, I've started project with Activator (just chose Scala + Akka template) and I've got ready-to-go application with Sbt, Scala, Akka and ability to run the app with another beautiful tool - [Typesafe Console](http://typesafe.com/platform/runtime/console).
 
 ## Keep your stuff in Config
 
@@ -241,16 +241,12 @@ future pipeTo self
 This line sends result of the Future to actor itself. There are two possible ways after.
 
 1.  If there is a next page in the message, it goes to this case:
-   ``` scala
-   case ListResult(listUrl, urls, Some(nextPage))
-   ```
+   ```case ListResult(listUrl, urls, Some(nextPage))```
    It sends **AddListUrl** message to the **CollectorService**, as well as **ListResult** message without next page to actor itself.
 2.  If there is no next page (or it's a message from 1), it goes to another case
-   ``` scala
-   case ListResult(listUrl, urls, None)
-   ```
+   ```case ListResult(listUrl, urls, None)```
 
-Second *ListResult* case firstly checks list of URLs. If it's empty, **RemoveListUrl** will be sent to the **CollectorService**. If it's not empty, actor sends **AddPageUrl** message for every URL to itself.
+Second *ListResult* case checks list of URLs. If it's empty, **RemoveListUrl** will be sent to the **CollectorService**. If it's not empty, actor sends **AddPageUrl** message for every URL to itself.
 
 In **AddPageUrl** case, actor saves specified URL to *pageUrls* and sends **StartPageParser** message to **PageParser**, next actor in hierarchy.
 
