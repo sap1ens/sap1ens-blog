@@ -308,8 +308,6 @@ I like the results: it takes about 4 minutes on my MBP to find, fetch, parse and
 ## Bonus: Immutable data structures 
 May be you didn't notice, but all inner variables inside the actors are immutable. It's not a requirement because actor can process only one message from mailbox at the one period of time, so it won't mess with any mutable data. I used immutable data structures just as an exercise and also it's a good culture in Scala. That's why we have these implicits to work with List and Map.
 ``` scala
-package com.sap1ens.scraper
-
 trait CollectionImplicits {
     implicit class ListExtensions[K](val list: List[K]) {
         def copyWithout(item: K) = {
