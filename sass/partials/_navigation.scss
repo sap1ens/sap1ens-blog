@@ -97,6 +97,27 @@ body > nav {
     }
   }
 }
+.social-networks {
+  padding-top: .4em;
+  ul {
+    list-style: none;
+    overflow: hidden;
+    margin: 0;
+    li {
+      float: left;
+      padding-left: 1em;
+      a {
+        @include link-colors($nav-color, $nav-color-hover, $visited: $nav-color);
+        font-family: $sans;
+        text-shadow: lighten($nav-bg, 12) 0 1px;
+        text-decoration: none;
+        font-size: 0.9em;
+        padding: .1em 0;
+        line-height: 1.5em;
+      }
+    }
+  }
+}
 .no-placeholder {
   body > nav .search {
     background: lighten($nav-bg, 15) image-url('search.png') .3em .25em no-repeat;
