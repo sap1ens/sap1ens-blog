@@ -12,6 +12,8 @@ Since my first meeting with Scala I always think that this language was designed
 
 Here is the GitHub repo: [https://github.com/sap1ens/craigslist-scraper](https://github.com/sap1ens/craigslist-scraper).
 
+<!-- more -->
+
 ## The Task
 
 So, my task was to find some ads on Craigslist website, extract data from these ads and save all results to a XLS file. Also, I had a list of cities in US and Canada (472 totally). This work can be done in a few steps:
