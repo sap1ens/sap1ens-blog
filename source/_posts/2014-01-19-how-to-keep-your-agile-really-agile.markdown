@@ -9,7 +9,7 @@ categories:
 
 It can be surprise for somebody, but Agile project management sometimes requires more attention than classical waterfall methodologies.
 
-From [wikipedia](http://en.wikipedia.org/wiki/Scrum_(software_development)): "Scrum enables the creation of self-organizing teams by encouraging co-location of all team members, and verbal communication among all team members and disciplines in the project.".
+From [wikipedia](<http://en.wikipedia.org/wiki/Scrum_(software_development)>): "Scrum enables the creation of self-organizing teams by encouraging co-location of all team members, and verbal communication among all team members and disciplines in the project.".
 
 Self-organizing team, huh? It's awesome idea, but actually there is one necessary requirement - passionate Scrum master. Without such person your team is like a boat full of rowers, but without steersman.
 
