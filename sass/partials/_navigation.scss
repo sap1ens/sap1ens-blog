@@ -105,14 +105,12 @@ body > nav {
     margin: 0;
     li {
       float: left;
-      padding-left: 1em;
+      padding-left: 7px;
       a {
-        @include link-colors($nav-color, $nav-color-hover, $visited: $nav-color);
-        font-family: $sans;
+        @include link-colors(lighten($nav-color, 12), lighten($nav-color-hover, 12), $visited: lighten($nav-color, 12));
         text-shadow: lighten($nav-bg, 12) 0 1px;
         text-decoration: none;
-        font-size: 0.9em;
-        padding: .1em 0;
+        font-size: 1.5em;
         line-height: 1.5em;
       }
     }
