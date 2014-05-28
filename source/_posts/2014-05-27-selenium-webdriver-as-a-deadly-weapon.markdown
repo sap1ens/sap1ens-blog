@@ -26,6 +26,7 @@ But Selenium Webdriver is not only a testing tool - it's browser automation tool
 So, you wrote a sequence of steps for scraping some website. Awesome! But what step should be next? Of course you can just run it manually on your computer, but what if you need to create some sort of service or even platform based on it? Yes, it's possible! 
 
 [Xvfb](http://www.x.org/archive/X11R7.7/doc/man/man1/Xvfb.1.xhtml) is a virtual display server implementing the X11 protocol. Selenium Webdriver needs a display to work and it works nicely with Xvfb. Set of steps you need to do if you want to run all this stuff on your server:
+
 - install Google Chrome application
 - install Xvfb
 - [download](https://sites.google.com/a/chromium.org/chromedriver/downloads) Google Chrome driver, add a path to this file to the "webdriver.chrome.driver" system property
@@ -109,7 +110,9 @@ driver.executeScript("return navigator.userAgent") match {
 
 ## Defence
 
-Before I said that it's almost impossible to detect Selenium Webdriver and Google Chrome when they used together. Actually, I see two ways to protect yourself:
+Before I said that it's almost impossible to detect Selenium Webdriver and Google Chrome when they used together. Actually, I see a few ways to protect yourself:
+
+- CAPTCHA. But there are a lot of tools that can help with recognition, so it can't be really serious protection.
 - Create your website/web app with Flash. It's ugly, nobody uses it except for promo sites, but it should work. I'm sure it's possible to find a way to interact with Flash as well (with JavaScript calls or using other tools), but it won't be a native browser way to do it - so, probably, you can detect it.
 - Heuristic methods. For example, Google AdWords/AdSense system is able to detect bots by tracking mouse moves, scrolls, timings, etc. I believe it's very complicated and very expensive technology, but it exists. 
 
