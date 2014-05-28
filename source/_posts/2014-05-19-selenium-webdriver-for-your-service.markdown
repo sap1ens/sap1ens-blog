@@ -7,7 +7,7 @@ categories:
 - Selenium
 ---
 
-### Weapon
+## Weapon
 
 During my career I see the battle between website/web app owners and bots/scrapers/crawlers writers. I thought this battle can't be won. But about 6 months ago I joined this battle and I think now I have [almost] deadly weapon.
 
@@ -19,9 +19,9 @@ Probably, you heard or used it before. It's the most popular tool for the functi
 
 But Selenium Webdriver is not only a testing tool - it's browser automation tool. Modern implementation with Google Chrome (actually Chromium) driver is very powerful - it communicates with Google Chrome via protocol which is a native thing for this browser. You have access to everything - JavaScript, DOM, even secure cookies! That's why it's almost impossible to detect scraper written with Selenium Webdriver and Google Chrome - you just tell browser what to do and it works like there is a real person who is sitting in front of the browser and clicking buttons. 
 
-### Preparations for the battle 
+## Preparations for the battle 
 
-#### Xvfb
+### Xvfb
 
 So, you wrote a sequence of steps for scraping some website. Awesome! But what should be the next step? Of course you can just run it manually on your computer, but what if you need to create some sort of service or even platform based on it? Yes, it's possible! 
 
@@ -34,7 +34,7 @@ Xvfb is a virtual display server implementing the X11 protocol. Selenium Webdriv
 - set DISPLAY variable like "export DISPLAY=:99", where 99 is a number of your virtual display, I believe it can be a random number
 - now you can run your application! Everything should just work, including screenshots (useful for debugging). 
 
-#### File download
+### File download
 
 There is one problem that Selenium Webdriver can't solve. Usually, when you click to download button you see the OS modal window. Unfortunately browser driver can't handle OS windows. But there is a nice solution for this problem - create your own file downloader and pass all session information to it, like cookies and other headers. Example with Apache HttpClient and Scala:
 ``` scala
@@ -93,11 +93,27 @@ object FileDownloader {
     }
 }
 ```
+It takes URL to download, path where it should save the file, set of cookies and optional user agent. Of course you can pass and add more headers if you need. 
 
- 
+It's very easy to get current cookies:
+``` scala
+driver.manage().getCookies.toSet
+```
+and user agent:
+``` scala
+driver.executeScript("return navigator.userAgent") match {
+    case userAgent: String => Some(userAgent)
+    case _ => None
+}
+``` 
 
+## Defence
 
-Before I said that it's almost impossible to detect Selenium Webdriver and Chrome when they used. Actually, I see two ways to protect yourself:
-1) Create your website/web app with Flash >_<. It's ugly, but it should work. I'm sure it's possible to find a way to interact with Flash as well (with JavaScript calls or using other tools), but it won't be a native browser way to do it - so, probably, you can detect it.
-2) Any heuristic methods. For example, Google AdWords/AdSense system is able to detect bots by tracking mouse moves, scrolls, timings, etc. I believe it's very complicated and very expensive technology, but it exists. 
+Before I said that it's almost impossible to detect Selenium Webdriver and Google Chrome when they used together. Actually, I see two ways to protect yourself:
+- Create your website/web app with Flash >_<. It's ugly, but it should work. I'm sure it's possible to find a way to interact with Flash as well (with JavaScript calls or using other tools), but it won't be a native browser way to do it - so, probably, you can detect it.
+- Heuristic methods. For example, Google AdWords/AdSense system is able to detect bots by tracking mouse moves, scrolls, timings, etc. I believe it's very complicated and very expensive technology, but it exists. 
+
+## Summary
+
+As you can see (and as I said a few times), Selenium Webdriver is a very powerful tool, not only for testing, but for browser automation in general. If you need an integration with web app that doesn't have a public API, Selenium Webdriver can be a way to go. But with great power comes great responsibility...
 
