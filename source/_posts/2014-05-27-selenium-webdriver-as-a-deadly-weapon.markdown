@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "Selenium Webdriver for your service"
-date: 2014-05-19 21:19:20 -0700
+title: "Selenium Webdriver as a deadly weapon"
+date: 2014-05-27 21:19:20 -0700
 comments: true
 categories:
 - Selenium
@@ -11,11 +11,11 @@ categories:
 
 During my career I see the battle between website/web app owners and bots/scrapers/crawlers writers. I thought this battle can't be won. But about 6 months ago I joined this battle and I think now I have [almost] deadly weapon.
 
-Selenium Webdriver is my weapon. 
+[Selenium Webdriver](http://docs.seleniumhq.org/projects/webdriver/) is my choice. 
 
 <!-- more -->
 
-Probably, you heard or used it before. It's the most popular tool for the functional tests (also known as end-to-end tests), and projects like saucelabs.com can make these tests very easy to implement and run.
+Probably, you heard or used it before. It's the most popular tool for the functional tests (also known as end-to-end tests), and projects like [saucelabs.com](https://saucelabs.com) can make these tests very easy to implement and run.
 
 But Selenium Webdriver is not only a testing tool - it's browser automation tool. Modern implementation with Google Chrome (actually Chromium) driver is very powerful - it communicates with Google Chrome via protocol which is a native thing for this browser. You have access to everything - JavaScript, DOM, even secure cookies! That's why it's almost impossible to detect scraper written with Selenium Webdriver and Google Chrome - you just tell browser what to do and it works like there is a real person who is sitting in front of the browser and clicking buttons. 
 
@@ -23,20 +23,20 @@ But Selenium Webdriver is not only a testing tool - it's browser automation tool
 
 ### Xvfb
 
-So, you wrote a sequence of steps for scraping some website. Awesome! But what should be the next step? Of course you can just run it manually on your computer, but what if you need to create some sort of service or even platform based on it? Yes, it's possible! 
+So, you wrote a sequence of steps for scraping some website. Awesome! But what step should be the next step? Of course you can just run it manually on your computer, but what if you need to create some sort of service or even platform based on it? Yes, it's possible! 
 
-Xvfb is a virtual display server implementing the X11 protocol. Selenium Webdriver needs a display to work and it works nicely with Xvfb. Set of steps you need to do if you want to run all this stuff on your server:
+[Xvfb](http://www.x.org/archive/X11R7.7/doc/man/man1/Xvfb.1.xhtml) is a virtual display server implementing the X11 protocol. Selenium Webdriver needs a display to work and it works nicely with Xvfb. Set of steps you need to do if you want to run all this stuff on your server:
 - install Google Chrome application
 - install Xvfb
-- download Google Chrome driver from this page - https://sites.google.com/a/chromium.org/chromedriver/downloads
-- create Xvfb initialization script, example for Ubuntu - https://gist.github.com/jterrace/2911875
+- [download](https://sites.google.com/a/chromium.org/chromedriver/downloads) Google Chrome driver, add a path to this file to the "webdriver.chrome.driver" system property
+- create Xvfb initialization script, [example for Ubuntu](https://gist.github.com/jterrace/2911875)
 - run Xvfb
 - set DISPLAY variable like "export DISPLAY=:99", where 99 is a number of your virtual display, I believe it can be a random number
 - now you can run your application! Everything should just work, including screenshots (useful for debugging). 
 
 ### File download
 
-There is one problem that Selenium Webdriver can't solve. Usually, when you click to download button you see the OS modal window. Unfortunately browser driver can't handle OS windows. But there is a nice solution for this problem - create your own file downloader and pass all session information to it, like cookies and other headers. Example with Apache HttpClient and Scala:
+There is one problem that Selenium Webdriver can't solve. Usually, when you click to download button you see the OS modal window. Unfortunately browser driver can't handle OS windows. But there is a solution for this problem - create your own file downloader and pass session information to it, like cookies and other headers. Example with Apache HttpClient and Scala:
 ``` scala
 object FileDownloader {
     val defaultUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.131 Safari/537.36"
@@ -77,7 +77,7 @@ object FileDownloader {
         downloadedFile.getCanonicalPath
     }}
 
-    protected def mimicCookieState(seleniumCookieSet: Set[Cookie]): BasicCookieStore = {
+    private def mimicCookieState(seleniumCookieSet: Set[Cookie]): BasicCookieStore = {
         val mimicWebDriverCookieStore = new BasicCookieStore()
 
         for (seleniumCookie <- seleniumCookieSet) {
@@ -93,9 +93,9 @@ object FileDownloader {
     }
 }
 ```
-It takes URL to download, path where it should save the file, set of cookies and optional user agent. Of course you can pass and add more headers if you need. 
+It takes URL to download, path where it should save the file, set of cookies and optional user agent header. Of course you can pass and add more headers if you need. 
 
-It's very easy to get current cookies:
+And it's very easy to get current cookies:
 ``` scala
 driver.manage().getCookies.toSet
 ```
@@ -115,5 +115,5 @@ Before I said that it's almost impossible to detect Selenium Webdriver and Googl
 
 ## Summary
 
-As you can see (and as I said a few times), Selenium Webdriver is a very powerful tool, not only for testing, but for browser automation in general. If you need an integration with web app that doesn't have a public API, Selenium Webdriver can be a way to go. But with great power comes great responsibility...
+As you can see, Selenium Webdriver is a very powerful tool, not only for testing, but for browser automation in general. If you need an integration with web app that doesn't have a public API, Selenium Webdriver can be a way to go. But with great power comes great responsibility...
 
