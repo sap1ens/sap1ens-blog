@@ -7,20 +7,21 @@ categories:
 - Selenium
 ---
 
-During my career I constantly see the battle between people who own websites, web services and even search engines with people who try to break a system, find backdoors or simply automate routine things with custom methods. 
-I don't mean just hackers, there are a lot of interesting specialities like black SEO guys, bot/scraper/crawler writers, etc.  
+### Weapon
 
-Today I'll talk about a need to emulate user's behaviour in a web browser. Usually you could find such fake users by analyzing logs, HTTP headers or with more sophisticated tools, like checking JavaScript stuff. Web crawler probably doesn't support JavaScript you might think. Well, they didn't, but things changed. 
+During my career I see the battle between website/web app owners and bots/scrapers/crawlers writers. I thought this battle can't be won. But about 6 months ago I joined this battle and I think now I have [almost] deadly weapon.
 
-Selenium Webdriver is a real masterpiece. 
+Selenium Webdriver is my weapon. 
 
-In the first place, it's very easy to start with this library - http://docs.seleniumhq.org/docs/03_webdriver.jsp, you can find implementations for all major languages and browsers. But Google Chrome support is especially good. Why?
+<!-- more -->
 
-Selenium Webdriver authors not just created some tool for testing and automation, but "forced" Google (actually Chromium) to create and support (!) special driver. So it communicates with Google Chrome via protocol which is a native thing for this browser. You have access to everything, including, for example, secure cookies! 
+Probably, you heard or used it before. It's the most popular tool for the functional tests (also known as end-to-end tests), and projects like saucelabs.com can make these tests very easy to implement and run.
 
-It's almost impossible detect bot/crawler written with Selenium Webdriver and Chrome. HTTP headers, JavaScript, cookies - everything will just work. 
+But Selenium Webdriver is not only a testing tool - it's browser automation tool. Modern implementation with Google Chrome (actually Chromium) driver is very powerful - it communicates with Google Chrome via protocol which is a native thing for this browser. You have access to everything - JavaScript, DOM, even secure cookies! That's why it's almost impossible to detect scraper written with Selenium Webdriver and Google Chrome - you just tell browser what to do and it works like there is a real person who is sitting in front of the browser and clicking buttons. 
 
-// ...
+### Preparations for the battle 
+
+
 
 
 Before I said that it's almost impossible to detect Selenium Webdriver and Chrome when they used. Actually, I see two ways to protect yourself:
