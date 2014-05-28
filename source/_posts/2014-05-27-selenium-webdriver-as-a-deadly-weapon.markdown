@@ -9,7 +9,7 @@ categories:
 
 ## Weapon
 
-During my career I see the battle between website/web app owners and bots/scrapers/crawlers writers. I thought this battle can't be won. But about 6 months ago I joined this battle and I think now I have [almost] deadly weapon.
+During my career I see the battle between website/web app owners and bots/scrapers/crawlers writers. I thought this battle can't be won. But about 6 months ago I joined it and I think now I have [almost] deadly weapon.
 
 [Selenium Webdriver](http://docs.seleniumhq.org/projects/webdriver/) is my choice. 
 
@@ -17,13 +17,13 @@ During my career I see the battle between website/web app owners and bots/scrape
 
 Probably, you heard or used it before. It's the most popular tool for the functional tests (also known as end-to-end tests), and projects like [saucelabs.com](https://saucelabs.com) can make these tests very easy to implement and run.
 
-But Selenium Webdriver is not only a testing tool - it's browser automation tool. Modern implementation with Google Chrome (actually Chromium) driver is very powerful - it communicates with Google Chrome via protocol which is a native thing for this browser. You have access to everything - JavaScript, DOM, even secure cookies! That's why it's almost impossible to detect scraper written with Selenium Webdriver and Google Chrome - you just tell browser what to do and it works like there is a real person who is sitting in front of the browser and clicking buttons. 
+But Selenium Webdriver is not only a testing tool - it's browser automation tool. Modern implementation with Google Chrome (actually Chromium) driver is very powerful - it communicates with Google Chrome via special protocol which is a native thing for this browser. You have access to everything - JavaScript, DOM, even secure cookies! That's why it's almost impossible to detect scraper written with Selenium Webdriver and Google Chrome - you just tell browser what to do and it works like there is a real person who is sitting in front of the browser and clicking buttons. 
 
 ## Preparations for the battle 
 
 ### Xvfb
 
-So, you wrote a sequence of steps for scraping some website. Awesome! But what step should be the next step? Of course you can just run it manually on your computer, but what if you need to create some sort of service or even platform based on it? Yes, it's possible! 
+So, you wrote a sequence of steps for scraping some website. Awesome! But what step should be next? Of course you can just run it manually on your computer, but what if you need to create some sort of service or even platform based on it? Yes, it's possible! 
 
 [Xvfb](http://www.x.org/archive/X11R7.7/doc/man/man1/Xvfb.1.xhtml) is a virtual display server implementing the X11 protocol. Selenium Webdriver needs a display to work and it works nicely with Xvfb. Set of steps you need to do if you want to run all this stuff on your server:
 - install Google Chrome application
@@ -36,7 +36,7 @@ So, you wrote a sequence of steps for scraping some website. Awesome! But what s
 
 ### File download
 
-There is one problem that Selenium Webdriver can't solve. Usually, when you click to download button you see the OS modal window. Unfortunately browser driver can't handle OS windows. But there is a solution for this problem - create your own file downloader and pass session information to it, like cookies and other headers. Example with Apache HttpClient and Scala:
+There is one problem that Selenium Webdriver can't solve. Usually, when you click to a download button you see the OS modal window. Unfortunately, driver can't handle OS windows. But there is a solution for this problem - create your own file downloader and pass session information to it, like cookies and other headers. Example with Apache HttpClient and Scala:
 ``` scala
 object FileDownloader {
     val defaultUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.131 Safari/537.36"
@@ -110,7 +110,7 @@ driver.executeScript("return navigator.userAgent") match {
 ## Defence
 
 Before I said that it's almost impossible to detect Selenium Webdriver and Google Chrome when they used together. Actually, I see two ways to protect yourself:
-- Create your website/web app with Flash >_<. It's ugly, but it should work. I'm sure it's possible to find a way to interact with Flash as well (with JavaScript calls or using other tools), but it won't be a native browser way to do it - so, probably, you can detect it.
+- Create your website/web app with Flash. It's ugly, nobody uses it except for promo sites, but it should work. I'm sure it's possible to find a way to interact with Flash as well (with JavaScript calls or using other tools), but it won't be a native browser way to do it - so, probably, you can detect it.
 - Heuristic methods. For example, Google AdWords/AdSense system is able to detect bots by tracking mouse moves, scrolls, timings, etc. I believe it's very complicated and very expensive technology, but it exists. 
 
 ## Summary
