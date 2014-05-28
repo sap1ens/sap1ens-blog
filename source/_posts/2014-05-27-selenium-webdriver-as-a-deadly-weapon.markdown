@@ -4,6 +4,7 @@ title: "Selenium Webdriver as a deadly weapon"
 date: 2014-05-27 21:19:20 -0700
 comments: true
 categories:
+- Scala
 - Selenium
 ---
 
