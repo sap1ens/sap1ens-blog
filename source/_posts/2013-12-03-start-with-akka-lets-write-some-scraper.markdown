@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Start with Akka: Let's write a scraper"
+title: "Start with Akka: Let's write some scraper"
 date: 2013-12-03 18:45:44 -0800
 comments: true
 categories:
@@ -10,13 +10,13 @@ categories:
 
 Since my first meeting with Scala I always think that this language was designed to work in a concurrent environment. I wasn't familiar with actors for a long time, but a few months ago I got a task to write a website scraper. It's a typical story, there are a lot of nice solutions, but I felt it's a right time to try Akka in action. This article is the result of my work. I don't want to describe the basic things, so you should be familiar with the main Akka concepts: actors and messages.
 
-Here is the GitHub repo: [https://github.com/sap1ens/craigslist-scraper](https://github.com/sap1ens/craigslist-scraper).
+Here is the GitHub repo: [https://github.com/sap1ens/scraper](https://github.com/sap1ens/scraper).
 
 <!-- more -->
 
 ## The Task
 
-So, my task was to find some ads on Craigslist website, extract data from these ads and save all results to a XLS file. Also, I had a list of cities in US and Canada (472 totally). This work can be done in a few steps:
+So, my task was to find some ads on ***** website, extract data from these ads and save all results to a XLS file. Also, I had a list of cities in US and Canada (472 totally). This work can be done in a few steps:
 
 1. Generate a list of URLs for all cities.
 2. Every page with city results can contain a pagination, so we should fetch all pages.
@@ -32,7 +32,7 @@ So, I've started project with Activator (just chose Scala + Akka template) and I
 ## Keep your stuff in Config
 
 Also, I put all my configuration stuff into the [Typesafe Config](https://github.com/typesafehub/config) file (I've chose JSON format).
-There are a list of cities/countries, Craigslist search query and some settings related to saving.
+There are a list of cities/countries, search query and some settings related to saving.
 
 ## ActorSystem
 
@@ -41,7 +41,7 @@ There are a list of cities/countries, Craigslist search query and some settings 
 object Scraper extends App {
 
     val config = ConfigFactory.load()
-    val system = ActorSystem("craigslist-scraper-system")
+    val system = ActorSystem("scraper-system")
 
     val profiles = for {
         profile: ConfigObject <- config.getObjectList("profiles").asScala
