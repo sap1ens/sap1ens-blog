@@ -11,6 +11,8 @@ I think that self-education is the most important aspect of a good Software Engi
 
 And with self-education I don't necessary mean visiting some expensive courses or getting additional certificate. Not at all. For me, reading books, articles and tutorials is always more efficient - you can choose very granular pieces of wisdom that can help you fill the gaps in your knowledge.
 
+<!-- more -->
+
 Thankfully, there are a lot of ways to increase your reading list: social networks, blogs, email subscriptions, feed aggregators... Even old-school books can be accessed online with different devices. I want to share what I use to manage all these things.
 
 And before I start I just want to mention that I usually use iPad Air for reading and I think it's a best device for that ;)
