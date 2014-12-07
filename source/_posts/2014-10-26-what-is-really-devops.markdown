@@ -4,7 +4,7 @@ title: "What is really DevOps?"
 date: 2014-10-26 11:51:11 -0700
 comments: true
 categories:
-- devops
+- DevOps
 ---
 
 DevOps, from [wikipedia](http://en.wikipedia.org/wiki/DevOps):
