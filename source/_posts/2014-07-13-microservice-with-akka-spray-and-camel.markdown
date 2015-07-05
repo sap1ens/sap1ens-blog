@@ -7,6 +7,7 @@ categories:
 - Scala
 - Akka
 - Spray
+- Microservices
 ---
 
 [Microservices architecture](http://wayfinder.co/pathways/53536427f7040a11002ae407/a-field-guide-to-microservices-april-2014-edition) is a popular trend right now. I don't want to repeat anything about microservices in general, but instead I want to introduce an example project of a microservice based on Akka, Spray and Camel.
