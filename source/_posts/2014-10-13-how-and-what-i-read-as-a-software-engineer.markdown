@@ -5,6 +5,7 @@ date: 2014-10-13 15:06:09 -0700
 comments: true
 categories:
 - Me
+- Reading
 ---
 
 I think that self-education is the most important aspect of a good Software Engineer. You *have to* learn a lot, because our field is still very changeable: popular technology that you know right now might be forgotten very soon, in 2-3 years. And even if you spend significant amount of time during you work day it's not enough :) Always not enough. I'm not saying that you should learn *everything*, but mastering even 2-3 skills that you have and care for is very challenging.
