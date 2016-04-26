@@ -7,7 +7,7 @@ categories:
 - Thoughts
 ---
 
-Software teams naturally have leaders. I see two types of leaders: team leads and technical leads.
+Software development teams naturally have leaders. I see two types of leaders: team leads and technical leads.
 
 Team leads care about projects, tasks, velocity and related things and usually have titles like Team Lead, Project Manager or Technical Project Manager. They can be programmers and know how to code, but their main focus is planning projects and organizing processes.
 
