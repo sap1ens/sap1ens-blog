@@ -6,6 +6,9 @@ comments: false
 sharing: false
 footer: true
 ---
+
+<img src="/images/pages/me_about_page.jpg" width="400" style="float: right;" />
+
 Hey, my name is Yaroslav Tkachenko, I was born in Russia and I'm currently living in Vancouver, Canada.
 
 I’m a polyglot Software Engineer, I love to work with DevOps tools and practices, design and build infrastructure for complex systems, work on software architecture and design, distributed systems and back-end programming (Python, Node.js, Java, Scala) with a focus on scalability and high availability.
