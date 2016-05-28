@@ -6,6 +6,7 @@ comments: true
 categories:
 - Scala
 - Akka
+- Talk
 ---
 
 Last few months at Bench Accounting I've been working on an eventing system for our microservices stack. We outgrown our legacy system and had new requirements: new messaging app! So it was clear that we need something more flexible, robust and nicer to work with.
