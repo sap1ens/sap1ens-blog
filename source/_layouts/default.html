@@ -2,7 +2,6 @@
 {% include head.html %}
 <body {% if page.body_id %} id="{{ page.body_id }}" {% endif %} {% if page.sidebar == false %} class="no-sidebar" {% endif %} class="collapse-sidebar sidebar-footer" >
   <header role="banner">{% include header.html %}</header>
-  <nav role="navigation">{% include navigation.html %}</nav>
   <div class="social-networks">
     <ul>
       <li><a href="https://github.com/sap1ens" class="symbol" title="githubalt" target="_blank"></a></li>
@@ -12,6 +11,7 @@
       <li><a href="http://stackoverflow.com/users/899937/sap1ens" class="symbol" title="stackoverflow" target="_blank"></a></li>
     </ul>
   </div>
+  <nav role="navigation">{% include navigation.html %}</nav>
   <div id="main">
     <div id="content">
       {{ content | expand_urls: root_url }}

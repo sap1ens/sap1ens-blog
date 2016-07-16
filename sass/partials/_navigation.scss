@@ -36,7 +36,7 @@ body > nav {
     select{ width: 100%; font-size: .8em; border: 1px solid #888;}
   }
   ul { display: none; }
-  @media only screen and (min-width: 550px) {
+  @media only screen and (min-width: 620px) {
     font-size: .9em;
     ul {
       @include horizontal-list(0);
@@ -98,13 +98,13 @@ body > nav {
   }
 }
 .social-networks {
-  padding-top: .4em;
+  padding-bottom: .4em;
   ul {
     list-style: none;
     overflow: hidden;
     margin: 0;
     li {
-      float: left;
+      float: right;
       padding-left: 7px;
       a {
         @include link-colors(lighten($nav-color, 12), lighten($nav-color-hover, 12), $visited: lighten($nav-color, 12));
@@ -138,7 +138,7 @@ body > nav {
 }
 .maskImage {
   body > nav {
-    @media only screen and (min-width: 550px) {
+    @media only screen and (min-width: 620px) {
       ul[data-subscription$=email] + form {
         width: $sidebar-width-medium - $pad-medium*2 - $sidebar-pad-medium - 32px;
       }
