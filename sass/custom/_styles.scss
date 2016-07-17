@@ -6,6 +6,10 @@
 
 html {
 	background: #FFFFFF;
+
+	&.intro {
+		height: 100%;
+	}
 }
 
 
@@ -95,6 +99,31 @@ body {
 				padding-right: 0px;
 			}	
 		}
+	}
+
+
+}
+
+.intro body {
+	@extend .sans;
+	height: 100%;
+	max-width: $max-width * 0.6;
+
+	.social-networks {
+		width: 175px;
+		margin: 0 auto;
+	}
+
+	.me-pic {
+		width: 120px;
+		margin: -40px 0 40px 40px;
+		float: right;
+	}
+
+	#main {
+		top: 50%;
+		position: relative;
+		margin-top: -150px;
 	}
 }
 

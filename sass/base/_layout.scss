@@ -94,6 +94,10 @@ body {
   > div, > article { width: 100%; }
 }
 
+.intro #content {
+  overflow: visible;
+}
+
 aside.sidebar {
   float: none;
   padding: 0 $pad-min 1px;

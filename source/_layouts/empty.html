@@ -1,0 +1,13 @@
+{% capture root_url %}{{ site.root | strip_slash }}{% endcapture %}
+{% capture intro_page %}true{% endcapture %}
+{% include head.html %}
+<body {% if page.body_id %} id="{{ page.body_id }}" {% endif %} class="no-sidebar" >
+  <div id="main">
+    <div id="content">
+      {{ content | expand_urls: root_url }}
+    </div>
+    {% include social_networks.html %}
+  </div>
+  {% include after_footer.html %}
+</body>
+</html>
