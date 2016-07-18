@@ -1,106 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom">
-
-  <title><![CDATA[Category: Ansible | sap1ens blog]]></title>
-  <link href="http://sap1ens.com/blog/categories/ansible/atom.xml" rel="self"/>
-  <link href="http://sap1ens.com/"/>
-  <updated>2016-07-17T19:51:56-07:00</updated>
-  <id>http://sap1ens.com/</id>
-  <author>
-    <name><![CDATA[Yaroslav Tkachenko]]></name>
-    
-  </author>
-  <generator uri="http://octopress.org/">Octopress</generator>
-
-  
-  <entry>
-    <title type="html"><![CDATA[Ansible and resolving hostnames]]></title>
-    <link href="http://sap1ens.com/blog/2015/02/09/ansible-and-resolving-hostnames/"/>
-    <updated>2015-02-09T20:13:50-08:00</updated>
-    <id>http://sap1ens.com/blog/2015/02/09/ansible-and-resolving-hostnames</id>
-    <content type="html"><![CDATA[<p>Recently I’ve worked on a very simple Ansible task. My goal was to start an environment, wait until it becomes available (online) and do some things after. With environment I mean a web service &ndash; imagine any language or framework you want. Let’s say you need to access some specific URL like /api/heartbeat to make sure it’s initialized properly.</p>
-
-<p>Piece of cake, right?</p>
-
-<!-- more -->
-
-
-<h2>Attempt #1</h2>
-
-<p>If you take a look at the list of all Ansible modules <a href="http://docs.ansible.com/list_of_all_modules.html">here</a>, first of all you probably notice <strong>wait_for</strong>. Let’s try to use it:</p>
-
-<p><code>yml
---- 
- - hosts: localhost
-   tasks:
-     - wait_for: host=http://domain.com/api/heartbeat port=80 timeout=5
-</code></p>
-
-<p>(I’m using small timeout here just for demo purposes.)</p>
-
-<p>Result: <em>msg: Timeout when waiting for …</em></p>
-
-<p>So, <strong>wait_for</strong> doesn’t actually work in our case &ndash; it accepts only hostnames without additional path. Ok, skip it.</p>
-
-<p>How about <strong>uri</strong> module? Looks promising:</p>
-
-<p><code>yml
---- 
- - hosts: localhost
-   tasks:
-     - uri: url=http://domain.com/api/heartbeat timeout=5
-</code></p>
-
-<p>It should work, but I have a very specific use case &ndash; every environment I start can also create a new CNAME address. It requires some time to become resolvable. So, unfortunately result is <em>msg: Unable to resolve the host name given.</em></p>
-
-<p>I’ve realized that I couldn’t do it with Ansible tools.</p>
-
-<h2>Attempt #2</h2>
-
-<p>If Ansible is powerless let’s just use old school bash. How about that:</p>
-
-<p><code>yml
---- 
- - hosts: localhost
-   tasks:
-     - shell: curl --silent --show-error --output /dev/null --retry 90 --retry-delay 10 --retry-max-time 900 http://domain.com/api/heartbeat
-</code></p>
-
-<p>Looks like it works! Except it doesn’t :&ndash;/</p>
-
-<p>If you run this playbook you see that it actually waits for the URL to be available. But there is a problem in the interval between environment becoming resolvable and environment returning HTTP reply. Curl fails in that specific moment.</p>
-
-<p>Wget is better in this case, it has <em>retry-connrefused</em> flag that really helps with the issue. Unfortunately it fails with the part of resolving hostname.</p>
-
-<h2>Attempt #3</h2>
-
-<p>I’ve decided to continue with Curl approach, but improve it as much as I can. So, finally:</p>
-
-<p><code>yml
---- 
- - hosts: localhost
-   tasks:
-     - script: scripts/wait_for.sh http://domain.com/api/heartbeat
-</code></p>
-
-<p>where wait_for.sh:</p>
-
-<p>```bash</p>
-
-<h1>!/bin/sh </h1>
-
-<p> until curl &mdash;silent &mdash;output /dev/null $1; do
-   echo Could not fetch, retrying&hellip;
-   sleep 30
- done
-```</p>
-
-<p>Looks really optimistic (and simple!), but you can always cancel it.</p>
-
-<h2>Conclusion</h2>
-
-<p>I really like the Ansible way, because you can always switch to old school bash and implement whatever you want. I’ve almost decided that this task is impossible to do with Ansible but finally did it in a different way. Don’t be afraid and experiment!</p>
-]]></content>
-  </entry>
-  
-</feed>
