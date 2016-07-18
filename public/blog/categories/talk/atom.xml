@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Talk | sap1ens blog]]></title>
+  <link href="http://sap1ens.com/blog/categories/talk/atom.xml" rel="self"/>
+  <link href="http://sap1ens.com/"/>
+  <updated>2016-07-17T19:51:56-07:00</updated>
+  <id>http://sap1ens.com/</id>
+  <author>
+    <name><![CDATA[Yaroslav Tkachenko]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Polyglotconf 2016 Talk]]></title>
+    <link href="http://sap1ens.com/blog/2016/05/28/polyglotconf-2016-talk/"/>
+    <updated>2016-05-28T16:13:33-07:00</updated>
+    <id>http://sap1ens.com/blog/2016/05/28/polyglotconf-2016-talk</id>
+    <content type="html"><![CDATA[<p>Today I participated in <a href="http://www.polyglotconf.com">Polyglotconf</a> 3rd year in a row. This time I was prepared though, I wanted to talk about microservices and different advantages and disadvantages you can have if you use messaging as your main internal communication protocol. Also, it makes perfect sense for me to use Actors to build the actual microservices and I tried to explain why.</p>
+
+<p>It seems like this topic is quite popular nowadays and I got the biggest auditorium as well as dozens and dozens of interested people.</p>
+
+<p><a href="http://www.slideshare.net/sap1ens/why-actorbased-systems-are-the-best-for-microservices">My slides</a>:</p>
+
+<iframe src="http://sap1ens.com//www.slideshare.net/slideshow/embed_code/key/wfNzLXVfyg0aTx" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Vancouver Scala Meetup Talk]]></title>
+    <link href="http://sap1ens.com/blog/2015/11/15/vancouver-scala-meetup-talk/"/>
+    <updated>2015-11-15T09:25:17-08:00</updated>
+    <id>http://sap1ens.com/blog/2015/11/15/vancouver-scala-meetup-talk</id>
+    <content type="html"><![CDATA[<p>Last few months at Bench Accounting I&rsquo;ve been working on an eventing system for our microservices stack. We outgrown our legacy system and had new requirements: new messaging app! So it was clear that we need something more flexible, robust and nicer to work with.</p>
+
+<p>The new eventing system was finished a couple of weeks ago and it has been running in production for a while. This week I gave a talk at <a href="http://www.meetup.com/vancouver-scala/">Vancouver Scala</a> meetup about the high-level overview of the system, implementation details and some challenges we faced.</p>
+
+<p><a href="http://www.slideshare.net/sap1ens/building-eventing-systems-for-microservice-architecture">My slides</a>:</p>
+
+<iframe src="http://sap1ens.com//www.slideshare.net/slideshow/embed_code/key/B9yUit0xSdKl2z" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe>
+
+]]></content>
+  </entry>
+  
+</feed>

@@ -1,0 +1,579 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Scala Slick 3: How To Start, An Opinionated Guide - sap1ens blog</title>
+  <meta name="author" content="Yaroslav Tkachenko">
+
+  
+  <meta name="description" content="Slick is a modern database query and access library for Scala. It allows you to work with stored data almost as if you were using Scala collections &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://sap1ens.com/blog/2015/07/26/scala-slick-3-how-to-start">
+  <link href="/favicon.ico" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="sap1ens blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-21545352-9']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   class="collapse-sidebar sidebar-footer" >
+  <header role="banner">
+</header>
+  <div class="social-networks">
+    <ul>
+      <li><a href="https://github.com/sap1ens" class="symbol" title="githubalt" target="_blank"></a></li>
+      <li><a href="http://ca.linkedin.com/in/sap1ens" class="symbol" title="linkedin" target="_blank"></a></li>
+      <li><a href="https://twitter.com/sap1ens" class="symbol" title="twitter" target="_blank"></a></li>
+      <li><a href="https://www.facebook.com/yaroslav.tkachenko" class="symbol" title="facebook" target="_blank"></a></li>
+      <li><a href="http://stackoverflow.com/users/899937/sap1ens" class="symbol" title="stackoverflow" target="_blank"></a></li>
+    </ul>
+  </div>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="sap1ens.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/talks">Talks</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+  
+    
+      <h1 class="entry-title">Scala Slick 3: How to Start, an Opinionated Guide</h1>
+    
+  
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-07-26T16:42:30-07:00" pubdate data-updated="true">Jul 26<span>th</span>, 2015</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><blockquote><p>Slick is a modern database query and access library for Scala. It allows you to work with stored data almost as if you were using Scala collections while at the same time giving you full control over when a database access happens and which data is transferred.</p></blockquote>
+
+<p><a href="http://slick.typesafe.com">Slick</a> 3.0.0 became available a few months ago, but I’ve started a project earlier using 3.0.0-RC1. Now the project is released in production and everything seems to be working really well. In this post I want to introduce you to some of the Slick concepts and describe some gotchas and best practices that I have discovered.</p>
+
+<!-- more -->
+
+
+<h2>Intro</h2>
+
+<p>If you haven’t seen Slick 3 in action a little example from docs for you:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">val</span> <span class="n">q3</span> <span class="k">=</span> <span class="k">for</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">c</span> <span class="k">&lt;-</span> <span class="n">coffees</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">price</span> <span class="o">&lt;</span> <span class="mf">9.0</span>
+</span><span class='line'>  <span class="n">s</span> <span class="k">&lt;-</span> <span class="n">c</span><span class="o">.</span><span class="n">supplier</span>
+</span><span class='line'><span class="o">}</span> <span class="k">yield</span> <span class="o">(</span><span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="o">,</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="o">)</span>
+</span><span class='line'><span class="c1">// Equivalent SQL code:</span>
+</span><span class='line'><span class="c1">// select c.COF_NAME, s.SUP_NAME from COFFEES c, SUPPLIERS s where c.PRICE &lt; 9.0 and s.SUP_ID = c.SUP_ID</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Slick uses Functional Relational Mapping (FRM) which is obviously more suitable for functional programming than Object-relational mapping (ORM). So you have an impression that you work with Scala collections, but really code is translated to SQL. <a href="http://slick.typesafe.com/doc/3.0.0/introduction.html">More about that</a> if you’re interested.</p>
+
+<h2>Reactive streams, Futures, non-blocking calls and making sense of it all</h2>
+
+<p>About an year ago we were walking with <a href="https://twitter.com/agonigberg">Arthur Gonigberg</a> after a Scala meetup and discussing HTTP Scala frameworks. I’m a big fan of Spray and Arthur worked with Scalatra a lot. When I said that Spray is an asynchronous and non-blocking library, he asked about the database driver we use. It’s a really good question, because to be honest, an year ago I didn’t know any non-blocking database driver for Scala, except may be Reactive Mongo. But we didn’t use it.</p>
+
+<p>Arthur’s point was: why do you care about non-blocking behaviour in your HTTP/API level if your database still blocks? And that’s true… at least partially. You still can do tricks with Futures and <code>blocking {}</code> stuff, but it’s a bit different.</p>
+
+<p>Finally, our dreams may come true. Slick 3 was built on <a href="http://www.reactive-streams.org">Reactive Streams</a> implemented in Akka &ndash; tool that can provide asynchronous  and non-blocking streaming. But it’s important to know that you still use normal blocking database drivers, so the whole <em>asynchronicity</em> happens on the level higher. I’m not sure how I feel about that, but practically I don’t see any difference. I believe that the end goal for Slick is to use / implement non-blocking drivers though.</p>
+
+<p>People often ask how to work with different queries in Slick 3 and what error handling mechanism they should use. Answer is simple, since Slick is an asynchronous library &ndash; use Futures. In my opinion, if you have a model type M, you can only have 3 result types: Future[M], Future[Option[M]] and Future[Seq[M]] (and Future[Unit], of course). If you need to have something different from Future &ndash; it’s probably worth to take a look at Slick 2.x again.</p>
+
+<p>Also, Future makes perfect sense for error handling. It’s a monad, so you can use default Scala tools for working with monads as well as callbacks.</p>
+
+<h2>Setup</h2>
+
+<p>Setup a project with required dependencies and configuration is a non-trivial step already. <a href="http://slick.typesafe.com/doc/3.0.0/gettingstarted.html#quick-introduction">Documentation</a> mostly uses H2 Database in examples, but real setup for MySQL or Postgres is a bit different.</p>
+
+<p>So, my example for Postgres 9.4.</p>
+
+<p>application.conf:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="n">database</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">dataSourceClass</span> <span class="k">=</span> <span class="n">org</span><span class="o">.</span><span class="n">postgresql</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="nc">PGSimpleDataSource</span>
+</span><span class='line'>  <span class="n">properties</span> <span class="k">=</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">databaseName</span> <span class="k">=</span> <span class="err">“</span><span class="n">some_db</span><span class="err">”</span>
+</span><span class='line'>    <span class="n">user</span> <span class="k">=</span> <span class="err">“</span><span class="n">local</span><span class="err">”</span>
+</span><span class='line'>    <span class="n">password</span> <span class="k">=</span> <span class="err">“</span><span class="n">local</span><span class="err">”</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  <span class="n">numThreads</span> <span class="k">=</span> <span class="mi">10</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>or using JDBC url</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="n">database</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">dataSourceClass</span> <span class="k">=</span> <span class="n">org</span><span class="o">.</span><span class="n">postgresql</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="nc">PGSimpleDataSource</span>
+</span><span class='line'>  <span class="n">properties</span> <span class="k">=</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">url</span> <span class="k">=</span> <span class="err">“</span><span class="n">jdbc</span><span class="k">:</span><span class="kt">postgresql://some_url/some_db</span><span class="err">”</span>
+</span><span class='line'>    <span class="kt">user</span> <span class="o">=</span> <span class="err">“</span><span class="n">local</span><span class="err">”</span>
+</span><span class='line'>    <span class="n">password</span> <span class="k">=</span> <span class="err">“</span><span class="n">local</span><span class="err">”</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  <span class="n">numThreads</span> <span class="k">=</span> <span class="mi">10</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>build.sbt:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="n">libraryDependencies</span> <span class="o">++=</span> <span class="nc">Seq</span><span class="o">(</span>
+</span><span class='line'>  <span class="err">“</span><span class="n">com</span><span class="o">.</span><span class="n">typesafe</span><span class="o">.</span><span class="n">slick</span><span class="err">”</span> <span class="o">%%</span> <span class="err">“</span><span class="n">slick</span><span class="err">”</span> <span class="o">%</span> <span class="err">“</span><span class="mf">3.0</span><span class="o">.</span><span class="mi">0</span><span class="err">”</span><span class="o">,</span>
+</span><span class='line'>  <span class="err">“</span><span class="n">com</span><span class="o">.</span><span class="n">zaxxer</span><span class="err">”</span> <span class="o">%</span> <span class="err">“</span><span class="nc">HikariCP</span><span class="o">-</span><span class="n">java6</span><span class="err">”</span> <span class="o">%</span> <span class="err">“</span><span class="mf">2.3</span><span class="o">.</span><span class="mi">2</span><span class="err">”</span><span class="o">,</span>
+</span><span class='line'>  <span class="err">“</span><span class="n">org</span><span class="o">.</span><span class="n">postgresql</span><span class="err">”</span> <span class="o">%</span> <span class="err">“</span><span class="n">postgresql</span><span class="err">”</span> <span class="o">%</span> <span class="err">“</span><span class="mf">9.4</span><span class="o">-</span><span class="mi">1201</span><span class="o">-</span><span class="n">jdbc41</span><span class="err">”</span><span class="o">,</span>
+</span><span class='line'>  <span class="c1">// …</span>
+</span><span class='line'><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Model</h2>
+
+<p>First of all, we need to create a Database object to run our queries and generate schema. It’s very simple to do:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">val</span> <span class="n">db</span> <span class="k">=</span> <span class="nc">Database</span><span class="o">.</span><span class="n">forConfig</span><span class="o">(</span><span class="err">“</span><span class="n">database</span><span class="err">”</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Where “database” refers to the config block from our application.conf file.</p>
+
+<p>Now let’s create a model representing some Account and containing two fields &ndash; id and name.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">import</span> <span class="nn">slick.driver.PostgresDriver.api._</span>
+</span><span class='line'><span class="k">import</span> <span class="nn">scala.concurrent.Future</span>
+</span><span class='line'><span class="k">import</span> <span class="nn">scala.concurrent.ExecutionContext.Implicits.global</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">case</span> <span class="k">class</span> <span class="nc">Account</span><span class="o">(</span><span class="n">id</span><span class="k">:</span> <span class="kt">Long</span><span class="o">,</span> <span class="n">name</span><span class="k">:</span> <span class="kt">Long</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">Accounts</span><span class="o">(</span><span class="n">tag</span><span class="k">:</span> <span class="kt">Tag</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">Table</span><span class="o">[</span><span class="kt">Account</span><span class="o">](</span><span class="n">tag</span><span class="o">,</span> <span class="err">“</span><span class="nc">ACCOUNTS</span><span class="err">”</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">id</span> <span class="k">=</span> <span class="n">column</span><span class="o">[</span><span class="kt">Long</span><span class="o">](</span><span class="err">“</span><span class="nc">ID</span><span class="err">”</span><span class="o">,</span> <span class="n">O</span><span class="o">.</span><span class="nc">PrimaryKey</span><span class="o">,</span> <span class="n">O</span><span class="o">.</span><span class="nc">AutoInc</span><span class="o">)</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">name</span> <span class="k">=</span> <span class="n">column</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="err">“</span><span class="nc">NAME</span><span class="err">”</span><span class="o">)</span>
+</span><span class='line'>  <span class="k">def</span> <span class="o">*</span> <span class="k">=</span> <span class="o">(</span><span class="n">id</span><span class="o">,</span> <span class="n">name</span><span class="o">)</span> <span class="o">&lt;&gt;</span> <span class="o">(</span><span class="nc">Account</span><span class="o">.</span><span class="n">tupled</span><span class="o">,</span> <span class="nc">Account</span><span class="o">.</span><span class="n">unapply</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">object</span> <span class="nc">AccountsDAO</span> <span class="k">extends</span> <span class="nc">TableQuery</span><span class="o">(</span><span class="k">new</span> <span class="nc">Accounts</span><span class="o">(</span><span class="k">_</span><span class="o">))</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">findById</span><span class="o">(</span><span class="n">id</span><span class="k">:</span> <span class="kt">Long</span><span class="o">)</span><span class="k">:</span> <span class="kt">Future</span><span class="o">[</span><span class="kt">Option</span><span class="o">[</span><span class="kt">Account</span><span class="o">]]</span> <span class="k">=</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">db</span><span class="o">.</span><span class="n">run</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="k">_</span><span class="o">.</span><span class="n">id</span> <span class="o">===</span> <span class="n">id</span><span class="o">).</span><span class="n">result</span><span class="o">).</span><span class="n">map</span><span class="o">(</span><span class="k">_</span><span class="o">.</span><span class="n">headOption</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="n">create</span><span class="o">(</span><span class="n">account</span><span class="k">:</span> <span class="kt">Account</span><span class="o">)</span><span class="k">:</span> <span class="kt">Future</span><span class="o">[</span><span class="kt">Account</span><span class="o">]</span> <span class="k">=</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">db</span><span class="o">.</span><span class="n">run</span><span class="o">(</span><span class="k">this</span> <span class="n">returning</span> <span class="k">this</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="k">_</span><span class="o">.</span><span class="n">id</span><span class="o">)</span> <span class="n">into</span> <span class="o">((</span><span class="n">acc</span><span class="o">,</span> <span class="n">id</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">acc</span><span class="o">.</span><span class="n">copy</span><span class="o">(</span><span class="n">id</span> <span class="k">=</span> <span class="n">id</span><span class="o">))</span> <span class="o">+=</span> <span class="n">account</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="n">deleteById</span><span class="o">(</span><span class="n">id</span><span class="k">:</span> <span class="kt">Long</span><span class="o">)</span><span class="k">:</span> <span class="kt">Future</span><span class="o">[</span><span class="kt">Int</span><span class="o">]</span> <span class="k">=</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">db</span><span class="o">.</span><span class="n">run</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="k">_</span><span class="o">.</span><span class="n">id</span> <span class="o">===</span> <span class="n">id</span><span class="o">).</span><span class="n">delete</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>A few things you might notice:</p>
+
+<p>We use <em>Account</em> case class to represent a model. It is possible to use regular Scala class, but case classes have too many benefits to avoid them.</p>
+
+<p> <em>AccountsDAO</em> can be initialized differently, as a variable:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">val</span> <span class="nc">AccountsDAO</span> <span class="k">=</span> <span class="nc">TableQuery</span><span class="o">[</span><span class="kt">Accounts</span><span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>But I think an object is more useful. For example, you can add your custom methods to a DAO and there will be no difference between YourDAO.SlickCall and YourDAO.CustomCall. And in case of a variable you need to create your methods somewhere else.</p>
+
+<p>Queries in Slick are lazy. It means that they are not executed unless we explicitly tell database to do so. For example:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="nc">AccountsDAO</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="k">_</span><span class="o">.</span><span class="n">id</span> <span class="o">===</span> <span class="n">id</span><span class="o">)</span> <span class="c1">// 1</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>doesn’t return any results, but some sort of a pointer to a query, so you can easily combine it with different methods.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="nc">AccountsDAO</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="k">_</span><span class="o">.</span><span class="n">id</span> <span class="o">===</span> <span class="n">id</span><span class="o">).</span><span class="n">result</span> <span class="c1">// 2</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>doesn’t return any results, despite of its name.  But it returns a representation of a query. In this case we can execute this single query later or collect a sequence of queries and execute them all at once. Finally:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="n">db</span><span class="o">.</span><span class="n">run</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="k">_</span><span class="o">.</span><span class="n">id</span> <span class="o">===</span> <span class="n">id</span><span class="o">).</span><span class="n">result</span><span class="o">).</span><span class="n">map</span><span class="o">(</span><span class="k">_</span><span class="o">.</span><span class="n">headOption</span><span class="o">)</span> <span class="c1">// 3</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>returns Future[Option[Account]] (map is just a way to convert a list to an item, since we know that id is unique).</p>
+
+<p>My rule of thumb is to use #1 and sometimes #2 queries for private methods you can combine together and #3 for a public interface.</p>
+
+<p><em>create</em> method looks complicated. Why is that? We have a simple case class as a model object, so we need to specify all the fields. From the other side, <em>ID</em> is a field with auto-increment, so we can’t know the value of the <em>ID</em> field before we save the object. Solution is a bit tricky &ndash; you can specify any <em>ID</em> you want (I usually go with <em>0</em>) and then use method <em>returning</em> to get an auto-generated ID back. But because case classes are immutable, we have to copy our class. Oh, please show me the better solution :)</p>
+
+<p>One of our imports (slick.driver.PostgresDriver.api._) contains all necessary operators and methods. It seems to me, that the interfaces of all slick.driver.*.api._ methods are similar and you can replace Postgres driver with MySQL driver without changing your database schema or queries. But to be honest I haven’t tried that :&ndash;/</p>
+
+<h2>Tests</h2>
+
+<p>There is nothing special about testing Slick queries, but I want to mention something useful for tests &ndash; database schema generation.
+Imagine you have your SomeDAO1 and SomeDAO2. Every time you run a test you want to have a clean state in your database and recreate all tables. Slick allows you to do that. Every DAO has a method called <em>schema</em> and you can combine multiple DAOs to get a schema that contains all the tables you need. Syntax is simple:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">def</span> <span class="n">schema</span> <span class="k">=</span> <span class="nc">SomeDAO1</span><span class="o">.</span><span class="n">schema</span> <span class="o">++</span> <span class="nc">SomeDAO2</span><span class="o">.</span><span class="n">schema</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now you have access to <em>create</em> and <em>drop</em> statements:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="n">schema</span><span class="o">.</span><span class="n">drop</span><span class="o">.</span><span class="n">statements</span>
+</span><span class='line'><span class="n">schema</span><span class="o">.</span><span class="n">create</span><span class="o">.</span><span class="n">statements</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>But there is a little issue with that. If any of your statement fails the whole schema generation process fails too, <strong>silently</strong> (<a href="https://github.com/slick/slick/issues/93">https://github.com/slick/slick/issues/93</a>). Solution that I use:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">def</span> <span class="n">recreateSchema</span><span class="o">(</span><span class="n">database</span><span class="k">:</span> <span class="kt">Database</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">database</span><span class="o">.</span><span class="n">withSession</span> <span class="o">{</span> <span class="n">session</span> <span class="k">=&gt;</span>
+</span><span class='line'>    <span class="k">for</span><span class="o">(</span><span class="n">s</span> <span class="k">&lt;-</span> <span class="n">schema</span><span class="o">.</span><span class="n">drop</span><span class="o">.</span><span class="n">statements</span> <span class="o">++</span> <span class="n">schema</span><span class="o">.</span><span class="n">create</span><span class="o">.</span><span class="n">statements</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">session</span><span class="o">.</span><span class="n">withPreparedStatement</span><span class="o">(</span><span class="n">s</span><span class="o">)(</span><span class="k">_</span><span class="o">.</span><span class="n">execute</span><span class="o">)</span>
+</span><span class='line'>      <span class="o">}</span> <span class="k">catch</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">case</span> <span class="n">e</span><span class="k">:</span> <span class="kt">Throwable</span> <span class="o">=&gt;</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So, if some table doesn’t exist when you call <em>drop</em>, Slick won’t stop the schema regeneration.</p>
+
+<h2>Summary</h2>
+
+<p>I hope this little guide will help you to start with Slick 3, really great Scala library to work with almost every relational database. I&rsquo;ve tried to make it really concise and highlight the most unclear parts. Happy coding!</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Yaroslav Tkachenko</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-07-26T16:42:30-07:00" pubdate data-updated="true">Jul 26<span>th</span>, 2015</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/scala/'>Scala</a>, <a class='category' href='/blog/categories/slick/'>Slick</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://sap1ens.com/blog/2015/07/26/scala-slick-3-how-to-start/" data-via="sap1ens" data-counturl="http://sap1ens.com/blog/2015/07/26/scala-slick-3-how-to-start/" >Tweet</a>
+  
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/07/04/simple-checklist-before-starting-to-implement-microservices/" title="Previous Post: Simple checklist before starting to implement microservices">&laquo; Simple checklist before starting to implement microservices</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2015/10/25/actors-streams-and-futures-in-akka/" title="Next Post: Actors, Streams and Futures in Akka: what to use?">Actors, Streams and Futures in Akka: what to use? &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/07/10/syrup-scrum-cli-tool/">Syrup - Scrum CLI tool</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/06/19/postgres-jsonb-indexing-is-tricky/">Postgres JSONB indexing is tricky</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/28/polyglotconf-2016-talk/">Polyglotconf 2016 Talk</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/22/static-typing-and-refactoring/">Static typing and refactoring</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/25/about-technical-leadership/">About technical leadership</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/sap1ens">@sap1ens</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'sap1ens',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+<section class="googleplus googleplus-hidden">
+  <h1>
+    <a href="https://plus.google.com/YaroslavTkachenko?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - 2016 | Yaroslav Tkachenko <br/>
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a>, customized with <a href="https://github.com/mjhea0/whiterspace">whiterspace</a>.</span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'sap1ens';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://sap1ens.com/blog/2015/07/26/scala-slick-3-how-to-start/';
+        var disqus_url = 'http://sap1ens.com/blog/2015/07/26/scala-slick-3-how-to-start/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

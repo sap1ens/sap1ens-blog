@@ -1,0 +1,438 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Scala | sap1ens blog]]></title>
+  <link href="http://sap1ens.com/blog/categories/scala/atom.xml" rel="self"/>
+  <link href="http://sap1ens.com/"/>
+  <updated>2016-07-17T19:51:56-07:00</updated>
+  <id>http://sap1ens.com/</id>
+  <author>
+    <name><![CDATA[Yaroslav Tkachenko]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Vancouver Scala Meetup Talk]]></title>
+    <link href="http://sap1ens.com/blog/2015/11/15/vancouver-scala-meetup-talk/"/>
+    <updated>2015-11-15T09:25:17-08:00</updated>
+    <id>http://sap1ens.com/blog/2015/11/15/vancouver-scala-meetup-talk</id>
+    <content type="html"><![CDATA[<p>Last few months at Bench Accounting I&rsquo;ve been working on an eventing system for our microservices stack. We outgrown our legacy system and had new requirements: new messaging app! So it was clear that we need something more flexible, robust and nicer to work with.</p>
+
+<p>The new eventing system was finished a couple of weeks ago and it has been running in production for a while. This week I gave a talk at <a href="http://www.meetup.com/vancouver-scala/">Vancouver Scala</a> meetup about the high-level overview of the system, implementation details and some challenges we faced.</p>
+
+<p><a href="http://www.slideshare.net/sap1ens/building-eventing-systems-for-microservice-architecture">My slides</a>:</p>
+
+<iframe src="http://sap1ens.com//www.slideshare.net/slideshow/embed_code/key/B9yUit0xSdKl2z" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Actors, Streams and Futures in Akka: what to use?]]></title>
+    <link href="http://sap1ens.com/blog/2015/10/25/actors-streams-and-futures-in-akka/"/>
+    <updated>2015-10-25T16:40:54-07:00</updated>
+    <id>http://sap1ens.com/blog/2015/10/25/actors-streams-and-futures-in-akka</id>
+    <content type="html"><![CDATA[<p>Akka ecosystem provides a rich set of tools nowadays: you can use classic Akka Actors, well-known Scala Futures or relatively new Akka Streams. Because all these tools can help you to build concurrent applications you might start comparing them. Or even <a href="http://eng.localytics.com/akka-streams-akka-without-the-actors/">say that Actors are bad and Streams are much better</a>.</p>
+
+<p>I think that every approach has its own use cases, as well as pros and cons.</p>
+
+<!-- more -->
+
+
+<p><strong>Actors model</strong> has two major advantages: control flow and state.</p>
+
+<p>Control flow is very natural to Actor models, you can express quite complicated algorithms with relatively simple Actor structures. Supervision hierarchy helps to make this structure resilient. Also, Actor can be a structural unit that maps nicely to a Service from DDD.</p>
+
+<p>So, it’s possible to design the whole application using Actors. Streams and Futures usually handle only parts of the application business logic.</p>
+
+<p>Stateful actors is a powerful concept. Akka Clustering, Persistence and Distributed Data intend to use internal Actor state, coordinated or replicated in different forms. Streams and Futures also have state, but short-lived, usually.</p>
+
+<p><strong>Streams</strong> were created to handle asynchronous data pipelines with non-blocking back pressure. So it’s the best tool to use for any kind of data processing, file transformations, ETL pipelines, messaging and eventing solutions.</p>
+
+<p>It looks like an overkill to use Streams for simple asynchronous tasks, Futures seem to be a better option.</p>
+
+<p><strong>Future</strong> is the simplest concurrency mechanism in the Akka world. It’s just an asynchronous task with a timeout. It can be used to run a processes in background or to be a connection between other tools. For example, Actors can use “ask” pattern to return a Future as a result of a communication between them. It’s also possible to “pipe” results of a Future back to an Actor. And Streams can return Futures as a result of materialization.</p>
+
+<p>Instead of a conclusion: JVM and Akka ecosystems have very rich concurrency tools and it’s important to realize advantages, disadvantages and ways to combine them with each other.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Scala Slick 3: How To Start, An Opinionated Guide]]></title>
+    <link href="http://sap1ens.com/blog/2015/07/26/scala-slick-3-how-to-start/"/>
+    <updated>2015-07-26T16:42:30-07:00</updated>
+    <id>http://sap1ens.com/blog/2015/07/26/scala-slick-3-how-to-start</id>
+    <content type="html"><![CDATA[<blockquote><p>Slick is a modern database query and access library for Scala. It allows you to work with stored data almost as if you were using Scala collections while at the same time giving you full control over when a database access happens and which data is transferred.</p></blockquote>
+
+<p><a href="http://slick.typesafe.com">Slick</a> 3.0.0 became available a few months ago, but I’ve started a project earlier using 3.0.0-RC1. Now the project is released in production and everything seems to be working really well. In this post I want to introduce you to some of the Slick concepts and describe some gotchas and best practices that I have discovered.</p>
+
+<!-- more -->
+
+
+<h2>Intro</h2>
+
+<p>If you haven’t seen Slick 3 in action a little example from docs for you:</p>
+
+<p><code>scala
+val q3 = for {
+  c &lt;- coffees if c.price &lt; 9.0
+  s &lt;- c.supplier
+} yield (c.name, s.name)
+// Equivalent SQL code:
+// select c.COF_NAME, s.SUP_NAME from COFFEES c, SUPPLIERS s where c.PRICE &lt; 9.0 and s.SUP_ID = c.SUP_ID
+</code></p>
+
+<p>Slick uses Functional Relational Mapping (FRM) which is obviously more suitable for functional programming than Object-relational mapping (ORM). So you have an impression that you work with Scala collections, but really code is translated to SQL. <a href="http://slick.typesafe.com/doc/3.0.0/introduction.html">More about that</a> if you’re interested.</p>
+
+<h2>Reactive streams, Futures, non-blocking calls and making sense of it all</h2>
+
+<p>About an year ago we were walking with <a href="https://twitter.com/agonigberg">Arthur Gonigberg</a> after a Scala meetup and discussing HTTP Scala frameworks. I’m a big fan of Spray and Arthur worked with Scalatra a lot. When I said that Spray is an asynchronous and non-blocking library, he asked about the database driver we use. It’s a really good question, because to be honest, an year ago I didn’t know any non-blocking database driver for Scala, except may be Reactive Mongo. But we didn’t use it.</p>
+
+<p>Arthur’s point was: why do you care about non-blocking behaviour in your HTTP/API level if your database still blocks? And that’s true… at least partially. You still can do tricks with Futures and <code>blocking {}</code> stuff, but it’s a bit different.</p>
+
+<p>Finally, our dreams may come true. Slick 3 was built on <a href="http://www.reactive-streams.org">Reactive Streams</a> implemented in Akka &ndash; tool that can provide asynchronous  and non-blocking streaming. But it’s important to know that you still use normal blocking database drivers, so the whole <em>asynchronicity</em> happens on the level higher. I’m not sure how I feel about that, but practically I don’t see any difference. I believe that the end goal for Slick is to use / implement non-blocking drivers though.</p>
+
+<p>People often ask how to work with different queries in Slick 3 and what error handling mechanism they should use. Answer is simple, since Slick is an asynchronous library &ndash; use Futures. In my opinion, if you have a model type M, you can only have 3 result types: Future[M], Future[Option[M]] and Future[Seq[M]] (and Future[Unit], of course). If you need to have something different from Future &ndash; it’s probably worth to take a look at Slick 2.x again.</p>
+
+<p>Also, Future makes perfect sense for error handling. It’s a monad, so you can use default Scala tools for working with monads as well as callbacks.</p>
+
+<h2>Setup</h2>
+
+<p>Setup a project with required dependencies and configuration is a non-trivial step already. <a href="http://slick.typesafe.com/doc/3.0.0/gettingstarted.html#quick-introduction">Documentation</a> mostly uses H2 Database in examples, but real setup for MySQL or Postgres is a bit different.</p>
+
+<p>So, my example for Postgres 9.4.</p>
+
+<p>application.conf:</p>
+
+<p>```
+database {
+  dataSourceClass = org.postgresql.ds.PGSimpleDataSource
+  properties = {</p>
+
+<pre><code>databaseName = “some_db”
+user = “local”
+password = “local”
+</code></pre>
+
+<p>  }
+  numThreads = 10
+}
+```</p>
+
+<p>or using JDBC url</p>
+
+<p>```
+database {
+  dataSourceClass = org.postgresql.ds.PGSimpleDataSource
+  properties = {</p>
+
+<pre><code>url = “jdbc:postgresql://some_url/some_db”
+user = “local”
+password = “local”
+</code></pre>
+
+<p>  }
+  numThreads = 10
+}
+```</p>
+
+<p>build.sbt:</p>
+
+<p><code>scala
+libraryDependencies ++= Seq(
+  “com.typesafe.slick” %% “slick” % “3.0.0”,
+  “com.zaxxer” % “HikariCP-java6” % “2.3.2”,
+  “org.postgresql” % “postgresql” % “9.4-1201-jdbc41”,
+  // …
+)
+</code></p>
+
+<h2>Model</h2>
+
+<p>First of all, we need to create a Database object to run our queries and generate schema. It’s very simple to do:</p>
+
+<p><code>scala
+val db = Database.forConfig(“database”)
+</code></p>
+
+<p>Where “database” refers to the config block from our application.conf file.</p>
+
+<p>Now let’s create a model representing some Account and containing two fields &ndash; id and name.</p>
+
+<p>``` scala
+import slick.driver.PostgresDriver.api._
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global</p>
+
+<p>case class Account(id: Long, name: Long)</p>
+
+<p>class Accounts(tag: Tag) extends Table<a href="tag,%20%E2%80%9CACCOUNTS%E2%80%9D">Account</a> {
+  def id = column<a href="%E2%80%9CID%E2%80%9D,%20O.PrimaryKey,%20O.AutoInc">Long</a>
+  def name = column<a href="%E2%80%9CNAME%E2%80%9D">String</a>
+  def * = (id, name) &lt;> (Account.tupled, Account.unapply)
+}</p>
+
+<p>object AccountsDAO extends TableQuery(new Accounts(_)) {
+  def findById(id: Long): Future[Option[Account]] = {</p>
+
+<pre><code>db.run(this.filter(_.id === id).result).map(_.headOption)
+</code></pre>
+
+<p>  }</p>
+
+<p>  def create(account: Account): Future[Account] = {</p>
+
+<pre><code>db.run(this returning this.map(_.id) into ((acc, id) =&gt; acc.copy(id = id)) += account)
+</code></pre>
+
+<p>  }</p>
+
+<p>  def deleteById(id: Long): Future[Int] = {</p>
+
+<pre><code>db.run(this.filter(_.id === id).delete)
+</code></pre>
+
+<p>  }
+}
+```</p>
+
+<p>A few things you might notice:</p>
+
+<p>We use <em>Account</em> case class to represent a model. It is possible to use regular Scala class, but case classes have too many benefits to avoid them.</p>
+
+<p> <em>AccountsDAO</em> can be initialized differently, as a variable:
+<code>
+val AccountsDAO = TableQuery[Accounts]
+</code>
+But I think an object is more useful. For example, you can add your custom methods to a DAO and there will be no difference between YourDAO.SlickCall and YourDAO.CustomCall. And in case of a variable you need to create your methods somewhere else.</p>
+
+<p>Queries in Slick are lazy. It means that they are not executed unless we explicitly tell database to do so. For example:</p>
+
+<p><code>scala
+AccountsDAO.filter(_.id === id) // 1
+</code></p>
+
+<p>doesn’t return any results, but some sort of a pointer to a query, so you can easily combine it with different methods.</p>
+
+<p><code>scala
+AccountsDAO.filter(_.id === id).result // 2
+</code></p>
+
+<p>doesn’t return any results, despite of its name.  But it returns a representation of a query. In this case we can execute this single query later or collect a sequence of queries and execute them all at once. Finally:</p>
+
+<p><code>scala
+db.run(this.filter(_.id === id).result).map(_.headOption) // 3
+</code>
+returns Future[Option[Account]] (map is just a way to convert a list to an item, since we know that id is unique).</p>
+
+<p>My rule of thumb is to use #1 and sometimes #2 queries for private methods you can combine together and #3 for a public interface.</p>
+
+<p><em>create</em> method looks complicated. Why is that? We have a simple case class as a model object, so we need to specify all the fields. From the other side, <em>ID</em> is a field with auto-increment, so we can’t know the value of the <em>ID</em> field before we save the object. Solution is a bit tricky &ndash; you can specify any <em>ID</em> you want (I usually go with <em>0</em>) and then use method <em>returning</em> to get an auto-generated ID back. But because case classes are immutable, we have to copy our class. Oh, please show me the better solution :)</p>
+
+<p>One of our imports (slick.driver.PostgresDriver.api._) contains all necessary operators and methods. It seems to me, that the interfaces of all slick.driver.*.api._ methods are similar and you can replace Postgres driver with MySQL driver without changing your database schema or queries. But to be honest I haven’t tried that :&ndash;/</p>
+
+<h2>Tests</h2>
+
+<p>There is nothing special about testing Slick queries, but I want to mention something useful for tests &ndash; database schema generation.
+Imagine you have your SomeDAO1 and SomeDAO2. Every time you run a test you want to have a clean state in your database and recreate all tables. Slick allows you to do that. Every DAO has a method called <em>schema</em> and you can combine multiple DAOs to get a schema that contains all the tables you need. Syntax is simple:</p>
+
+<p><code>scala
+def schema = SomeDAO1.schema ++ SomeDAO2.schema
+</code></p>
+
+<p>Now you have access to <em>create</em> and <em>drop</em> statements:</p>
+
+<p><code>scala
+schema.drop.statements
+schema.create.statements
+</code></p>
+
+<p>But there is a little issue with that. If any of your statement fails the whole schema generation process fails too, <strong>silently</strong> (<a href="https://github.com/slick/slick/issues/93">https://github.com/slick/slick/issues/93</a>). Solution that I use:</p>
+
+<p>``` scala
+def recreateSchema(database: Database) {
+  database.withSession { session =></p>
+
+<pre><code>for(s &lt;- schema.drop.statements ++ schema.create.statements) {
+  try {
+    session.withPreparedStatement(s)(_.execute)
+  } catch {
+    case e: Throwable =&gt;
+  }
+}
+</code></pre>
+
+<p>  }
+}
+```</p>
+
+<p>So, if some table doesn’t exist when you call <em>drop</em>, Slick won’t stop the schema regeneration.</p>
+
+<h2>Summary</h2>
+
+<p>I hope this little guide will help you to start with Slick 3, really great Scala library to work with almost every relational database. I&rsquo;ve tried to make it really concise and highlight the most unclear parts. Happy coding!</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Microservice with Akka, Spray and Camel]]></title>
+    <link href="http://sap1ens.com/blog/2014/07/13/microservice-with-akka-spray-and-camel/"/>
+    <updated>2014-07-13T15:44:37-07:00</updated>
+    <id>http://sap1ens.com/blog/2014/07/13/microservice-with-akka-spray-and-camel</id>
+    <content type="html"><![CDATA[<p><a href="http://wayfinder.co/pathways/53536427f7040a11002ae407/a-field-guide-to-microservices-april-2014-edition">Microservices architecture</a> is a popular trend right now. I don&rsquo;t want to repeat anything about microservices in general, but instead I want to introduce an example project of a microservice based on Akka, Spray and Camel.</p>
+
+<p><strong><a href="https://github.com/sap1ens/akka-microservice">akka-microservice</a></strong> is based on one of the Typesafe Activator templates, but it&rsquo;s very (really) simple and very easy to learn &ndash; just go and checkout the codebase. It doesn&rsquo;t contain any front-end parts, just pure Scala.</p>
+
+<p>Application has a lot of handy stuff:</p>
+
+<ul>
+<li>Easy to test Akka system with a sample actor</li>
+<li>Spray-based RESTful API with full <a href="http://en.wikipedia.org/wiki/Cross-origin_resource_sharing">CORS</a> support</li>
+<li>Actor and API sample tests</li>
+<li>Camel/ActiveMQ extension for a handy integration with Akka system</li>
+<li>Typesafe config with different profiles for production and testing environments</li>
+<li>Logback-SLF4J logging</li>
+<li>Sbt assembly plugin for JAR-file creation with custom merge strategy</li>
+</ul>
+
+
+<p>So it&rsquo;s focused more on production usage, you can just take the project, rename a few files &amp; packages and it&rsquo;s ready to be deployed! Just write your actors and routes. Happy hAkking! :)</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Selenium Webdriver as a deadly weapon]]></title>
+    <link href="http://sap1ens.com/blog/2014/05/27/selenium-webdriver-as-a-deadly-weapon/"/>
+    <updated>2014-05-27T21:19:20-07:00</updated>
+    <id>http://sap1ens.com/blog/2014/05/27/selenium-webdriver-as-a-deadly-weapon</id>
+    <content type="html"><![CDATA[<h2>Weapon</h2>
+
+<p>During my career I see the battle between website/web app owners and bots/scrapers/crawlers writers. I thought this battle can&rsquo;t be won. But about 6 months ago I joined it and I think now I have [almost] deadly weapon.</p>
+
+<p><a href="http://docs.seleniumhq.org/projects/webdriver/">Selenium Webdriver</a> is my choice.</p>
+
+<!-- more -->
+
+
+<p>Probably, you heard or used it before. It&rsquo;s the most popular tool for the functional tests (also known as end-to-end tests), and projects like <a href="https://saucelabs.com">saucelabs.com</a> can make these tests very easy to implement and run.</p>
+
+<p>But Selenium Webdriver is not only a testing tool &ndash; it&rsquo;s browser automation tool. Modern implementation with Google Chrome (actually Chromium) driver is very powerful &ndash; it communicates with Google Chrome via special protocol which is a native thing for this browser. You have access to everything &ndash; JavaScript, DOM, even secure cookies! That&rsquo;s why it&rsquo;s almost impossible to detect scraper written with Selenium Webdriver and Google Chrome &ndash; you just tell browser what to do and it works like there is a real person who is sitting in front of the browser and clicking buttons.</p>
+
+<h2>Preparations for the battle</h2>
+
+<h3>Xvfb</h3>
+
+<p>So, you wrote a sequence of steps for scraping some website. Awesome! But what step should be next? Of course you can just run it manually on your computer, but what if you need to create some sort of service or even platform based on it? Yes, it&rsquo;s possible!</p>
+
+<p><a href="http://www.x.org/archive/X11R7.7/doc/man/man1/Xvfb.1.xhtml">Xvfb</a> is a virtual display server implementing the X11 protocol. Selenium Webdriver needs a display to work and it works nicely with Xvfb. Set of steps you need to do if you want to run all this stuff on your server:</p>
+
+<ul>
+<li>install Google Chrome application</li>
+<li>install Xvfb</li>
+<li><a href="https://sites.google.com/a/chromium.org/chromedriver/downloads">download</a> Google Chrome driver, add a path to this file to the &ldquo;webdriver.chrome.driver&rdquo; system property</li>
+<li>create Xvfb initialization script, <a href="https://gist.github.com/jterrace/2911875">example for Ubuntu</a></li>
+<li>run Xvfb</li>
+<li>set DISPLAY variable like &ldquo;export DISPLAY=:99&rdquo;, where 99 is a number of your virtual display, I believe it can be a random number</li>
+<li>now you can run your application! Everything should just work, including screenshots (useful for debugging).</li>
+</ul>
+
+
+<h3>File download</h3>
+
+<p>There is one problem that Selenium Webdriver can&rsquo;t solve. Usually, when you click to a download button you see the OS modal window. Unfortunately, driver can&rsquo;t handle OS windows. But there is a solution for this problem &ndash; create your own file downloader and pass session information to it, like cookies and other headers. Example with Apache HttpClient and Scala:
+``` scala
+object FileDownloader {</p>
+
+<pre><code>val defaultUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.131 Safari/537.36"
+val timeout = 10 // seconds
+
+def download(url: String, pathToSave: String, cookies: Set[Cookie], userAgent: Option[String]): Future[String] = Future { blocking {
+    val fileUrl = new URL(url)
+
+    val downloadedFile = new File(pathToSave)
+    if (!downloadedFile.canWrite) downloadedFile.setWritable(true)
+
+    val config = RequestConfig.custom()
+        .setConnectTimeout(timeout * 1000)
+        .setConnectionRequestTimeout(timeout * 1000)
+        .setSocketTimeout(timeout * 1000)
+        .setCookieSpec(CookieSpecs.BROWSER_COMPATIBILITY)
+        .build()
+
+    val client = HttpClientBuilder.create()
+        .setDefaultRequestConfig(config)
+        .setRedirectStrategy(new LaxRedirectStrategy())
+        .setUserAgent(userAgent getOrElse defaultUserAgent)
+        .build()
+
+    val localContext = new BasicHttpContext()
+
+    localContext.setAttribute(HttpClientContext.COOKIE_STORE, mimicCookieState(cookies))
+
+    val request = new HttpGet(fileUrl.toURI)
+
+    val response = client.execute(request, localContext)
+
+    log.info(s"HTTP GET request status: ${response.getStatusLine.getStatusCode}, Downloading file: ${downloadedFile.getName}")
+
+    FileUtils.copyInputStreamToFile(response.getEntity.getContent, downloadedFile)
+    response.getEntity.getContent.close()
+
+    downloadedFile.getCanonicalPath
+}}
+
+private def mimicCookieState(seleniumCookieSet: Set[Cookie]): BasicCookieStore = {
+    val mimicWebDriverCookieStore = new BasicCookieStore()
+
+    for (seleniumCookie &lt;- seleniumCookieSet) {
+        val duplicateCookie = new BasicClientCookie(seleniumCookie.getName, seleniumCookie.getValue)
+        duplicateCookie.setDomain(seleniumCookie.getDomain)
+        duplicateCookie.setSecure(seleniumCookie.isSecure)
+        duplicateCookie.setExpiryDate(seleniumCookie.getExpiry)
+        duplicateCookie.setPath(seleniumCookie.getPath)
+        mimicWebDriverCookieStore.addCookie(duplicateCookie)
+    }
+
+    mimicWebDriverCookieStore
+}
+</code></pre>
+
+<p>}
+```
+It takes URL to download, path where it should save the file, set of cookies and optional user agent header. Of course you can pass and add more headers if you need.</p>
+
+<p>And it&rsquo;s very easy to get current cookies:
+<code>scala
+driver.manage().getCookies.toSet
+</code>
+and user agent:
+``` scala
+driver.executeScript(&ldquo;return navigator.userAgent&rdquo;) match {</p>
+
+<pre><code>case userAgent: String =&gt; Some(userAgent)
+case _ =&gt; None
+</code></pre>
+
+<p>}
+```</p>
+
+<h2>Defence</h2>
+
+<p>Before I said that it&rsquo;s almost impossible to detect Selenium Webdriver and Google Chrome when they used together. Actually, I see a few ways to protect yourself:</p>
+
+<ul>
+<li>CAPTCHA. But there are a lot of tools that can help with recognition, so it can&rsquo;t be really serious protection.</li>
+<li>Create your website/web app with Flash. It&rsquo;s ugly, nobody uses it except for promo sites, but it should work. I&rsquo;m sure it&rsquo;s possible to find a way to interact with Flash as well (with JavaScript calls or using other tools), but it won&rsquo;t be a native browser way to do it &ndash; so, probably, you can detect it.</li>
+<li>Heuristic methods. For example, Google AdWords/AdSense system is able to detect bots by tracking mouse moves, scrolls, timings, etc. I believe it&rsquo;s very complicated and very expensive technology, but it exists.</li>
+</ul>
+
+
+<h2>Summary</h2>
+
+<p>As you can see, Selenium Webdriver is a very powerful tool, not only for testing, but for browser automation in general. If you need an integration with web app that doesn&rsquo;t have a public API, Selenium Webdriver can be a way to go. But with great power comes great responsibility&hellip;</p>
+]]></content>
+  </entry>
+  
+</feed>

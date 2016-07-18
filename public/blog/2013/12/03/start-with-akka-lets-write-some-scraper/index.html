@@ -1,0 +1,868 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Start with Akka: Let's write some scraper - sap1ens blog</title>
+  <meta name="author" content="Yaroslav Tkachenko">
+
+  
+  <meta name="description" content="Since my first meeting with Scala I always think that this language was designed to work in a concurrent environment. I wasn&rsquo;t familiar with &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://sap1ens.com/blog/2013/12/03/start-with-akka-lets-write-some-scraper">
+  <link href="/favicon.ico" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="sap1ens blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-21545352-9']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   class="collapse-sidebar sidebar-footer" >
+  <header role="banner">
+</header>
+  <div class="social-networks">
+    <ul>
+      <li><a href="https://github.com/sap1ens" class="symbol" title="githubalt" target="_blank"></a></li>
+      <li><a href="http://ca.linkedin.com/in/sap1ens" class="symbol" title="linkedin" target="_blank"></a></li>
+      <li><a href="https://twitter.com/sap1ens" class="symbol" title="twitter" target="_blank"></a></li>
+      <li><a href="https://www.facebook.com/yaroslav.tkachenko" class="symbol" title="facebook" target="_blank"></a></li>
+      <li><a href="http://stackoverflow.com/users/899937/sap1ens" class="symbol" title="stackoverflow" target="_blank"></a></li>
+    </ul>
+  </div>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="sap1ens.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/talks">Talks</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+  
+    
+      <h1 class="entry-title">Start With Akka: Let's Write Some Scraper</h1>
+    
+  
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-12-03T18:45:44-08:00" pubdate data-updated="true">Dec 3<span>rd</span>, 2013</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Since my first meeting with Scala I always think that this language was designed to work in a concurrent environment. I wasn&rsquo;t familiar with actors for a long time, but a few months ago I got a task to write a website scraper. It&rsquo;s a typical story, there are a lot of nice solutions, but I felt it&rsquo;s a right time to try Akka in action. This article is the result of my work. I don&rsquo;t want to describe the basic things, so you should be familiar with the main Akka concepts: actors and messages.</p>
+
+<p>Here is the GitHub repo: <a href="https://github.com/sap1ens/scraper">https://github.com/sap1ens/scraper</a>.</p>
+
+<!-- more -->
+
+
+<h2>The Task</h2>
+
+<p>So, my task was to find some ads on ***** website, extract data from these ads and save all results to a XLS file. Also, I had a list of cities in US and Canada (472 totally). This work can be done in a few steps:</p>
+
+<ol>
+<li>Generate a list of URLs for all cities.</li>
+<li>Every page with city results can contain a pagination, so we should fetch all pages.</li>
+<li>Then we should extract URLs of the ads and parse the data.</li>
+<li>Once it&rsquo;s ready (all ads were fetched and parsed), we need to combine results (for grouping, sorting, etc.) and save to the file.</li>
+</ol>
+
+
+<h2>Start with Activator</h2>
+
+<p><a href="http://typesafe.com/activator">Typesafe Activator</a> is a beautiful tool to start Typesafe stack projects. It&rsquo;s <a href="http://typesafe.com/platform/getstarted">very easy</a> to install.</p>
+
+<p>So, I&rsquo;ve started project with Activator (just chose Scala + Akka template) and I&rsquo;ve got a ready-to-go application with Sbt, Scala, Akka and ability to run the application with another beautiful tool &ndash; <a href="http://typesafe.com/platform/runtime/console">Typesafe Console</a>.</p>
+
+<h2>Keep your stuff in Config</h2>
+
+<p>Also, I put all my configuration stuff into the <a href="https://github.com/typesafehub/config">Typesafe Config</a> file (I&rsquo;ve chose JSON format).
+There are a list of cities/countries, search query and some settings related to saving.</p>
+
+<h2>ActorSystem</h2>
+
+<h3>Scraper.scala</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">object</span> <span class="nc">Scraper</span> <span class="k">extends</span> <span class="nc">App</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">val</span> <span class="n">config</span> <span class="k">=</span> <span class="nc">ConfigFactory</span><span class="o">.</span><span class="n">load</span><span class="o">()</span>
+</span><span class='line'>    <span class="k">val</span> <span class="n">system</span> <span class="k">=</span> <span class="nc">ActorSystem</span><span class="o">(</span><span class="s">&quot;scraper-system&quot;</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">val</span> <span class="n">profiles</span> <span class="k">=</span> <span class="k">for</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">profile</span><span class="k">:</span> <span class="kt">ConfigObject</span> <span class="kt">&lt;-</span> <span class="kt">config.getObjectList</span><span class="o">(</span><span class="err">&quot;</span><span class="kt">profiles</span><span class="err">&quot;</span><span class="o">)</span><span class="kt">.asScala</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">yield</span> <span class="nc">Profile</span><span class="o">(</span>
+</span><span class='line'>        <span class="n">profile</span><span class="o">.</span><span class="n">get</span><span class="o">(</span><span class="s">&quot;country&quot;</span><span class="o">).</span><span class="n">unwrapped</span><span class="o">().</span><span class="n">toString</span><span class="o">,</span>
+</span><span class='line'>        <span class="n">profile</span><span class="o">.</span><span class="n">get</span><span class="o">(</span><span class="s">&quot;pattern&quot;</span><span class="o">).</span><span class="n">unwrapped</span><span class="o">().</span><span class="n">toString</span><span class="o">,</span>
+</span><span class='line'>        <span class="n">profile</span><span class="o">.</span><span class="n">get</span><span class="o">(</span><span class="s">&quot;cities&quot;</span><span class="o">).</span><span class="n">unwrapped</span><span class="o">().</span><span class="n">asInstanceOf</span><span class="o">[</span><span class="kt">java.util.ArrayList</span><span class="o">[</span><span class="kt">String</span><span class="o">]].</span><span class="n">toList</span>
+</span><span class='line'>    <span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">val</span> <span class="n">searchString</span> <span class="k">=</span> <span class="n">config</span><span class="o">.</span><span class="n">getString</span><span class="o">(</span><span class="s">&quot;search&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="k">val</span> <span class="n">resultsFolder</span> <span class="k">=</span> <span class="n">config</span><span class="o">.</span><span class="n">getString</span><span class="o">(</span><span class="s">&quot;results.folder&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="k">val</span> <span class="n">resultsMode</span> <span class="k">=</span> <span class="n">config</span><span class="o">.</span><span class="n">getString</span><span class="o">(</span><span class="s">&quot;results.mode&quot;</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">val</span> <span class="n">collectorService</span> <span class="k">=</span> <span class="n">system</span><span class="o">.</span><span class="n">actorOf</span><span class="o">(</span><span class="nc">Props</span><span class="o">(</span><span class="k">new</span> <span class="nc">CollectorService</span><span class="o">(</span>
+</span><span class='line'>        <span class="n">profiles</span><span class="o">.</span><span class="n">toList</span><span class="o">,</span>
+</span><span class='line'>        <span class="n">searchString</span><span class="o">,</span>
+</span><span class='line'>        <span class="n">resultsFolder</span><span class="o">,</span>
+</span><span class='line'>        <span class="n">resultsMode</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">),</span> <span class="s">&quot;CollectorService&quot;</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">collectorService</span> <span class="o">!</span> <span class="nc">StartScraper</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here I&rsquo;ve took some config data, created ActorSystem and root actor named <strong>CollectorService</strong>. The app starts with sending <strong>StartScraper</strong> message to the root actor.</p>
+
+<h2>Actors</h2>
+
+<h3>CollectorService.scala</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">case</span> <span class="k">class</span> <span class="nc">Profile</span><span class="o">(</span><span class="n">country</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">pattern</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">cities</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">String</span><span class="o">])</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">object</span> <span class="nc">CollectorService</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">import</span> <span class="nn">PageParser._</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">case</span> <span class="k">object</span> <span class="nc">StartScraper</span>
+</span><span class='line'>    <span class="k">case</span> <span class="k">object</span> <span class="nc">SaveResults</span>
+</span><span class='line'>    <span class="k">case</span> <span class="k">class</span> <span class="nc">PagesResults</span><span class="o">(</span><span class="n">results</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">PageResult</span><span class="o">])</span>
+</span><span class='line'>    <span class="k">case</span> <span class="k">class</span> <span class="nc">AddListUrl</span><span class="o">(</span><span class="n">url</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span>
+</span><span class='line'>    <span class="k">case</span> <span class="k">class</span> <span class="nc">RemoveListUrl</span><span class="o">(</span><span class="n">url</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">CollectorService</span><span class="o">(</span><span class="n">profiles</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Profile</span><span class="o">],</span> <span class="n">search</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">resultsFolder</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">resultsMode</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">Actor</span> <span class="k">with</span> <span class="nc">ActorLogging</span> <span class="k">with</span> <span class="nc">CollectionImplicits</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">import</span> <span class="nn">CollectorService._</span>
+</span><span class='line'>    <span class="k">import</span> <span class="nn">ListParser._</span>
+</span><span class='line'>    <span class="k">import</span> <span class="nn">PageParser._</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">val</span> <span class="n">lists</span> <span class="k">=</span> <span class="n">context</span><span class="o">.</span><span class="n">actorOf</span><span class="o">(</span><span class="nc">Props</span><span class="o">(</span><span class="k">new</span> <span class="nc">ListParser</span><span class="o">(</span><span class="n">self</span><span class="o">)).</span><span class="n">withRouter</span><span class="o">(</span><span class="nc">SmallestMailboxRouter</span><span class="o">(</span><span class="mi">5</span><span class="o">)),</span> <span class="n">name</span> <span class="k">=</span> <span class="s">&quot;AdvertisementList&quot;</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">var</span> <span class="n">pageResults</span> <span class="k">=</span> <span class="nc">List</span><span class="o">[</span><span class="kt">PageResult</span><span class="o">]()</span>
+</span><span class='line'>    <span class="k">var</span> <span class="n">listUrls</span> <span class="k">=</span> <span class="nc">List</span><span class="o">[</span><span class="kt">String</span><span class="o">]()</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="n">receive</span> <span class="k">=</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">case</span> <span class="nc">StartScraper</span> <span class="k">=&gt;</span> <span class="o">{</span>
+</span><span class='line'>            <span class="k">val</span> <span class="n">searchEncoded</span> <span class="k">=</span> <span class="nc">URLEncoder</span><span class="o">.</span><span class="n">encode</span><span class="o">(</span><span class="n">search</span><span class="o">,</span> <span class="s">&quot;UTF-8&quot;</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="k">for</span><span class="o">(</span><span class="n">profile</span> <span class="k">&lt;-</span> <span class="n">profiles</span><span class="o">;</span> <span class="n">city</span> <span class="k">&lt;-</span> <span class="n">profile</span><span class="o">.</span><span class="n">cities</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>                <span class="n">self</span> <span class="o">!</span> <span class="nc">AddListUrl</span><span class="o">(</span><span class="n">createCityUrl</span><span class="o">(</span><span class="n">profile</span><span class="o">.</span><span class="n">pattern</span><span class="o">,</span> <span class="n">searchEncoded</span><span class="o">,</span> <span class="n">city</span><span class="o">))</span>
+</span><span class='line'>            <span class="o">}</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="k">case</span> <span class="nc">AddListUrl</span><span class="o">(</span><span class="n">url</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">listUrls</span> <span class="k">=</span> <span class="n">url</span> <span class="o">::</span> <span class="n">listUrls</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="n">lists</span> <span class="o">!</span> <span class="nc">StartListParser</span><span class="o">(</span><span class="n">url</span><span class="o">)</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="k">case</span> <span class="nc">RemoveListUrl</span><span class="o">(</span><span class="n">url</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">listUrls</span> <span class="k">=</span> <span class="n">listUrls</span><span class="o">.</span><span class="n">copyWithout</span><span class="o">(</span><span class="n">url</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="k">if</span><span class="o">(</span><span class="n">listUrls</span><span class="o">.</span><span class="n">isEmpty</span><span class="o">)</span> <span class="n">self</span> <span class="o">!</span> <span class="nc">SaveResults</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="k">case</span> <span class="nc">PagesResults</span><span class="o">(</span><span class="n">results</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">pageResults</span> <span class="k">=</span> <span class="n">results</span> <span class="o">:::</span> <span class="n">pageResults</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="k">case</span> <span class="nc">SaveResults</span> <span class="k">=&gt;</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="o">(</span><span class="n">s</span><span class="s">&quot;Total results: ${pageResults.size}&quot;</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="nc">ExcelFileWriter</span><span class="o">.</span><span class="n">write</span><span class="o">(</span><span class="n">pageResults</span><span class="o">,</span> <span class="n">resultsFolder</span><span class="o">,</span> <span class="n">resultsMode</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="n">context</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">shutdown</span><span class="o">()</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="n">createCityUrl</span><span class="o">(</span><span class="n">pattern</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">search</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">city</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">pattern</span>
+</span><span class='line'>            <span class="o">.</span><span class="n">replace</span><span class="o">(</span><span class="s">&quot;{search}&quot;</span><span class="o">,</span> <span class="n">search</span><span class="o">)</span>
+</span><span class='line'>            <span class="o">.</span><span class="n">replace</span><span class="o">(</span><span class="s">&quot;{city}&quot;</span><span class="o">,</span> <span class="n">city</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>CollectorService</strong> is the root actor, it coordinates all work.</p>
+
+<p>It contains variable (or <em>value</em>, to be correct) named <em>lists</em>, which holds a pointer to the next level of hierarchy &ndash; <strong>ListParser</strong> actors. Constructor of the <strong>ListParser</strong> accepts one element, <strong>CollectorService</strong>. Also, it uses routing to balance requests between 5 actors, based on the actor mailbox capacity (<a href="http://doc.akka.io/docs/akka/2.2.3/scala/routing.html">SmallestMailboxRouter</a>).</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">val</span> <span class="n">lists</span> <span class="k">=</span> <span class="n">context</span><span class="o">.</span><span class="n">actorOf</span><span class="o">(</span><span class="nc">Props</span><span class="o">(</span><span class="k">new</span> <span class="nc">ListParser</span><span class="o">(</span><span class="n">self</span><span class="o">)).</span><span class="n">withRouter</span><span class="o">(</span><span class="nc">SmallestMailboxRouter</span><span class="o">(</span><span class="mi">5</span><span class="o">)),</span> <span class="n">name</span> <span class="k">=</span> <span class="s">&quot;AdvertisementList&quot;</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>CollectorService</strong> also contains two variables: <em>pageResults</em> and <em>listUrls</em>. First one is the storage for final ads results, second one holds URLs to be fetched.</p>
+
+<p><strong>CollectorService</strong> starts with <strong>StartScraper</strong> message, it sends all generated URLs to itself in <strong>AddListUrl</strong> message. Probably you think that sending messages to itself is a strange practice, but I don&rsquo;t agree :) It&rsquo;s a good pattern to decouple and reuse logic and you&rsquo;ll see it.</p>
+
+<p>The next step is to start fetching these URLs. <strong>CollectorService</strong> delegates this job to the <strong>ListParser</strong> actor and you can see here the second pattern: every actor should have its own task.</p>
+
+<p>So, sending <strong>AddListUrl</strong> message adds URL to the <em>listUrls</em> variable as well as sends the <strong>StartListParser</strong> message to the <strong>ListParser</strong> actor.</p>
+
+<p><strong>RemoveListUrl</strong> message removes specified URL from the <em>listUrls</em> and if it&rsquo;s empty, we think that job is done and it should persist results (so it sends <strong>SaveResults</strong> to itself).</p>
+
+<p><strong>PagesResults</strong> message adds an extracted page data to the <em>pageResults</em> variable. We&rsquo;ll use it later, during saving process.</p>
+
+<h3>ListParser.scala</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">object</span> <span class="nc">ListParser</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">import</span> <span class="nn">PageParser._</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">case</span> <span class="k">class</span> <span class="nc">StartListParser</span><span class="o">(</span><span class="n">listUrl</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span>
+</span><span class='line'>    <span class="k">case</span> <span class="k">class</span> <span class="nc">ListResult</span><span class="o">(</span><span class="n">listUrl</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">pageUrls</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">String</span><span class="o">],</span> <span class="n">nextPage</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="nc">None</span><span class="o">)</span>
+</span><span class='line'>    <span class="k">case</span> <span class="k">class</span> <span class="nc">AddPageUrl</span><span class="o">(</span><span class="n">listUrl</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">url</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span>
+</span><span class='line'>    <span class="k">case</span> <span class="k">class</span> <span class="nc">RemovePageUrl</span><span class="o">(</span><span class="n">listUrl</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">url</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span>
+</span><span class='line'>    <span class="k">case</span> <span class="k">class</span> <span class="nc">SavePageResult</span><span class="o">(</span><span class="n">listUrl</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">result</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">PageResult</span><span class="o">])</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">ListParser</span><span class="o">(</span><span class="n">collectorService</span><span class="k">:</span> <span class="kt">ActorRef</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">Actor</span> <span class="k">with</span> <span class="nc">ActorLogging</span> <span class="k">with</span> <span class="nc">CollectionImplicits</span> <span class="k">with</span> <span class="nc">ParserUtil</span> <span class="k">with</span> <span class="nc">ParserImplicits</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">import</span> <span class="nn">ListParser._</span>
+</span><span class='line'>    <span class="k">import</span> <span class="nn">PageParser._</span>
+</span><span class='line'>    <span class="k">import</span> <span class="nn">CollectorService._</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">val</span> <span class="n">pages</span> <span class="k">=</span> <span class="n">context</span><span class="o">.</span><span class="n">actorOf</span><span class="o">(</span><span class="nc">Props</span><span class="o">(</span><span class="k">new</span> <span class="nc">PageParser</span><span class="o">(</span><span class="n">self</span><span class="o">)).</span><span class="n">withRouter</span><span class="o">(</span><span class="nc">SmallestMailboxRouter</span><span class="o">(</span><span class="mi">10</span><span class="o">)),</span> <span class="n">name</span> <span class="k">=</span> <span class="s">&quot;Advertisement&quot;</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">var</span> <span class="n">pageUrls</span> <span class="k">=</span> <span class="nc">Map</span><span class="o">[</span><span class="kt">String</span>, <span class="kt">List</span><span class="o">[</span><span class="kt">String</span><span class="o">]]()</span>
+</span><span class='line'>    <span class="k">var</span> <span class="n">pageResults</span> <span class="k">=</span> <span class="nc">Map</span><span class="o">[</span><span class="kt">String</span>, <span class="kt">List</span><span class="o">[</span><span class="kt">Option</span><span class="o">[</span><span class="kt">PageResult</span><span class="o">]]]()</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="n">receive</span> <span class="k">=</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">case</span> <span class="nc">StartListParser</span><span class="o">(</span><span class="n">listUrl</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="o">{</span>
+</span><span class='line'>            <span class="k">val</span> <span class="n">future</span> <span class="k">=</span> <span class="n">parseAdvertisementList</span><span class="o">(</span><span class="n">listUrl</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="n">future</span> <span class="n">onFailure</span> <span class="o">{</span>
+</span><span class='line'>                <span class="k">case</span> <span class="n">e</span><span class="k">:</span> <span class="kt">Exception</span> <span class="o">=&gt;</span> <span class="o">{</span>
+</span><span class='line'>                    <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="o">(</span><span class="n">s</span><span class="s">&quot;Can&#39;t process $listUrl, cause: ${e.getMessage}&quot;</span><span class="o">)</span>
+</span><span class='line'>                    <span class="n">collectorService</span> <span class="o">!</span> <span class="nc">RemoveListUrl</span><span class="o">(</span><span class="n">listUrl</span><span class="o">)</span>
+</span><span class='line'>                <span class="o">}</span>
+</span><span class='line'>            <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="n">future</span> <span class="n">pipeTo</span> <span class="n">self</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="k">case</span> <span class="nc">AddPageUrl</span><span class="o">(</span><span class="n">listUrl</span><span class="o">,</span> <span class="n">url</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">pageUrls</span> <span class="k">=</span> <span class="n">pageUrls</span><span class="o">.</span><span class="n">updatedWith</span><span class="o">(</span><span class="n">listUrl</span><span class="o">,</span> <span class="nc">List</span><span class="o">.</span><span class="n">empty</span><span class="o">)</span> <span class="o">{</span><span class="n">url</span> <span class="o">::</span> <span class="k">_</span><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="n">pages</span> <span class="o">!</span> <span class="nc">StartPageParser</span><span class="o">(</span><span class="n">listUrl</span><span class="o">,</span> <span class="n">url</span><span class="o">)</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="k">case</span> <span class="nc">RemovePageUrl</span><span class="o">(</span><span class="n">listUrl</span><span class="o">,</span> <span class="n">url</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">pageUrls</span> <span class="k">=</span> <span class="n">pageUrls</span><span class="o">.</span><span class="n">updatedWith</span><span class="o">(</span><span class="n">listUrl</span><span class="o">,</span> <span class="nc">List</span><span class="o">.</span><span class="n">empty</span><span class="o">)</span> <span class="o">{</span> <span class="n">urls</span> <span class="k">=&gt;</span>
+</span><span class='line'>                <span class="k">val</span> <span class="n">updatedUrls</span> <span class="k">=</span> <span class="n">urls</span><span class="o">.</span><span class="n">copyWithout</span><span class="o">(</span><span class="n">url</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>                <span class="k">if</span><span class="o">(</span><span class="n">updatedUrls</span><span class="o">.</span><span class="n">isEmpty</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>                    <span class="n">pageResults</span><span class="o">.</span><span class="n">get</span><span class="o">(</span><span class="n">listUrl</span><span class="o">)</span> <span class="n">map</span> <span class="o">{</span> <span class="n">results</span> <span class="k">=&gt;</span>
+</span><span class='line'>                        <span class="n">collectorService</span> <span class="o">!</span> <span class="nc">PagesResults</span><span class="o">(</span><span class="n">results</span><span class="o">.</span><span class="n">flatten</span><span class="o">.</span><span class="n">toList</span><span class="o">)</span>
+</span><span class='line'>                        <span class="n">collectorService</span> <span class="o">!</span> <span class="nc">RemoveListUrl</span><span class="o">(</span><span class="n">listUrl</span><span class="o">)</span>
+</span><span class='line'>                    <span class="o">}</span>
+</span><span class='line'>                <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>                <span class="n">updatedUrls</span>
+</span><span class='line'>            <span class="o">}</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="k">case</span> <span class="nc">SavePageResult</span><span class="o">(</span><span class="n">listUrl</span><span class="o">,</span> <span class="n">result</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">pageResults</span> <span class="k">=</span> <span class="n">pageResults</span><span class="o">.</span><span class="n">updatedWith</span><span class="o">(</span><span class="n">listUrl</span><span class="o">,</span> <span class="nc">List</span><span class="o">.</span><span class="n">empty</span><span class="o">)</span> <span class="o">{</span><span class="n">result</span> <span class="o">::</span> <span class="k">_</span><span class="o">}</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="k">case</span> <span class="nc">ListResult</span><span class="o">(</span><span class="n">listUrl</span><span class="o">,</span> <span class="n">urls</span><span class="o">,</span> <span class="nc">Some</span><span class="o">(</span><span class="n">nextPage</span><span class="o">))</span> <span class="k">=&gt;</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">collectorService</span> <span class="o">!</span> <span class="nc">AddListUrl</span><span class="o">(</span><span class="n">nextPage</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="n">self</span> <span class="o">!</span> <span class="nc">ListResult</span><span class="o">(</span><span class="n">listUrl</span><span class="o">,</span> <span class="n">urls</span><span class="o">,</span> <span class="nc">None</span><span class="o">)</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="k">case</span> <span class="nc">ListResult</span><span class="o">(</span><span class="n">listUrl</span><span class="o">,</span> <span class="n">urls</span><span class="o">,</span> <span class="nc">None</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="o">(</span><span class="n">s</span><span class="s">&quot;${urls.size} pages were extracted&quot;</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="k">if</span><span class="o">(</span><span class="n">urls</span><span class="o">.</span><span class="n">isEmpty</span><span class="o">)</span> <span class="n">collectorService</span> <span class="o">!</span> <span class="nc">RemoveListUrl</span><span class="o">(</span><span class="n">listUrl</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="n">urls</span> <span class="n">foreach</span> <span class="o">{</span> <span class="n">url</span> <span class="k">=&gt;</span>
+</span><span class='line'>                <span class="n">self</span> <span class="o">!</span> <span class="nc">AddPageUrl</span><span class="o">(</span><span class="n">listUrl</span><span class="o">,</span> <span class="n">url</span><span class="o">)</span>
+</span><span class='line'>            <span class="o">}</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="n">parseAdvertisementList</span><span class="o">(</span><span class="n">listUrl</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Future</span><span class="o">[</span><span class="kt">ListResult</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Future</span> <span class="o">{</span>
+</span><span class='line'>        <span class="c1">// skip</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As you can see, the <strong>ListParser</strong> also contains few variables: <em>pages</em>, <em>pageUrls</em> and <em>pageResults</em>. <em>pages</em> is similar to <em>lists</em> from <strong>CollectorService</strong>: it holds next level actors &ndash; <strong>PageParser</strong> and the same router, SmallestMailboxRouter.</p>
+
+<p><em>pageUrls</em> and <em>pageResults</em> help to keep intermediate results. They are pretty similar to the <em>listUrls</em> and <em>pageResults</em> from <strong>CollectorService</strong>, except they are maps, where key is <em>listUrl</em>.</p>
+
+<p><strong>ListParser</strong> starts with the <strong>StartListParser</strong> message. It sends URL to <em>parseAdvertisementList</em> method (which I want to skip, you can find it in the GitHub repo though). As a result, it receives a Future with the <strong>ListResult</strong> case class. This class contains a list of page-level URLs and optionally an URL to the next page of this city results.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="n">future</span> <span class="n">pipeTo</span> <span class="n">self</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This line sends the result of the Future to actor itself. There are two possible ways after.</p>
+
+<ol>
+<li>If there is a next page in the message, it goes to this case:
+<code>case ListResult(listUrl, urls, Some(nextPage))</code>
+It sends the <strong>AddListUrl</strong> message to the <strong>CollectorService</strong>, as well as the <strong>ListResult</strong> message without next page to actor itself.</li>
+<li>If there is no next page (or it&rsquo;s a message from 1), it goes to another case
+<code>case ListResult(listUrl, urls, None)</code></li>
+</ol>
+
+
+<p>Second <em>ListResult</em> case checks a list of URLs. If it&rsquo;s an empty, <strong>RemoveListUrl</strong> will be sent to the <strong>CollectorService</strong>. If it&rsquo;s not empty, actor sends the <strong>AddPageUrl</strong> message for every URL to itself.</p>
+
+<p>In <strong>AddPageUrl</strong> case, actor saves specified URL to the <em>pageUrls</em> and sends the <strong>StartPageParser</strong> message to the <strong>PageParser</strong>, next actor in hierarchy.</p>
+
+<p>In <strong>RemovePageUrl</strong> case it removes specified url from the <em>pageUrls</em> and if it&rsquo;s empty, it sends the <strong>PagesResults</strong> as well as the <strong>RemoveListUrl</strong> to the <strong>CollectorService</strong>.</p>
+
+<p>Also <strong>ListParser</strong> contains <strong>SavePageResult</strong> case, which just saves sent data to the <em>pageResults</em>.</p>
+
+<h3>PageParser.scala</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">object</span> <span class="nc">PageParser</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">case</span> <span class="k">class</span> <span class="nc">StartPageParser</span><span class="o">(</span><span class="n">listUrl</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">pageUrl</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span>
+</span><span class='line'>    <span class="k">case</span> <span class="k">class</span> <span class="nc">PageResult</span><span class="o">(</span>
+</span><span class='line'>        <span class="n">url</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span>
+</span><span class='line'>        <span class="n">title</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span>
+</span><span class='line'>        <span class="n">description</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span>
+</span><span class='line'>        <span class="n">date</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[(</span><span class="kt">String</span>, <span class="kt">String</span><span class="o">)]</span> <span class="k">=</span> <span class="nc">None</span><span class="o">,</span>
+</span><span class='line'>        <span class="n">email</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="nc">None</span><span class="o">,</span>
+</span><span class='line'>        <span class="n">phone</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="nc">None</span>
+</span><span class='line'>    <span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">PageParser</span><span class="o">(</span><span class="n">listParser</span><span class="k">:</span> <span class="kt">ActorRef</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">Actor</span> <span class="k">with</span> <span class="nc">ActorLogging</span> <span class="k">with</span> <span class="nc">ParserUtil</span> <span class="k">with</span> <span class="nc">ParserImplicits</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">import</span> <span class="nn">PageParser._</span>
+</span><span class='line'>    <span class="k">import</span> <span class="nn">ListParser._</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="n">receive</span> <span class="k">=</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">case</span> <span class="nc">StartPageParser</span><span class="o">(</span><span class="n">listUrl</span><span class="o">,</span> <span class="n">pageUrl</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="o">{</span>
+</span><span class='line'>            <span class="k">val</span> <span class="n">future</span> <span class="k">=</span> <span class="n">parseAdvertisement</span><span class="o">(</span><span class="n">pageUrl</span><span class="o">).</span><span class="n">mapTo</span><span class="o">[</span><span class="kt">Option</span><span class="o">[</span><span class="kt">PageResult</span><span class="o">]]</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="n">future</span> <span class="n">onComplete</span> <span class="o">{</span>
+</span><span class='line'>                <span class="k">case</span> <span class="nc">Success</span><span class="o">(</span><span class="n">result</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="o">{</span>
+</span><span class='line'>                    <span class="n">listParser</span> <span class="o">!</span> <span class="nc">SavePageResult</span><span class="o">(</span><span class="n">listUrl</span><span class="o">,</span> <span class="n">result</span><span class="o">)</span>
+</span><span class='line'>                    <span class="n">listParser</span> <span class="o">!</span> <span class="nc">RemovePageUrl</span><span class="o">(</span><span class="n">listUrl</span><span class="o">,</span> <span class="n">pageUrl</span><span class="o">)</span>
+</span><span class='line'>                <span class="o">}</span>
+</span><span class='line'>                <span class="k">case</span> <span class="nc">Failure</span><span class="o">(</span><span class="n">e</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="o">{</span>
+</span><span class='line'>                    <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="o">(</span><span class="n">s</span><span class="s">&quot;Can&#39;t process pageUrl, cause: ${e.getMessage}&quot;</span><span class="o">)</span>
+</span><span class='line'>                    <span class="n">listParser</span> <span class="o">!</span> <span class="nc">RemovePageUrl</span><span class="o">(</span><span class="n">listUrl</span><span class="o">,</span> <span class="n">pageUrl</span><span class="o">)</span>
+</span><span class='line'>                <span class="o">}</span>
+</span><span class='line'>            <span class="o">}</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="n">parseAdvertisement</span><span class="o">(</span><span class="n">url</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Future</span><span class="o">[</span><span class="kt">Option</span><span class="o">[</span><span class="kt">PageResult</span><span class="o">]]</span> <span class="k">=</span> <span class="nc">Future</span> <span class="o">{</span>
+</span><span class='line'>        <span class="c1">// skip</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>PageParser</strong> actor is pretty straightforward. It uses <em>parseAdvertisement</em> method to get a Future with extracted data and then sends <strong>SavePageResult</strong> and <strong>RemovePageUrl</strong> messages to the parent actor (<strong>ListParser</strong>).</p>
+
+<h3>Important things</h3>
+
+<ol>
+<li>Error handling is a very important thing. That&rsquo;s why every Future has <em>onFailure</em> block, which sends clean-up messages to parent actors.</li>
+<li>You can find <strong>ListParser</strong> and <strong>PageParser</strong> similar: they both have 2 same types of inner variables, same actions (add item to the process queue, remove item from the processing queue, save results). It means we can extend actors hierarchy multiple times, but it&rsquo;s a good practice to have different actors for every level of hierarchy, because we can set up different <a href="http://doc.akka.io/docs/akka/2.2.3/scala/fault-tolerance.html">supervisors</a>. So, it&rsquo;s worth thinking how to reuse this behaviour.</li>
+</ol>
+
+
+<h2>Summary</h2>
+
+<p>I like the results: it takes about 4 minutes on my MBP to find, fetch, parse and save about 10k ads.</p>
+
+<h2>Bonus: Immutable data structures</h2>
+
+<p>May be you didn&rsquo;t notice, but all inner variables inside the actors are immutable. It&rsquo;s not a requirement because actor can process only one message from mailbox at the one period of time, so it won&rsquo;t mess with any mutable data. I used immutable data structures just as an exercise and also it&rsquo;s a good culture in Scala. That&rsquo;s why we have these implicits to work with List and Map.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">trait</span> <span class="nc">CollectionImplicits</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">implicit</span> <span class="k">class</span> <span class="nc">ListExtensions</span><span class="o">[</span><span class="kt">K</span><span class="o">](</span><span class="k">val</span> <span class="n">list</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">K</span><span class="o">])</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">def</span> <span class="n">copyWithout</span><span class="o">(</span><span class="n">item</span><span class="k">:</span> <span class="kt">K</span><span class="o">)</span> <span class="k">=</span> <span class="o">{</span>
+</span><span class='line'>            <span class="k">val</span> <span class="o">(</span><span class="n">left</span><span class="o">,</span> <span class="n">right</span><span class="o">)</span> <span class="k">=</span> <span class="n">list</span> <span class="n">span</span> <span class="o">(</span><span class="k">_</span> <span class="o">!=</span> <span class="n">item</span><span class="o">)</span>
+</span><span class='line'>            <span class="n">left</span> <span class="o">:::</span> <span class="n">right</span><span class="o">.</span><span class="n">drop</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">implicit</span> <span class="k">class</span> <span class="nc">MapExtensions</span><span class="o">[</span><span class="kt">K</span>, <span class="kt">V</span><span class="o">](</span><span class="k">val</span> <span class="n">map</span><span class="k">:</span> <span class="kt">Map</span><span class="o">[</span><span class="kt">K</span>, <span class="kt">V</span><span class="o">])</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">def</span> <span class="n">updatedWith</span><span class="o">(</span><span class="n">key</span><span class="k">:</span> <span class="kt">K</span><span class="o">,</span> <span class="n">default</span><span class="k">:</span> <span class="kt">V</span><span class="o">)(</span><span class="n">f</span><span class="k">:</span> <span class="kt">V</span> <span class="o">=&gt;</span> <span class="n">V</span><span class="o">)</span> <span class="k">=</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">map</span><span class="o">.</span><span class="n">updated</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">f</span><span class="o">(</span><span class="n">map</span><span class="o">.</span><span class="n">getOrElse</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">default</span><span class="o">)))</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Further Reading</h2>
+
+<p>I can recommend perfect book <a href="http://www.artima.com/shop/akka_concurrency">Akka Concurrency</a> by Derek Wyatt to continue learning about Akka.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Yaroslav Tkachenko</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-12-03T18:45:44-08:00" pubdate data-updated="true">Dec 3<span>rd</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/akka/'>Akka</a>, <a class='category' href='/blog/categories/scala/'>Scala</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://sap1ens.com/blog/2013/12/03/start-with-akka-lets-write-some-scraper/" data-via="sap1ens" data-counturl="http://sap1ens.com/blog/2013/12/03/start-with-akka-lets-write-some-scraper/" >Tweet</a>
+  
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/12/01/why-is-it-awesome-to-work-in-startup/" title="Previous Post: Why is it awesome to work in startup?">&laquo; Why is it awesome to work in startup?</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2013/12/08/the-road-to-akka-cluster/" title="Next Post: The Road to Akka Cluster">The Road to Akka Cluster &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/07/10/syrup-scrum-cli-tool/">Syrup - Scrum CLI tool</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/06/19/postgres-jsonb-indexing-is-tricky/">Postgres JSONB indexing is tricky</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/28/polyglotconf-2016-talk/">Polyglotconf 2016 Talk</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/22/static-typing-and-refactoring/">Static typing and refactoring</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/25/about-technical-leadership/">About technical leadership</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/sap1ens">@sap1ens</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'sap1ens',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+<section class="googleplus googleplus-hidden">
+  <h1>
+    <a href="https://plus.google.com/YaroslavTkachenko?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - 2016 | Yaroslav Tkachenko <br/>
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a>, customized with <a href="https://github.com/mjhea0/whiterspace">whiterspace</a>.</span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'sap1ens';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://sap1ens.com/blog/2013/12/03/start-with-akka-lets-write-some-scraper/';
+        var disqus_url = 'http://sap1ens.com/blog/2013/12/03/start-with-akka-lets-write-some-scraper/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

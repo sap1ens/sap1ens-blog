@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Node | sap1ens blog]]></title>
+  <link href="http://sap1ens.com/blog/categories/node/atom.xml" rel="self"/>
+  <link href="http://sap1ens.com/"/>
+  <updated>2016-07-17T19:51:56-07:00</updated>
+  <id>http://sap1ens.com/</id>
+  <author>
+    <name><![CDATA[Yaroslav Tkachenko]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Syrup - Scrum CLI tool]]></title>
+    <link href="http://sap1ens.com/blog/2016/07/10/syrup-scrum-cli-tool/"/>
+    <updated>2016-07-10T19:25:15-07:00</updated>
+    <id>http://sap1ens.com/blog/2016/07/10/syrup-scrum-cli-tool</id>
+    <content type="html"><![CDATA[<p>At Bench we’re convinced that GitHub should be a central place for everything project-related: codebase, documentation, tasks. That’s why we don’t use any specific Project Management software, but instead we try to use GitHub.</p>
+
+<p>Obviously GitHub has a very limited set of features: issues, labels, milestones. But, surprisingly, it’s good enough foundation that can be used by other services, for example <a href="https://waffle.io">Waffle.io</a>.</p>
+
+<p>Waffle gives you Kanban-style dashboard for managing your tasks. It has two-way synchronization with GitHub, so every change in GitHub is propagated to Waffle in near real-time and vice versa. Waffle also uses labels to organize issues in columns, which makes everything easier from the GitHub side.</p>
+
+<p>Still, there are lots of problems if you want to use GitHub &amp; Waffle for your Scrum process. That’s why I’ve been working on <a href="https://github.com/sap1ens/syrup">syrup</a>, CLI tool for Scrum. <a href="https://github.com/sap1ens/syrup/blob/master/README.md">Readme</a> has lots of details describing Waffle problems and suggested workflow to overcome them. It’s published as <a href="https://www.npmjs.com/package/syrup-cli">npm module</a>, so it’s really easy to install.</p>
+
+<p>From technical point of view it’s a very simple Node.js/ES6 app (using Babel) that mostly uses GitHub API for fetching data.</p>
+
+<p>PS: currently I investigate <a href="https://www.zenhub.com">ZenHub</a> as a Waffle &amp; Syrup replacement. It solves the same problems and brings even more features, like built-in epics and burndown charts. At the same time, Waffle is completely free even for private repositories (and ZenHub <a href="https://www.zenhub.com/pricing">is not</a>). Syrup still can be useful for ZenHub though, you can find more details in <a href="https://github.com/sap1ens/syrup/blob/master/README.md#zenhub-workflow">Readme</a>.</p>
+]]></content>
+  </entry>
+  
+</feed>

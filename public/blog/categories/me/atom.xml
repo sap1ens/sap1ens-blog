@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Me | sap1ens blog]]></title>
+  <link href="http://sap1ens.com/blog/categories/me/atom.xml" rel="self"/>
+  <link href="http://sap1ens.com/"/>
+  <updated>2016-07-17T19:51:56-07:00</updated>
+  <id>http://sap1ens.com/</id>
+  <author>
+    <name><![CDATA[Yaroslav Tkachenko]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[How and what I read [as a Software Engineer]]]></title>
+    <link href="http://sap1ens.com/blog/2014/10/13/how-and-what-i-read-as-a-software-engineer/"/>
+    <updated>2014-10-13T15:06:09-07:00</updated>
+    <id>http://sap1ens.com/blog/2014/10/13/how-and-what-i-read-as-a-software-engineer</id>
+    <content type="html"><![CDATA[<p>I think that self-education is the most important aspect of a good Software Engineer. You <em>have to</em> learn a lot, because our field is still very changeable: popular technology that you know right now might be forgotten very soon, in 2-3 years. And even if you spend significant amount of time during you work day it&rsquo;s not enough :) Always not enough. I&rsquo;m not saying that you should learn <em>everything</em>, but mastering even 2-3 skills that you have and care for is very challenging.</p>
+
+<p>And with self-education I don&rsquo;t necessary mean visiting some expensive courses or getting additional certificate. Not at all. For me, reading books, articles and tutorials is always more efficient &ndash; you can choose very granular pieces of wisdom that can help you fill the gaps in your knowledge.</p>
+
+<!-- more -->
+
+
+<p>Thankfully, there are a lot of ways to increase your reading list: social networks, blogs, email subscriptions, feed aggregators&hellip; Even old-school books can be accessed online with different devices. I want to share what I use to manage all these things.</p>
+
+<p>And before I start I just want to mention that I usually use iPad Air for reading and I think it&rsquo;s a best device for that ;)</p>
+
+<h2>Books and everything else</h2>
+
+<p>I think it&rsquo;s good to separate books (and long research papers, tutorials, etc.) from relatively short articles and blog posts. In this case you can read one book at the time (for example spend 30 minutes during the evening every day) and also consume articles on the fly (when you&rsquo;re going to work, having lunch, taking a break, etc).</p>
+
+<p>I use <a href="https://www.omnigroup.com/omnifocus">OmniFocus</a> for all kinds of ToDo lists. And I have a separate list for books to read. Usually I read them with <a href="https://itunes.apple.com/ca/app/ibooks/id364709193">iBooks</a> or <a href="https://itunes.apple.com/ca/app/kindle/id302584613">Kindle for iPad</a>.</p>
+
+<p>Let&rsquo;s see how to deal with smaller things.</p>
+
+<h3>RSS</h3>
+
+<p><a href="http://www.newsblur.com">NewsBlur</a> is my Google Reader replacement. Right now I have 48 subscriptions, mostly technical blogs like <a href="http://highscalability.com">highscalability.com</a>, <a href="http://letitcrash.com">letitcrash.com</a> or  <a href="http://martinfowler.com">martinfowler.com</a>.</p>
+
+<h3>Pocket</h3>
+
+<p><a href="https://getpocket.com">Pocket</a> is my main reading list. Before I&rsquo;ve tried <a href="https://www.readability.com">Readability</a>, which is free, but Pocket has much better iOS app. And also it can save videos!</p>
+
+<h2>Things in action</h2>
+
+<p>So, I have different streams of incoming information &ndash; Twitter, NewsBlur, reddit and reddit-like websites, conversations with colleagues, meetups, etc. Something I read right away, but most of the articles go to the Pocket app. It&rsquo;s important to give every article a few tags, so you can easily filter and choose what you want to read later. And with books I spent a few minutes to check reviews and content before adding them to the reading list.</p>
+
+<p>I don&rsquo;t use recommendation-based apps like Flipboard or Prismatic, because my reading lists are never empty :) And also, I&rsquo;ll know about all really important and popular articles anyway, for example from Twitter.</p>
+
+<h2>Choice</h2>
+
+<p>It&rsquo;s so easy to sink into this flow of articles, blog posts, updates&hellip; I&rsquo;m trying to plan what I&rsquo;m going to learn and save things accordingly. For example, I have plans to learn more Haskell, so if I see really good article about some Haskell concept or library, I save it. But if it&rsquo;s Go, Rust or how Lift framework works &ndash; I don&rsquo;t have interest now (and in the near future), so I just skip them. You should be realistic and honest to yourself.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Software Development at Bench Accounting]]></title>
+    <link href="http://sap1ens.com/blog/2014/09/02/software-development-at-bench-accounting/"/>
+    <updated>2014-09-02T10:37:50-07:00</updated>
+    <id>http://sap1ens.com/blog/2014/09/02/software-development-at-bench-accounting</id>
+    <content type="html"><![CDATA[<p>I&rsquo;m glad to present the new page about Software Development at Bench Accounting: <a href="https://developers.bench.co/">https://developers.bench.co</a>.</p>
+
+<p><img src="https://www.evernote.com/shard/s24/sh/79a8363d-6f39-4097-8307-51d4274b8a71/0a5fc38a6cae9329e29d0a2b0d1558ba/deep/0/Bench---Developers.png" alt="" /></p>
+
+<p>We open-sourced a few small projects and we&rsquo;re going to do more: <a href="https://github.com/BenchLabs">https://github.com/BenchLabs</a>.</p>
+
+<p>Our blog is in progress right now and it should be finished in the end of September. More cool articles there!</p>
+
+<p>PS: We&rsquo;re hiring! Check our <a href="https://bench.recruiterbox.com/jobs/fk0oj4">DevOps Engineer</a> position. Also, we&rsquo;ll start looking for the Front-end Engineer and Mobile/iOS Engineer very soon, stay tuned!</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Why is it awesome to work in startup?]]></title>
+    <link href="http://sap1ens.com/blog/2013/12/01/why-is-it-awesome-to-work-in-startup/"/>
+    <updated>2013-12-01T09:18:11-08:00</updated>
+    <id>http://sap1ens.com/blog/2013/12/01/why-is-it-awesome-to-work-in-startup</id>
+    <content type="html"><![CDATA[<p>Only in startup you can spend your Monday creating new module for single-page app in CoffeeScript, Tuesday refactoring billing system in Java, Wednesday writing new endpoint for RESTful API in Scala, Thursday researching CSS Flexbox spec and Friday making changes for internal Node.js service.</p>
+
+<p>This is priceless.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[New blog: version unknown]]></title>
+    <link href="http://sap1ens.com/blog/2013/11/24/new-blog-version-unknown/"/>
+    <updated>2013-11-24T20:03:28-08:00</updated>
+    <id>http://sap1ens.com/blog/2013/11/24/new-blog-version-unknown</id>
+    <content type="html"><![CDATA[<p>It looks like this is my new blog. I&rsquo;ve tried to keep a few blogs before, but because of different reasons they all are closed.
+Right now it feels right for me to keep my writings somewhere. Let&rsquo;s try one more time.</p>
+]]></content>
+  </entry>
+  
+</feed>

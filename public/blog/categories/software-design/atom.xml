@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Software Design | sap1ens blog]]></title>
+  <link href="http://sap1ens.com/blog/categories/software-design/atom.xml" rel="self"/>
+  <link href="http://sap1ens.com/"/>
+  <updated>2016-07-17T19:51:56-07:00</updated>
+  <id>http://sap1ens.com/</id>
+  <author>
+    <name><![CDATA[Yaroslav Tkachenko]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Complexity and software]]></title>
+    <link href="http://sap1ens.com/blog/2016/02/21/complexity-and-software/"/>
+    <updated>2016-02-21T11:58:28-08:00</updated>
+    <id>http://sap1ens.com/blog/2016/02/21/complexity-and-software</id>
+    <content type="html"><![CDATA[<p>Software engineers like to discuss different aspects of their craft: elegant solutions, performance benchmarks, semantics of programming languages, the shortest webapp implementation with a favourite framework, etc. We like to argue why language X is better than Y and why framework A is faster/simpler/better to use than B.</p>
+
+<p>Something that we don’t usually discuss is complexity. The important thing to realize: we can’t remove it. We can try to hide it, yes. But any relatively big system has complexity in some form, on some level.</p>
+
+<p>As an example, let’s take a look at popular Sinatra-inspired web frameworks: Flask, Express, etc. It’s <strong>really</strong> simple to create a small webapp or RESTful API. Very simple. So simple that the whole implementation fits on one screen. But still, they hide complexity. Try to run them on multi-core and multi-node cluster efficiently and reliably. That should be relatively “easy” to do, until your application has a state or you discover that not everything is thread-safe. Fun stuff. Distributed systems are hard.</p>
+
+<p>Ok, how about the other side now. Toolkits like Erlang/OTP or Scala/Akka are considered to be complex and suited for building distributed systems. They move complexity to a different edge, so bootstrapping takes much more time, but “hard” problems are actually easier to solve. <a href="http://doc.akka.io/docs/akka/2.4.2/scala/cluster-singleton.html">Cluster Singleton</a> or <a href="http://doc.akka.io/docs/akka/2.4.2/scala/cluster-sharding.html">Cluster Sharding</a>? Yep, it’s there!</p>
+
+<p>The same concept applies to programming languages. Everything has pros and cons. Complexity should always be an additional dimension that we should take into consideration, discuss it and plan accordingly.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[State &#8733; 1 / Scale]]></title>
+    <link href="http://sap1ens.com/blog/2014/12/06/state-1-slash-scale/"/>
+    <updated>2014-12-06T15:53:48-08:00</updated>
+    <id>http://sap1ens.com/blog/2014/12/06/state-1-slash-scale</id>
+    <content type="html"><![CDATA[<p>From <a href="http://www.jamesward.com/2014/12/03/java-doesnt-suck-youre-just-using-it-wrong">Java Doesn’t Suck – You’re Just Using it Wrong</a>:</p>
+
+<blockquote><p>Sticky sessions and server state are usually one of the best ways to kill your performance and resilience. Session state (in the traditional Servlet sense) makes it really hard to do Continuous Delivery and scale horizontally. If you want a session cache use a real cache system – something that was designed to deal with multi-node use and failure. e.g. Memcache, ehcache, etc. In-memory caches are fast but hard to invalidate in multi-node environments and are not durable across restarts – they have their place, like calculated / derived properties where invalidation and recalculation are easy.</p>
+
+<p>Web apps should move state to the edges. UI-related state should live on the client (e.g. cookies, local storage, and in-memory) and in external data stores (e.g. SQL/NoSQL databases, Memcache stores, and distributed cache clusters). Keep those REST services 100% stateless or else the state monster will literally eat you in your sleep.</p></blockquote>
+
+<p>It&rsquo;s easy to follow the rule, but if you didn&rsquo;t&hellip; :&ndash;/</p>
+
+<p>Server state is very hard to fix, it requires massive refactoring and additional tools sometimes. Personally, I&rsquo;ve realized that it&rsquo;ll be my rule #1: avoid state as much as you can.</p>
+]]></content>
+  </entry>
+  
+</feed>

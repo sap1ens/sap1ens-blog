@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Refactoring | sap1ens blog]]></title>
+  <link href="http://sap1ens.com/blog/categories/refactoring/atom.xml" rel="self"/>
+  <link href="http://sap1ens.com/"/>
+  <updated>2016-07-17T19:51:56-07:00</updated>
+  <id>http://sap1ens.com/</id>
+  <author>
+    <name><![CDATA[Yaroslav Tkachenko]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Static typing and refactoring]]></title>
+    <link href="http://sap1ens.com/blog/2016/05/22/static-typing-and-refactoring/"/>
+    <updated>2016-05-22T20:37:31-07:00</updated>
+    <id>http://sap1ens.com/blog/2016/05/22/static-typing-and-refactoring</id>
+    <content type="html"><![CDATA[<p>A few months ago I finished a <strong>huge</strong> refactoring of a Java/Scala project. It took 2 weeks and only 2 engineers to actually implement all the changes, make sure it worked and deploy. Surprisingly, deployment was <em>really</em> smooth, we didn’t encounter any major issues.</p>
+
+<p>I think the reason why it went so good was statically typed language + amazing IDE support for that. I can’t imagine doing similar refactoring in Ruby/Python/Node, for example.</p>
+
+<p><img src="/images/posts/refactoring.png"></p>
+
+<!-- more -->
+
+
+<h2>The task</h2>
+
+<p>Project consists from multiple layers:</p>
+
+<ol>
+<li>HTTP API and serialization/deserialization logic (Scala/Jersey)</li>
+<li>Service layer (Scala/Java/Spring)</li>
+<li>Model (Java/Hibernate/AspectJ)</li>
+<li>Database (MySQL)</li>
+</ol>
+
+
+<p>Our goal was to refactor a bunch of model/database fields, mostly renaming (things like <code>TransactionalDocument.TransactionalDocumentId</code> &ndash;> <code>JournalEntry.id</code>). As you can see it mostly affects model and database layers, but the same fields are used in service level as well as API serialization/deserialization logic &ndash; basically the whole system is affected.</p>
+
+<h2>Refactoring</h2>
+
+<p>First of all, we divided all model classes between 2 engineers and started to deal with classes one by one.</p>
+
+<p>Our toolkit included IntelliJ IDEA and some shell automation for applying database schema and changesets.</p>
+
+<p>Process was simple &ndash; rename model field using IntelliJ IDEA refactoring feature, rename database field in a schema file and verify your changes by:</p>
+
+<ul>
+<li>compiling the project (minute[s])</li>
+<li>recreating database from schema and changesets (seconds)</li>
+</ul>
+
+
+<p>A few words about IntelliJ IDEA: I’ve been using this IDE for years and I’m so thankful to Jetbrains for this amazing piece of tech (and also I’m a little bit proud, since it’s built by smart Russian guys). Because Java and Scala are statically typed languages, IDE is able to trace <em>every single usage of a type or a field</em>, including all layers I mentioned. You just run rename command, confirm all changes in preview, if changeset is large, and apply it in seconds! And you can be absolutely sure that all changes are correct.</p>
+
+<p>One more lesson from this exercise &ndash; it’s always a good idea to NOT expose your model fields directly in API. We have an explicit serialization/deserialization logic in that project and I didn’t have to also refactor front-end app (which is mostly Coffeescript) &ndash; so good! ;)</p>
+
+<p>Also I want to notice that compilation was enough to test changes, I didn’t even need to run the app to check intermediate results. It allowed us to iterate as fast as possible (which was not really fast, because it runs <strong>3</strong> compilers internally: AspectJ, Java and Scala).</p>
+
+<p>We obviously had a huge set of tests (hundreds) + some things could’ve been tested only in runtime (like Spring configuration), but again: you can mostly rely on IDE/compilation to make sure everything works smoothly. Which is an amazing feeling :)</p>
+
+<p>By the way, tests actually helped to discover something that IDE has missed. We use Hibernate and write all queries using JPQL. These queries are represented by simple strings, but IntelliJ IDEA is mostly able to parse those strings and understand actual classes and fields used there. I said mostly, because for some reason sometimes it missed some of the queries and we only could detect those using tests.</p>
+
+<h2>Summary</h2>
+
+<p>So, if you’re planning to work on a big refactoring I advice:</p>
+
+<ul>
+<li>Understand the easiest way to verify your changes. If you use a statically typed language, compilation is usually enough, but you should always have tests to cover your main code paths</li>
+<li>Make sure you know how to make iteration loop as fast as possible using previous verification step. Refactoring always needs time and it’s important to optimize your workflow</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>

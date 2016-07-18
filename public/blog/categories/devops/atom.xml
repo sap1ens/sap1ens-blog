@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: DevOps | sap1ens blog]]></title>
+  <link href="http://sap1ens.com/blog/categories/devops/atom.xml" rel="self"/>
+  <link href="http://sap1ens.com/"/>
+  <updated>2016-07-17T19:51:56-07:00</updated>
+  <id>http://sap1ens.com/</id>
+  <author>
+    <name><![CDATA[Yaroslav Tkachenko]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Ansible and resolving hostnames]]></title>
+    <link href="http://sap1ens.com/blog/2015/02/09/ansible-and-resolving-hostnames/"/>
+    <updated>2015-02-09T20:13:50-08:00</updated>
+    <id>http://sap1ens.com/blog/2015/02/09/ansible-and-resolving-hostnames</id>
+    <content type="html"><![CDATA[<p>Recently I’ve worked on a very simple Ansible task. My goal was to start an environment, wait until it becomes available (online) and do some things after. With environment I mean a web service &ndash; imagine any language or framework you want. Let’s say you need to access some specific URL like /api/heartbeat to make sure it’s initialized properly.</p>
+
+<p>Piece of cake, right?</p>
+
+<!-- more -->
+
+
+<h2>Attempt #1</h2>
+
+<p>If you take a look at the list of all Ansible modules <a href="http://docs.ansible.com/list_of_all_modules.html">here</a>, first of all you probably notice <strong>wait_for</strong>. Let’s try to use it:</p>
+
+<p><code>yml
+--- 
+ - hosts: localhost
+   tasks:
+     - wait_for: host=http://domain.com/api/heartbeat port=80 timeout=5
+</code></p>
+
+<p>(I’m using small timeout here just for demo purposes.)</p>
+
+<p>Result: <em>msg: Timeout when waiting for …</em></p>
+
+<p>So, <strong>wait_for</strong> doesn’t actually work in our case &ndash; it accepts only hostnames without additional path. Ok, skip it.</p>
+
+<p>How about <strong>uri</strong> module? Looks promising:</p>
+
+<p><code>yml
+--- 
+ - hosts: localhost
+   tasks:
+     - uri: url=http://domain.com/api/heartbeat timeout=5
+</code></p>
+
+<p>It should work, but I have a very specific use case &ndash; every environment I start can also create a new CNAME address. It requires some time to become resolvable. So, unfortunately result is <em>msg: Unable to resolve the host name given.</em></p>
+
+<p>I’ve realized that I couldn’t do it with Ansible tools.</p>
+
+<h2>Attempt #2</h2>
+
+<p>If Ansible is powerless let’s just use old school bash. How about that:</p>
+
+<p><code>yml
+--- 
+ - hosts: localhost
+   tasks:
+     - shell: curl --silent --show-error --output /dev/null --retry 90 --retry-delay 10 --retry-max-time 900 http://domain.com/api/heartbeat
+</code></p>
+
+<p>Looks like it works! Except it doesn’t :&ndash;/</p>
+
+<p>If you run this playbook you see that it actually waits for the URL to be available. But there is a problem in the interval between environment becoming resolvable and environment returning HTTP reply. Curl fails in that specific moment.</p>
+
+<p>Wget is better in this case, it has <em>retry-connrefused</em> flag that really helps with the issue. Unfortunately it fails with the part of resolving hostname.</p>
+
+<h2>Attempt #3</h2>
+
+<p>I’ve decided to continue with Curl approach, but improve it as much as I can. So, finally:</p>
+
+<p><code>yml
+--- 
+ - hosts: localhost
+   tasks:
+     - script: scripts/wait_for.sh http://domain.com/api/heartbeat
+</code></p>
+
+<p>where wait_for.sh:</p>
+
+<p>```bash</p>
+
+<h1>!/bin/sh </h1>
+
+<p> until curl &mdash;silent &mdash;output /dev/null $1; do
+   echo Could not fetch, retrying&hellip;
+   sleep 30
+ done
+```</p>
+
+<p>Looks really optimistic (and simple!), but you can always cancel it.</p>
+
+<h2>Conclusion</h2>
+
+<p>I really like the Ansible way, because you can always switch to old school bash and implement whatever you want. I’ve almost decided that this task is impossible to do with Ansible but finally did it in a different way. Don’t be afraid and experiment!</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[What is really DevOps?]]></title>
+    <link href="http://sap1ens.com/blog/2014/10/26/what-is-really-devops/"/>
+    <updated>2014-10-26T11:51:11-07:00</updated>
+    <id>http://sap1ens.com/blog/2014/10/26/what-is-really-devops</id>
+    <content type="html"><![CDATA[<p>DevOps, from <a href="http://en.wikipedia.org/wiki/DevOps">wikipedia</a>:</p>
+
+<blockquote><p>DevOps (a portmanteau of &ldquo;development&rdquo; and &ldquo;operations&rdquo;) is a concept dealing with, among other things: software development, operations, and services. It emphasizes communication, collaboration, and integration between software developers and information technology (IT) operations personnel. DevOps is a response to the interdependence of software development and IT operations. It aims to help an organization rapidly produce software products and services.</p></blockquote>
+
+<p>I think everybody in IT world knows about DevOps concept. Or at least heard about it. Somebody might hire DevOps Engineers.</p>
+
+<p>But if you ask yourself &ndash; what does DevOps mean precisely? What should DevOps Engineer do during the work day? &ndash; the answer probably is clear to you only if you’re DevOps Engineer (it should be!) or if you work very closely with them. For the other world it’s some kind of leprechaun that magically solves all the problems for the team (or application). Well, that’s usually true (not the leprechaun part), but it seems to me there are no any good common standards or rules for this job.</p>
+
+<p>I’d like to share my thoughts about what day-to-day activities should have every DevOps Engineer. I wrote them in a form that every developer should understand, especially if you’re interested in doing more DevOps stuff in your team.</p>
+
+<!-- more -->
+
+
+<h2>Two Simple Rules</h2>
+
+<p>So, let’s start from the two very simple rules that every DevOps  person should adopt:</p>
+
+<ul>
+<li>Everything should be automated</li>
+<li>Everything should be automated in a way that other member of the team can use it</li>
+</ul>
+
+
+<p>That’s it. You can apply it to anything &ndash; running tests, accessing logs, using monitoring, doing releases, … The whole point of having a DevOps Engineer is to glue your Product/Dev/Operations/QA teams together, eliminate any unnecessary communication and manual work. As a result you should see increased speed of development and decreased number of bugs (at least human errors).</p>
+
+<p>Ok, that was very high level things. Let’s go deeper.</p>
+
+<h2>DevOps Activities</h2>
+
+<h3>Development tools support</h3>
+
+<p>It’s important to increase development speed as much as you can &ndash; it affects budget, happiness and even business metrics. But sometimes you have to work with really complicated applications, especially if you use service-oriented architecture.</p>
+
+<p>Having the same setup for all developers can be challenging. Luckily tools like <a href="https://www.vagrantup.com">Vagrant</a> can reduce the struggle. For example, <a href="https://www.vagrantup.com">Vagrant</a> + <a href="https://www.docker.com">Docker</a> is a really powerful combination to reproduce any complicated stack.</p>
+
+<p>Also, make sure you use VCS for everything ;&ndash;)</p>
+
+<h3>Continuous Integration (CI)</h3>
+
+<p><a href="http://jenkins-ci.org">Jenkins</a>, <a href="https://www.jetbrains.com/teamcity/">TeamCity</a>, <a href="https://www.atlassian.com/software/bamboo">Bamboo</a>, <a href="https://circleci.com">CircleCI</a>, <a href="https://travis-ci.org">Travis</a>… &ndash; all these tools have very simple, but very powerful idea: run your builds or tests automatically, triggered by events (usually commits in VCS system) or time. It allows you, as a developer, sleep well, because all your changes are tested almost in realtime.</p>
+
+<p>As a DevOps Engineer it’s important to make sure developers can see results and debug any issues, but at the same time they shouldn’t deal with CI system too much &ndash; use email/chat notifications. They will like it.</p>
+
+<h3>Configuration management</h3>
+
+<p>When a codebase is tested it’s time to deploy it. At least to a staging server. We’ll talk about deployments in the next section, but here let’s talk about environments. Usually every team has a local environment for local development, dev or staging  environment for running tests / showing demos and, of course, production environment.</p>
+
+<p>So, imagine you decided to update a version for some library. Or programming language. It means you have to go and update it for every environment! And in case of local environment you should do it for every team member! That’s a nightmare!</p>
+
+<p>Fortunately we have really nice tools for configuration management. Check Tools section below.</p>
+
+<h3>Deployment / Continuous Delivery</h3>
+
+<p>Ok, codebase is ready, we also have a few environments that were configured automatically. It’s time to deploy our application!</p>
+
+<p>Actually, sometimes you might think that it’s a trivial task. You can just write a small bash-script that takes the latest version from your VCS and restarts a service or something.</p>
+
+<p>But it can be really complicated as well. Load balancers for rolling updates, feature flags, blue green deployments, RDBMS replicas and shards…</p>
+
+<p>And again, even very complicated deployment can be automated. Check Tools section for more details.</p>
+
+<p>Btw, you can combine CI and deployments! It’s called Continuous Delivery (or Continuous Deployment) and the idea behind is obvious: deploy your change right away if all tests are succeeded. That’s a huge win, you can deploy very often and you can get a feedback very fast.</p>
+
+<h3>Security</h3>
+
+<p>When you prepare your application for production release it’s very important to understand who can access what. Things like ssh keys, VPNs, IP whitelisting should make you life easier.</p>
+
+<h3>Monitoring</h3>
+
+<p>So, application is running and it gets some traffic. Nice!</p>
+
+<p>But production environment is always different. And someday you’ll see that one part of your app works really slow. Or just behave strange. Or traffic is too high. And you can’t reproduce it locally :(</p>
+
+<p>That’s why you should use monitoring. And when I say monitoring I don’t mean have <a href="http://newrelic.com">NewRelic</a> integration (which is great, actually) and relax. <a href="http://codeascraft.com/2011/02/15/measure-anything-measure-everything/">Measure Anything, Measure Everything</a> &ndash; that’s very good idea, especially for your future. You business folks will say thank you, you’ll see.</p>
+
+<h3>Maintenance</h3>
+
+<p>Monitoring itself usually is not enough. First of all, when something is not working you should know it first. Notifications and alerts that wake you up at 3am on Sunday are <strong>really</strong> helpful.</p>
+
+<p>All kinds of logs help you investigate issues and if you can afford <a href="http://www.splunk.com">Splunk</a> &ndash; just buy it.</p>
+
+<p>You can design some systems to have self-healing procedures. That’s not easy, but can reduce a lot of pain.</p>
+
+<h3>Backup &amp; Restore</h3>
+
+<p>You probably do some backups, don&rsquo;t you? But have you ever tried to actually use them?</p>
+
+<p>Backups can give you false confidence, you should only rely on restore procedure. Make sure you have backups for database, file storage, etc. and they can be quickly used. Otherwise you&rsquo;re in trouble.</p>
+
+<p>Hint: restore = [configuration management + ] deployment + backup data.</p>
+
+<h2>Tools</h2>
+
+<p><a href="https://www.getchef.com/chef/">Chef</a>, <a href="http://puppetlabs.com">Puppet</a>, <a href="http://www.ansible.com">Ansible</a>, <a href="http://www.saltstack.com">SaltStack</a> &ndash; these are main DevOps tools and every DevOps person should be familiar with at least one of them. They all have important features like configuration management, multi-node deployments, task execution, etc.</p>
+
+<p>Usually if you want to create a bash-script and put it on a remote machine one of those tools is a better solution.</p>
+
+<p>Let me show you <a href="https://github.com/ansible/ansible-examples/blob/master/tomcat-standalone/roles/tomcat/tasks/main.yml">an example</a> of using Ansible for Tomcat installation and configuration:</p>
+
+<h2>``` yaml</h2>
+
+<ul>
+<li><p>name: Install Java 1.7
+yum: name=java-1.7.0-openjdk state=present</p></li>
+<li><p>name: add group &ldquo;tomcat&rdquo;
+group: name=tomcat</p></li>
+<li><p>name: add user &ldquo;tomcat&rdquo;
+user: name=tomcat group=tomcat home=/usr/share/tomcat
+sudo: True</p></li>
+<li><p>name: delete home dir for symlink of tomcat
+shell: rm -fr /usr/share/tomcat
+sudo: True</p></li>
+<li><p>name: Download Tomcat
+get_url: url=<a href="http://www.us.apache.org/dist/tomcat/tomcat-7/v7.0.55/bin/apache-tomcat-7.0.55.tar.gz">http://www.us.apache.org/dist/tomcat/tomcat-7/v7.0.55/bin/apache-tomcat-7.0.55.tar.gz</a> dest=/opt/apache-tomcat-7.0.55.tar.gz</p></li>
+<li><p>name: Extract archive
+command: chdir=/usr/share /bin/tar xvf /opt/apache-tomcat-7.0.55.tar.gz -C /opt/ creates=/opt/apache-tomcat-7.0.55</p></li>
+<li><p>name: Symlink install directory
+file: src=/opt/apache-tomcat-7.0.55 path=/usr/share/tomcat state=link</p></li>
+<li><p>name: Change ownership of Tomcat installation
+file: path=/usr/share/tomcat/ owner=tomcat group=tomcat state=directory recurse=yes</p></li>
+<li><p>name: Configure Tomcat server
+template: src=server.xml dest=/usr/share/tomcat/conf/
+notify: restart tomcat</p></li>
+<li><p>name: Configure Tomcat users
+template: src=tomcat-users.xml dest=/usr/share/tomcat/conf/
+notify: restart tomcat</p></li>
+<li><p>name: Install Tomcat init script
+copy: src=tomcat-initscript.sh dest=/etc/init.d/tomcat mode=0755</p></li>
+<li><p>name: Start Tomcat
+service: name=tomcat state=started enabled=yes</p></li>
+<li><p>name: deploy iptables rules
+template: src=iptables-save dest=/etc/sysconfig/iptables
+notify: restart iptables</p></li>
+<li><p>name: wait for tomcat to start
+wait_for: port={{http_port}}
+```</p></li>
+</ul>
+
+
+<p>As you can see, it’s very easy to read. Don’t be afraid. Just pick one of those tools and act (pick <a href="http://www.ansible.com">Ansible</a>).</p>
+
+<h2>Summary</h2>
+
+<p>Constantly apply Two Simple Rules and you’ll see how much time you spend on actual development instead of struggling with configuration, environments or deployments. You can’t automate development process (yet), but you should automate everything else.</p>
+]]></content>
+  </entry>
+  
+</feed>

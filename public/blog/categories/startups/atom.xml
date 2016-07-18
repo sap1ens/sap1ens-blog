@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Startups | sap1ens blog]]></title>
+  <link href="http://sap1ens.com/blog/categories/startups/atom.xml" rel="self"/>
+  <link href="http://sap1ens.com/"/>
+  <updated>2016-07-17T19:51:56-07:00</updated>
+  <id>http://sap1ens.com/</id>
+  <author>
+    <name><![CDATA[Yaroslav Tkachenko]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Software Development at Bench Accounting]]></title>
+    <link href="http://sap1ens.com/blog/2014/09/02/software-development-at-bench-accounting/"/>
+    <updated>2014-09-02T10:37:50-07:00</updated>
+    <id>http://sap1ens.com/blog/2014/09/02/software-development-at-bench-accounting</id>
+    <content type="html"><![CDATA[<p>I&rsquo;m glad to present the new page about Software Development at Bench Accounting: <a href="https://developers.bench.co/">https://developers.bench.co</a>.</p>
+
+<p><img src="https://www.evernote.com/shard/s24/sh/79a8363d-6f39-4097-8307-51d4274b8a71/0a5fc38a6cae9329e29d0a2b0d1558ba/deep/0/Bench---Developers.png" alt="" /></p>
+
+<p>We open-sourced a few small projects and we&rsquo;re going to do more: <a href="https://github.com/BenchLabs">https://github.com/BenchLabs</a>.</p>
+
+<p>Our blog is in progress right now and it should be finished in the end of September. More cool articles there!</p>
+
+<p>PS: We&rsquo;re hiring! Check our <a href="https://bench.recruiterbox.com/jobs/fk0oj4">DevOps Engineer</a> position. Also, we&rsquo;ll start looking for the Front-end Engineer and Mobile/iOS Engineer very soon, stay tuned!</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[How to keep your Agile really agile]]></title>
+    <link href="http://sap1ens.com/blog/2014/01/19/how-to-keep-your-agile-really-agile/"/>
+    <updated>2014-01-19T19:37:14-08:00</updated>
+    <id>http://sap1ens.com/blog/2014/01/19/how-to-keep-your-agile-really-agile</id>
+    <content type="html"><![CDATA[<p>It can be surprise for somebody, but Agile project management sometimes requires more attention than classical waterfall methodologies.</p>
+
+<p>From <a href="http://en.wikipedia.org/wiki/Scrum_(software_development)">wikipedia</a>: &ldquo;Scrum enables the creation of self-organizing teams by encouraging co-location of all team members, and verbal communication among all team members and disciplines in the project.&rdquo;.</p>
+
+<p>Self-organizing team, huh? It&rsquo;s awesome idea, but actually there is one necessary requirement &ndash; passionate Scrum master. Without such person your team is like a boat full of rowers, but without steersman.</p>
+
+<p>Choose the right person.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Why is it awesome to work in startup?]]></title>
+    <link href="http://sap1ens.com/blog/2013/12/01/why-is-it-awesome-to-work-in-startup/"/>
+    <updated>2013-12-01T09:18:11-08:00</updated>
+    <id>http://sap1ens.com/blog/2013/12/01/why-is-it-awesome-to-work-in-startup</id>
+    <content type="html"><![CDATA[<p>Only in startup you can spend your Monday creating new module for single-page app in CoffeeScript, Tuesday refactoring billing system in Java, Wednesday writing new endpoint for RESTful API in Scala, Thursday researching CSS Flexbox spec and Friday making changes for internal Node.js service.</p>
+
+<p>This is priceless.</p>
+]]></content>
+  </entry>
+  
+</feed>

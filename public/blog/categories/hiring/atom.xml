@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Hiring | sap1ens blog]]></title>
+  <link href="http://sap1ens.com/blog/categories/hiring/atom.xml" rel="self"/>
+  <link href="http://sap1ens.com/"/>
+  <updated>2016-07-17T19:51:56-07:00</updated>
+  <id>http://sap1ens.com/</id>
+  <author>
+    <name><![CDATA[Yaroslav Tkachenko]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Software Engineer Interview]]></title>
+    <link href="http://sap1ens.com/blog/2014/02/11/software-engineer-interview/"/>
+    <updated>2014-02-11T20:43:21-08:00</updated>
+    <id>http://sap1ens.com/blog/2014/02/11/software-engineer-interview</id>
+    <content type="html"><![CDATA[<p>Hiring is always hard. You have a vacancy, then a lot of candidates came and you have to decide who will be the one.</p>
+
+<p>I think I&rsquo;ve finally understood what is the perfect interview for the software engineer position.</p>
+
+<!-- more -->
+
+
+<h3>Test application</h3>
+
+<p>First of all, you should prepare a task to write some test application. It should be simple and small (maximum 60 minutes to implement).</p>
+
+<p>Then add about 5 additional problems to work with (every problem can take about 10-60 minutes).</p>
+
+<h3>Interview process</h3>
+
+<p>Use Google Hangout or Skype to connect with candidate. After introduction ask to share his screen (it&rsquo;s important).</p>
+
+<p>Then describe the task. Candidate can use any language/framework, he can also use Google, Stackoverflow, any books, tutorials, etc.</p>
+
+<p>And magic happens here. Long resumes, great portfolios, recommendations, certifications &ndash; all these things are useless. Now you can see how people <em>really</em> <strong>work</strong>.</p>
+
+<p>After main task you should offer a few problems to work with. It&rsquo;s nice if you have either hard and easy problems &ndash; you can get additional information in this case. There are different types of software engineers, somebody likes to work on a really huge and complicated problem (think a lot about design, refactoring, etc.), and other people may like finishing tasks, fixing bugs&hellip; Sometimes you know what type you need.</p>
+
+<h3>Result</h3>
+
+<p>In the end of the interview you know a lot:</p>
+
+<ul>
+<li>You saw how candidate thought about the problem, how he analysed you requirements</li>
+<li>You saw how candidate designed the application, probably on macro- (project, module) and micro-levels (class, function)</li>
+<li>You saw how candidate used his IDE, OS, tools</li>
+<li>You know is candidate able to learn quickly, use Google/Stackoverflow successfully (important skill btw)</li>
+<li>You also saw his programming skills. If you&rsquo;re generalist it doesn&rsquo;t matter what language was used.</li>
+<li>You can probably decide will it be comfortable to work with this person</li>
+</ul>
+
+
+<p>Cool for the 90 minutes, right?</p>
+
+<p>PS: You might say &ndash; &ldquo;I don&rsquo;t like when somebody is watching when I work. I feel terrible.&rdquo;.</p>
+
+<p>I think it depends on experience &ndash; the more experience you have, the more comfortable you feel. Also, may be you didn&rsquo;t work in a team enough.</p>
+]]></content>
+  </entry>
+  
+</feed>
