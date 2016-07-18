@@ -17,7 +17,7 @@ I also have a huge experience in Web development, working knowledge of QA, Agile
 Current areas of interest:
 
 - Akka, Erlang/OTP and Actor systems in general
-- Event sourcing and CQRS
+- Event-sourcing and CQRS
 - Microservices
 
 Interests and hobbies: healthy vegetarian food and cooking, photography, soccer, travel, writing, books.
