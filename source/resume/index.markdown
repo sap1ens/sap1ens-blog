@@ -89,7 +89,7 @@ I worked on a big e-commerce website (up to 20k+ active users daily), responsibi
 **Web Developer**, November 2009 - February 2010 (4 months) | Omsk, Russia
 
 - Developed web sites and web apps (full-stack)
-- Led educational courses for interns
+- Led training program for interns
 
 ### IA Globus
 
