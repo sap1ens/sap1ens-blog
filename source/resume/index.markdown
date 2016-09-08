@@ -57,6 +57,7 @@ My contributions touched the whole stack. When I joined the company I mostly wor
 I always cared a lot about projects we develop and products we ship. Everything from tiny UI elements to code quality and team motivation. I quickly became a leader for many initiatives and was promoted to the Engineering Lead. As an example, I led the transition from Java monolith app to Scala microservices.
 
 My main projects and achievements included:
+
 - Completely rewritten front-end app from tangled jQuery to CoffeeScript, Backbone.js and RequireJS (it was 2012 ;-)
 - RESTful HTTP API for client and financial data [Scala/Jersey], as well as various APIs for other services and integrations [Scala/Spray]
 - Billing/subscriptions functionality via integration with Stripe [Java]
@@ -76,6 +77,7 @@ I continued to improve not only our codebase and quality standards, but lots of 
 **Senior Web Developer**, March 2010 - July 2011 (1 year 5 months) | Omsk, Russia (Remote)
 
 I worked on a big e-commerce website (up to 20k+ active users daily), responsibilities included:
+
 - Maintenance and feature development (full-stack), including catalog and shopping cart optimizations, custom admin UI and more
 - Implementation of a special shipping module based on a packing optimization algorithm
 - Heavy front-end development using various JS frameworks
