@@ -106,6 +106,9 @@ Engineer’s Degree, Software Engineering and System Analysis
 
 ### Additional certifications and workshops
 
+- Writing Microservices with Lagom, September 2016 | Strange Loop
+- Deploying and scaling applications with Docker, September 2016 | Strange Loop
+- Introduction to Rust, September 2016 | Strange Loop
 - Implementing Domain-Driven Design workshop, March 2016 | by Vaughn Vernon
 - Introduction to Machine Learning Using Spark, May 2015 | Polyglot Unconference
 - Principles of Reactive Programming, May 2015 | Coursera
@@ -122,21 +125,14 @@ I’m also really excited about microservices, containers and DevOps tools and p
 
 ### Tech I’ve used professionally over the last 10 years
 
-Scala: Akka (Actors, HTTP, Cluster, Persistence), Spray, Slick, SBT.
-
-Java: Spring Framework (Context, Security, Data, Roo, MVC), Hibernate, Tomcat, Jersey, Struts, Drools, Camel, Maven.
-
-JavaScript: ECMAScript3-6, CoffeeScript, Node.js, restify, npm.
-
-Python: Django, Flask, Fabric.
-
-PHP: Zend Framework, Code Igniter, Zencart, Magento, Wordpress.
-
-Web: HTML/CSS, jQuery, Backbone.js, AngularJS.
-
-Testing: Selenium, JUnit, TestNG, ScalaTest, Jasmine, Intern.js.
-
-Misc: ActiveMQ, Postgres, MySQL, MongoDB, Redis, Ansible, Docker, Vagrant, Consul, nginx, Amazon Web Services (EC2, S3, RDS, ElastiCache, IAM, Lambda, CloudFormation, EB, ECS, …), Git, SVN, Bash, NewRelic, Datadog, PagerDuty, Splunk, Jenkins, CircleCI.
+- Scala: Akka (Actors, HTTP, Cluster, Persistence), Spray, Slick, SBT.
+- Java: Spring Framework (Context, Security, Data, Roo, MVC), Hibernate, Tomcat, Jersey, Struts, Camel, Maven.
+- JavaScript: ECMAScript3-6, CoffeeScript, Node.js, restify, npm.
+- Python: Django, Flask.
+- PHP: Zend Framework, Code Igniter, Zencart, Magento, Wordpress.
+- Web: HTML/CSS, jQuery, Backbone.js, AngularJS.
+- Testing: Selenium, JUnit, TestNG, ScalaTest, Jasmine, Intern.js.
+- Misc: ActiveMQ, Postgres, MySQL, MongoDB, Redis, Ansible, Docker, Vagrant, Consul, nginx, Amazon Web Services (EC2, S3, RDS, ElastiCache, IAM, Lambda, CloudFormation, EB, ECS, …), Git, SVN, Bash, NewRelic, Datadog, PagerDuty, Splunk, Jenkins, CircleCI.
 
 ### Tech I’ve not used professionally, but either studied or used in small projects
 
