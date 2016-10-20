@@ -136,7 +136,7 @@ I’m also really excited about microservices, containers and DevOps tools and p
 
 ### Tech I’ve not used professionally, but either studied or used in small projects
 
-Erlang/OTP, Go, Haskell, Cassandra, Riak, Kafka, Spark.
+Haskell, Erlang, Go, Kafka, Cassandra, Riak, Spark.
 
 &nbsp;
 
