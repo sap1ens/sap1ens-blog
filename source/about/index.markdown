@@ -34,8 +34,10 @@ I taught myself web development when I was 15 and got full-time job as a web dev
 
 By that time I knew web development pretty well, front-end and back-end (mostly PHP and some Python). My focus at Bench was on UI and front-end development when I started, but I worked on *everything* over 5 years: UI, Java and Scala back-ends, APIs, integrations, core services, infrastructure, DevOps, all kinds of testing. I moved to Canada in 2013 and started to contribute to the overall architecture and transitioning to microservices. I took even more responsibilities shortly after and I've been promoted to the Engineering Lead first and Director of Engineering a few years later.
 
-Currently I'm still contributing a lot, but my focus shifted to back-end (mostly Java/Scala/Node.js), distributed systems, architecture and DevOps. I also manage a few teams (Platform, Integrations). I'm proud to say, that over the last few years I helped to scale Engineering department at Bench from **3 to 20+** engineers and established multiple domain-focused cross-functional Agile teams.
+I was still contributing a lot, but my focus shifted to back-end (mostly Java/Scala/Node.js), distributed systems, architecture and DevOps. I also managed a few teams (Platform, Integrations). I'm proud to say, that over the last few years I helped to scale Engineering department at Bench from **3 to 20+** engineers and established multiple domain-focused cross-functional Agile teams.
 
 By the way, Bench [has recently closed](https://www.crunchbase.com/funding-round/81aa9f47e56b0067461729ac173b815b) **Series B** round with $16M from multiple top investors.
+
+I decided to leave Bench in October 2016. I wrote a [blog post](/blog/2016/10/23/last-week-at-bench/#disqus_thread) about that. I joined [Mobify](https://www.mobify.com) as a Senior Software Engineer, Lead.
 
 You can find more in my [resume](/resume).

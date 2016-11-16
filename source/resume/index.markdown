@@ -39,9 +39,13 @@ You can find my experience, education and skills in the pages below.
 
 &nbsp;
 
+### Mobify
+
+**Senior Software Engineer, Lead**, November 2016 - Present | Vancouver, BC, Canada
+
 ### Bench Accounting
 
-**Director of Engineering**, October 2015 - Present (1 year) | Vancouver, BC, Canada
+**Director of Engineering**, October 2015 - October 2016 (1 year) | Vancouver, BC, Canada
 
 **Engineering Lead**, April 2014 - September 2015 (1 year 6 months) | Vancouver, BC, Canada
 
