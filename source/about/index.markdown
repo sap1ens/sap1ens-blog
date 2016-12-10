@@ -10,7 +10,7 @@ footer: true
 
 Hey, my name is Yaroslav (Slava) Tkachenko, I was born in Russia and I'm currently living in Vancouver, Canada.
 
-I'm a software engineer, at the moment Director of Engineering at [Bench Accounting](https://bench.co).
+I'm a software engineer, at the moment Senior Software Engineer, Lead at [Mobify](https://www.mobify.com).
 
 I like functional programming and distributed systems, you can find more info about what I do below and in my [resume](/resume).
 
