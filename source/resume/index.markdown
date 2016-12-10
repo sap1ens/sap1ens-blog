@@ -43,6 +43,8 @@ You can find my experience, education and skills in the pages below.
 
 **Senior Software Engineer, Lead**, November 2016 - Present | Vancouver, BC, Canada
 
+I joined Mobify to work on Mobify Platform, which includes Progressive Mobile and Engagement Marketing solutions. More details can be found here: [https://www.mobify.com/platform/](https://www.mobify.com/platform/).
+
 ### Bench Accounting
 
 **Director of Engineering**, October 2015 - October 2016 (1 year) | Vancouver, BC, Canada
