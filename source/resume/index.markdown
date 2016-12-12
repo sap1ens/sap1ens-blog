@@ -24,7 +24,7 @@ You can find my experience, education and skills in the pages below.
 
 ## Contacts
 
-2108 - 999 Seymour street, V6B 0M5, Vancouver, British Columbia, Canada.
+Vancouver, British Columbia, Canada.
 
 - Phone: 604-230-8734
 - Email: <sapiensy@gmail.com>
