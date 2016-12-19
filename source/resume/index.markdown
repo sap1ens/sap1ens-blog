@@ -54,11 +54,12 @@ I joined Mobify to work on Mobify Platform, which includes Progressive Mobile an
 **Software Engineer**, September 2011 - March 2014 (2 years 7 months) | Omsk, Russia (Remote) -> Vancouver, BC, Canada
 
 I’m the first employee of the company and I contributed a lot to  its growth and success. In the last 5 years:
+
 - Bench received $25M+ in funding
 - Bench had grown from 6 to 250+ employees
 - Engineering team had grown from 3 to 30 engineers
 
-My contributions touched the whole stack. When I joined the company I mostly worked on a front-end, rewriting multiple single page web apps, then focused more on API, back-end of the core services and integrations, and finally now I’m responsible for the whole Platform, including infrastructure work, DevOps tools and practices, core back-end services, integrations, microservices architecture and more.
+My contributions touched the whole stack. When I joined the company I mostly worked on a front-end, rewriting multiple single page web apps, then focused more on API, back-end of the core services and integrations, and finally I was responsible for the whole Platform, including infrastructure work, DevOps tools and practices, core back-end services, integrations, microservices architecture and more.
 
 I always cared a lot about projects we develop and products we ship. Everything from tiny UI elements to code quality and team motivation. I quickly became a leader for many initiatives and was promoted to the Engineering Lead. As an example, I led the transition from Java monolith app to Scala microservices.
 
@@ -76,7 +77,7 @@ My main projects and achievements included:
 - Creating reproducible infrastructure environments for the microservices architecture [Ansible, AWS CloudFormation]
 - Highly-available and auto-scalable set of microservices with zero-downtime deployment, unified monitoring and logging [Docker, AWS Elastic Beanstalk, Ansible, Jenkins, Datadog, Splunk]
 
-I continued to improve not only our codebase and quality standards, but lots of processes like project management, onboarding experience and education. Now in my role as a Director of Engineering I’m responsible for managing multiple teams working on Platform, infrastructure, API and integrations, as well as participating in technical discussions, contributing to architecture and mentoring. Still, my sleeves are always rolled up and I’m helping teams with regular tasks all the time.
+I continued to improve not only our codebase and quality standards, but lots of processes like project management, onboarding experience and education. In my role as a Director of Engineering I was responsible for managing multiple teams working on Platform, infrastructure, API and integrations, as well as participating in technical discussions, contributing to architecture and mentoring. Still, my sleeves were always rolled up and I was helping teams with regular tasks all the time.
 
 ### PureBulk
 
