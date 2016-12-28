@@ -29,7 +29,9 @@ Multiply that by number of years you're going to maintain that (∞) and the rat
 
 I'm going to talk about RAML ([RESTful API Modeling Language](http://raml.org/)) today. You probably heard about [Swagger](http://swagger.io/)? It seems to be more popular, so why not use it?
 
-Swagger and RAML are *really* similar, but RAML 1.0 uses its own YAML-based format to describe entities. Swagger (and RAML 0.8) uses JSON Schema, which, I think, is inhuman to read. JSON Schema is a great standard when you need to write it once, add to your validators and forget about it. But when you need to constantly iterate and spend most of the time reading it's just really cruel. As an example, try to find a big and relatively complicated JSON Schema file and understand it without a bunch of examples. Then compare it with RAML 1.0 types ;-)
+~~Swagger and RAML are *really* similar, but RAML 1.0 uses its own YAML-based format to describe entities. Swagger (and RAML 0.8) uses JSON Schema, which, I think, is inhuman to read. JSON Schema is a great standard when you need to write it once, add to your validators and forget about it. But when you need to constantly iterate and spend most of the time reading it's just really cruel. As an example, try to find a big and relatively complicated JSON Schema file and understand it without a bunch of examples. Then compare it with RAML 1.0 types ;-)~~
+
+Swagger 2.0 / Open API standard is actually really similar to RAML, including YAML-based format to describe entities. I still feel like RAML has more flexible, concise and elegant language.
 
 ## Syntax
 
@@ -156,3 +158,7 @@ Once you have the first version of the RAML spec you can actually start talking 
 RAML 1.0 is a relatively new standard without a lot of support yet, but it's really powerful! I didn't even mention things like overlays, annotations or multiple inheritance in types! RAML 1.0 is a huge spec and you probably will start using only 30% of it in the beginning.
 
 What I also really like - you don't need to use any of those tools and features right away! You can simply start with your favourite editor and small RAML definition, which is already way better than nothing ;-)
+
+***Update 1***: Hacker News comments - https://news.ycombinator.com/item?id=13260266
+
+***Update 2***: Updated **RAML vs Swagger** section.
