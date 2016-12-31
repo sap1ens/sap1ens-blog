@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Last week at Bench"
-date: 2016-10-23 22:09:38 -0700
+date: 2016-10-24 22:09:38 -0700
 comments: true
 categories:
 - Bench
