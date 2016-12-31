@@ -1,0 +1,80 @@
+---
+layout: post
+title: "2016 In Review"
+date: 2016-12-30 22:35:20 -0800
+comments: true
+categories:
+- Bench
+- Mobify
+- Me
+- Thoughts
+---
+
+Here's my first attempt to summarize most important things happened in my professional life (mostly programming) this year, for future self. May be it'll be interesting for someone else too.
+
+<!-- more -->
+
+## Bench -> Mobify
+
+Probably one of the hardest decisions I made was to leave Bench Accounting. I wrote all details [here](http://sap1ens.com/blog/2016/10/24/last-week-at-bench/), so I'm not going to repeat myself.
+
+I do want to mention that I was in a Director role in 2016 and I spent a lot of time managing different teams and mentoring people. That was a great experience! And I still had time to contribute to Scala/Akka and Node.js projects.
+
+Mobify surprised me in a few different ways. Good: project/product management is amazing! Also, Mobify is an early adopter for a lot of bleeding edge mobile web tech, like Progressive Web Apps and Payment Request API. Bad: as usual, lack of people. Pretty much every startup experiences that.
+
+I had a chance to contribute to the internal Progressive Web SDK (ES6/React/Redux), which felt great, because I didn't work with front-end for a while and it was a nice opportunity to catch up.
+
+Also it was exciting to explore and contribute to Scala/Kafka/Flink combo in a real-world streaming processing use case  (I hope to do it more in 2017).
+
+We have some big plans for Q1 I'm going to mention soon ;-)
+
+## Interviews
+
+It was a long time since I had been interviewed, so I was a bit lost when I decided to find a new job. I quickly realized that for successful interview I just need to have two things:
+
+- Ability to code really fast in a familiar environment
+- Good knowledge of algorithms and data structures. Thanks to [bigocheatsheet.com](http://bigocheatsheet.com) and [www.hackerrank.com](https://www.hackerrank.com
+)
+
+## Blog
+
+I had a goal to publish at least one blog post per month. So, as a result I wrote and published [12 posts](http://sap1ens.com/blog/archives/) in 2016 (including this one). Achievement unlocked! :-D I'm planning to publish at least 15 posts in 2017.
+
+Also I've finally moved this blog to AWS S3/Cloudfront, now it's blazing fast and highly available!
+
+Some annual stats about the blog:
+
+- Pageviews: 13521
+- Average session duration: 37 seconds
+- Top 5 countries: USA, Canada, Germany, UK, India
+- New / Returning visitor ratio: 80 / 20
+
+## Conferences / Talks / Workshops
+
+I visited 3 conferences and a few meetups this year. Mostly events in Vancouver:
+
+- Polyglotconf
+- DevOps Days
+- Scala Meetup
+- AWS User Group
+- ReactJS Meetup
+- ... probably something else I forgot to remember :)
+
+Also, finally visited Strange Loop conference in St. Louis!
+
+Not a lot of events, but DevOps Days and Strange Loop were really really great!
+
+I also visited 3-days iDDD workshop with Vaughn Vernon! Lots of wisdom and hands-on experience, did my first Event Storming exercise.
+
+I presented twice this year (Polyglotconf and AWS User Group in Vancouver), and I'm planning to do it more in 2017. I have some exciting news! Two of my workshop proposals are confirmed, I'm going to conduct full-day "Building Microservices with Scala and Akka" workshop at Microxchg Conference (Berlin, February 2017) and "Deep Dive Into Scala and Akka" full-day workshop at Craft Conf (Budapest, April 2017). And it's just a beginning of the year ;-)
+
+## Things I Learned
+
+- Scala is getting popular, but slowly
+- I still like CoffeeScript, but ES6 is the future
+- Docker Docker Docker
+- "Micro" in microservices doesn't mean a lot
+- DevOps is really hard
+- [Local development tooling](https://gist.github.com/sap1ens/9129d9e646718765193589896efb6be6), thanks JM!
+- Like: Kafka, Docker Swarm, Rust, React
+- Dislike: Go
