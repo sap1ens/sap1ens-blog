@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Software Engineer Interview"
-date: 2014-02-11 20:43:21 -0800
+date: 2014-02-12 20:43:21 -0800
 comments: true
 categories:
 - Hiring

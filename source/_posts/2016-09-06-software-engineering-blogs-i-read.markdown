@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Software Engineering Blogs I Read"
-date: 2016-09-05 21:45:16 -0700
+date: 2016-09-06 21:45:16 -0700
 comments: true
 categories:
 - Reading

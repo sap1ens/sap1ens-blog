@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Static typing and refactoring"
-date: 2016-05-22 20:37:31 -0700
+date: 2016-05-23 20:37:31 -0700
 comments: true
 categories:
 - Thoughts

@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "The Road to Akka Cluster"
-date: 2013-12-08 19:03:09 -0800
+date: 2013-12-09 19:03:09 -0800
 comments: true
 categories:
 - Akka

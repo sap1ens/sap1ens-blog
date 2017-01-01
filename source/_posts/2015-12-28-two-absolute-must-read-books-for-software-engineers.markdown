@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Two absolute must read books for software engineers"
-date: 2015-12-27 17:18:06 -0800
+date: 2015-12-28 17:18:06 -0800
 comments: true
 categories:
 - Reading

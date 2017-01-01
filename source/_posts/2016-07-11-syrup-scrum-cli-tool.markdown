@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Syrup - Scrum CLI tool"
-date: 2016-07-10 19:25:15 -0700
+date: 2016-07-11 19:25:15 -0700
 comments: true
 categories:
 - Node

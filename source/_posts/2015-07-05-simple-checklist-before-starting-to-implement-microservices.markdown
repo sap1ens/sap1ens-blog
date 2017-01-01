@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Simple checklist before starting to implement microservices"
-date: 2015-07-04 20:53:20 -0700
+date: 2015-07-05 20:53:20 -0700
 comments: true
 categories:
 - Microservices

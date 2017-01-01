@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "About technical leadership"
-date: 2016-04-25 21:06:16 -0700
+date: 2016-04-26 21:06:16 -0700
 comments: true
 categories:
 - Thoughts

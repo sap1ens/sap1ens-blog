@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Start with Akka: Let's write some scraper"
-date: 2013-12-03 18:45:44 -0800
+date: 2013-12-04 18:45:44 -0800
 comments: true
 categories:
 - Scala

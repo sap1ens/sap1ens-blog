@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Postgres JSONB indexing is tricky"
-date: 2016-06-19 18:39:15 -0700
+date: 2016-06-20 18:39:15 -0700
 comments: true
 categories:
 - Postgres

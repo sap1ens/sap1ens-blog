@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Ansible and resolving hostnames"
-date: 2015-02-09 20:13:50 -0800
+date: 2015-02-10 20:13:50 -0800
 comments: true
 categories:
 - DevOps
