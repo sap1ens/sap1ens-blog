@@ -1,0 +1,2881 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Building Microservices With Scala And Akka</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <style type="text/css">
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body { font-family: 'Droid Serif'; }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+
+      /* Custom stuff */
+      li {
+        margin-bottom: 10px;
+      }
+
+      .left-column {
+        width: 50%;
+        float: left;
+      }
+
+      .right-column {
+        width: 50%;
+        float: right;
+      }
+
+      .column-30 {
+        width: 30%;
+      }
+
+      .column-45 {
+        width: 45%;
+      }      
+
+      .column-70 {
+        width: 70%;
+      }   
+
+      .column-20 {
+        width: 20%;
+      }
+
+      .column-80 {
+        width: 80%;
+      } 
+
+      .column-50 {
+        width: 50%;
+      }  
+
+      .column-33 {
+        width: 33%;
+      }                      
+
+      .text-center {
+        text-align: center;
+      }
+
+      .text-right {
+        text-align: right;
+      }
+
+      .text-bigger {
+        font-size: 200%;
+      }
+
+      .image-bigger img {
+        width: 50%;
+      }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+# Building Microservices With Scala And Akka
+## Yaroslav Tkachenko
+
+---
+
+# About me
+
+.left-column.column-30[
+![](http://1.gravatar.com/avatar/565c77691f1676e0bab82b4881361f55?size=200)
+
+- Java, Scala
+- Node.js
+- Python
+- Microservices
+- Distributed Systems
+- DevOps
+- ... [and more](http://sap1ens.com/resume/)
+
+]
+
+.right-column.column-70[
+.text-center[
+**Yaroslav (Slava) Tkachenko**, Software engineer
+]
+
+.text-right[
+Vancouver, BC, Canada
+]
+
+**Mobify**
+
+- Senior Software Engineer, Lead, November 2016 – Present
+
+**Bench Accounting**
+
+- Director of Engineering, October 2015 – October 2016
+- Engineering Lead, April 2014 – September 2015 
+- Software Engineer, September 2011 – March 2014 
+
+**Freelance**
+
+- Web Developer, 2007 - 2011
+
+]
+
+???
+
+Ask everyone for 10 seconds introductions
+
+---
+
+# Agenda
+
+- Scala basics 
+- Functional programming in Scala
+- Scala Futures
+- Actor-based programming: theory, common patterns
+- Actors in Akka
+- Supervision 
+- Solving practical problem with Actors and Akka
+- Akka HTTP
+- Akka Clustering: sharding and singleton
+- Akka Persistence 
+- Akka Streams / Alpakka
+- Stateless microservices with Akka
+- Stateful microservices with Akka
+
+???
+
+Mention Lightbend
+
+---
+
+# Why Scala &amp; Akka?
+
+.center[
+![](http://sap1ens-archive.s3-website-us-east-1.amazonaws.com/pictures/scala.jpg)
+
+## Scala
+]
+
+???
+
+We're not going to learn all language features. Our goal is to know enough to use Akka.
+
+---
+
+class: center, middle
+
+# Scala basics 
+
+---
+
+# Scala basics 
+
+## Scala
+
+- General-purpose
+- Object-oriented
+- Functional 
+- Static typing 
+- JVM runtime
+
+## Scala REPL
+
+\> scala
+
+---
+
+# Scala basics - Primitive types and functions
+
+**"Primitive"** types: Byte, Char, Short, Int, Long, Float, Double, Boolean, String...
+
+Scala also supports Symbols (defined like `'name`, similar to `:symbol` in Ruby or `atom` in Erlang)
+
+Variables can be **mutable** and **immutable**: `var` and `val`
+
+Functions are defined using `def`, for example: `def length(n: String): Int`
+
+&nbsp;
+
+Hello World!
+
+```scala
+object HelloWorld {
+  def main(args: Array[String]): Unit = {
+    println("Hello, world!")
+  }
+}
+```
+
+???
+
+Symbols are interned and can be compared in constant time (O(1))
+
+---
+
+# Scala basics - Conditionals and loops
+
+Everything is an expression (that's why we don't need `return`)! 
+
+```scala
+if (x > 0) 1
+else if (x == 0) 0 else -1
+```
+
+```scala
+for (i <- 1 to n)
+ r = r * i
+```
+
+```scala
+for (i <- 1 to 3; j <- 1 to 3 if i != j) print((10 * i + j) + " ")
+```
+
+```scala
+for (i <- 1 to 10) yield i % 3
+```
+
+```scala
+var sum = 0
+var i = 0
+while (i <= 1000 && sum <= 1000) { sum += 1; i += 1 }
+```
+
+???
+
+- No `break` or `continue` operators. There is `import scala.util.control.Breaks._` with `breakable` and `break`, using exceptions.
+- For comprehensions are translated in series of flatMaps and filters
+
+---
+
+# Scala basics - Pattern matching
+
+```scala
+def matchTest(x: Any, y: Int): String = x match {
+  case 1 => "one"
+  case "two" => "2"
+  case 3 | 4 | 5 => "3, 4, 5"
+  case "ten" if y > 100 => "10"
+  case y: Int => s"Int: $y"
+  case _ => "idk"
+}
+```
+
+```scala
+try {
+ process(new URL("http://sap1ens.com"))
+} catch {
+ case _: MalformedURLException => println("Bad URL: " + url)
+ case ex: IOException => ex.printStackTrace()
+}
+```
+
+---
+
+# Scala basics - Classes
+
+```scala
+class Point(var x: Int, var y: Int) {
+  def move(dx: Int, dy: Int): Unit = {
+    x = x + dx
+    y = y + dy
+  }
+  override def toString: String =
+    "(" + x + ", " + y + ")"
+}
+```
+
+```scala
+case class Point(x: Int, y: Int)
+// copy
+// toString
+// compare
+// ...
+
+
+def findX(p: Point): Int = p match {
+  case Point(x, _) => x
+}
+```
+
+---
+
+# Scala basics - Objects
+
+```scala
+object Helper {
+  def doSomething(thing: String): String = { /* ... */ }
+}
+```
+
+```scala
+class Event(var metadata: String)
+
+object Event {
+  def apply(): Event = new Event("")
+  def apply(metadata: String): Event = new Event(metadata)
+}
+```
+
+???
+
+Case classes behave like they have `apply` methods defined
+
+---
+
+# Scala basics - Traits
+
+```scala
+trait One {
+  def one(): String
+}
+
+trait Two {
+  def two(): String = "two"
+}
+
+class Three extends One with Two {
+  def one(): String = "one"
+}
+```
+
+```scala
+sealed trait Account
+case object Chequing extends Account
+case object Savings extends Account
+case class CreditCard(user: String) extends Account
+```
+---
+
+# Scala basics - Generics
+
+```scala
+class Stack[T] {
+  var elems: List[T] = Nil
+  def push(x: T) { elems = x :: elems }
+  def top: T = elems.head
+  def pop() { elems = elems.tail }
+}
+```
+
+```scala
+def count[A](l: List[A]) = l.size
+def count(l: List[_]) = l.size // "wildcard"
+```
+
+```scala
+class Box[F <: Fruit](aFruit: F) {
+  def fruit: F = aFruit
+  def contains(aFruit: Fruit) = fruit.name == aFruit.name
+}
+ 
+val appleBox = new Box[Apple](new Apple)
+val orangeBox = new Box[Orange](new Orange)
+```
+
+---
+
+# Scala basics - Collections
+
+.center[
+![](http://docs.scala-lang.org/resources/images/collections.png)
+]
+
+---
+
+# Scala basics - Collections
+
+```scala
+List(1, 2, 3)
+HashMap("x" -> 24, "y" -> 25, "z" -> 26)
+Set(Color.red, Color.green, Color.blue)
+(1, "localhost")
+```
+
+- `foreach`
+- `map`
+- `filter`
+- `find`
+- `drop` / `dropWhile`
+- `foldRight` / `foldLeft`
+- `flatten`
+- `flatMap`
+- `count`
+- `groupBy`
+- ...
+
+---
+
+# Scala basics - Collections
+
+```scala
+List(1, 2, 3).foreach(element => println(element))
+```
+
+```scala
+List(1, 2, 3) foreach { element => println(element) }
+```
+
+```scala
+List(1, 2, 3).foreach(println(_))
+```
+
+```scala
+List(1, 2, 3).foreach { println(_) }
+```
+
+```scala
+List(1, 2, 3).foreach { println _ }
+```
+
+```scala
+List(1, 2, 3).foreach(println)
+```
+
+```scala
+List(1, 2, 3) foreach (println)
+```
+
+```scala
+List(1, 2, 3) foreach { println }
+```
+
+```scala
+List(1, 2, 3) foreach println
+```
+
+---
+
+# Scala basics - Packages and imports
+
+
+```
+- com
+  - sap1ens
+    - data
+      - App.scala
+```
+
+```scala
+package com.sap1ens.data
+
+object Thing {
+  def doSomething(): Unit
+}
+```
+
+```scala
+import com.sap1ens.data.Thing
+
+Thing.doSomething()
+```
+
+---
+
+class: center, middle
+
+# It's time to code!
+
+---
+
+# It's time to code!
+
+Task: 
+
+- Download [this file](https://raw.githubusercontent.com/jokecamp/FootballData/master/Euro%202012/Euro%202012%20stats%20TEAM.csv)
+- Create a case class to represent a team
+- Parse CSV file and keep results in memory
+- Find:
+  - Team with a biggest number of goals
+  - Teams starting with 'G' or 'P' characters and more than 5 goals
+  - Team that completed 1200 passes. Print its name if team exists, otherwise print "Nothing found"
+
+Tips:
+
+```scala
+val lines = scala.io.Source.fromFile("file.txt").getLines
+```
+
+---
+
+# It's time to code!
+
+```scala
+import scala.io.Source
+
+case class Team(name: String, goals: Int, passes: Int)
+
+val lines = Source.fromFile("/Users/sap1ens/Downloads/euro-stats.csv").getLines.toList.tail
+
+val teams: List[Team] = for(line <- lines) yield {
+  val teamRaw = line.split(",")
+  Team(teamRaw(0), teamRaw(1).toInt, teamRaw(12).toInt)
+}
+
+val teamWithBiggestGoals: Team = teams.maxBy(_.goals)
+
+val teamsStartingWithGP: List[Team] = teams
+  .filter(team => team.name.startsWith("G") || team.name.startsWith("P"))
+  .filter(_.goals > 5)
+
+val teamWith1200CompletedPasses: Option[Team] = teams.find(_.passes == 1200)
+
+teamWith1200CompletedPasses match {
+  case Some(team) => println(team.name)
+  case None => println("Nothing found")
+}
+
+```
+
+---
+
+class: center, middle
+
+# Functional programming in Scala
+
+---
+
+# Functional programming in Scala
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+.center.middle[
+http://www.lihaoyi.com/post/WhatsFunctionalProgrammingAllAbout.html
+]
+
+---
+
+# Functional programming in Scala
+
+Imperative recipe:
+```python
+def make_tiramisu(eggs, sugar1, wine, cheese, cream, fingers, espresso, sugar2, cocoa):
+    dissolve(sugar2, espresso)
+    mixture = whisk(eggs)
+    beat(mixture, sugar1, wine)
+    whisk(mixture) # over steam
+    whip(cream)
+    beat(cheese)
+    beat(mixture, cheese)
+    fold(mixture, cream)
+    assemble(mixture, fingers)
+    sift(mixture, cocoa)
+    refrigerate(mixture)
+    return mixture # it's now a tiramisu
+```
+
+---
+
+# Functional programming in Scala
+
+Functional recipe:
+```python
+def make_tiramisu(eggs, sugar1, wine, cheese, cream, fingers, espresso, sugar2, cocoa):
+    beat_eggs = beat(eggs)
+    mixture = beat(beat_eggs, sugar1, wine)
+    whisked = whisk(mixture)
+    beat_cheese = beat(cheese)
+    cheese_mixture = beat(whisked, beat_cheese)
+    whipped_cream = whip(cream)
+    folded_mixture = fold(cheese_mixture, whipped_cream)
+    sweet_espresso = dissolve(sugar2, espresso)
+    wet_fingers = soak2seconds(fingers, sweet_espresso)
+    assembled = assemble(folded_mixture, wet_fingers)
+    complete = sift(assembled, cocoa)
+    ready_tiramisu = refrigerate(complete)
+    return ready_tiramisu
+```
+
+???
+
+- No side-effects
+- Clear inputs and outputs
+- Easy to refactor and test
+- Easy to see dependencies (chain of calls) and missing variables
+
+---
+
+# Functional programming in Scala
+
+.center[
+![](http://sap1ens-archive.s3-website-us-east-1.amazonaws.com/pictures/TiramisuDiagram.png)
+
+&nbsp;
+
+![](http://sap1ens-archive.s3-website-us-east-1.amazonaws.com/pictures/DiagramGraph.png)
+]
+
+---
+
+# Functional programming in Scala
+
+
+- Functions are first class objects
+
+  - Collections: 
+    ```scala 
+    def filter(p: Int => Boolean): List[Int]
+    ```
+
+- Immutability, laziness, tail recursion
+
+  - Immutable collections, case classes, proper data types and algorithms
+
+  - Lazy vals:
+  ```scala
+  lazy val isReady = expensiveFunc()
+  ```
+
+  - Tail recursion
+  ```scala
+  @tailrec
+  ```
+
+- Types (*Category theory*)
+
+---
+
+# Functional programming in Scala - Option type
+
+
+- Ever seen `NullPointerException`?
+- How about writing `foo?.bar?.baz`?
+- And 
+```javascript
+if(test.level1 && test.level1.level2 && test.level1.level2.level3) {
+  // ...
+}
+```
+?
+
+Scala's solution:
+
+```scala
+sealed trait Option
+case object None extends Option
+case class Some(value: Any) extends Option
+```
+
+```scala
+val absentGreeting: Option[String] = Option(null) // absentGreeting will be None
+val presentGreeting: Option[String] = Option("Hello!") // presentGreeting will be Some("Hello!")
+```
+
+---
+
+# Functional programming in Scala - Option type
+
+```scala
+// 1
+optionVar match {
+  case Some(i) => println(i)
+  case None => println("That didn't work.")
+}
+
+// 2
+if(optionVar.isDefined) {
+  println(optionVar.get)
+} else {
+  println("That didn't work.")
+}
+
+// 3
+optionVar map { i => 
+  println(i)
+} getOrElse {
+  println("That didn't work.")
+}
+```
+
+???
+
+- Missing error message / details in case of None (use Either)
+
+---
+
+# Functional programming in Scala - Either type
+
+`Option` is great, but I also want to pass error message / details!
+
+Scala's solution:
+```scala
+sealed trait Either
+case class Left(value: Any) extends Either
+case class Right(value: Any) extends Either
+```
+
+```scala
+def getContent(url: URL): Either[String, Source] =
+  if (url.getHost.contains("google"))
+    Left("Requested URL is blocked for the good of the people!")
+  else
+    Right(Source.fromURL(url))
+```
+
+---
+
+# Functional programming in Scala - Either type
+
+Either is *unbiased*
+
+```scala
+// 1
+val content: Either[String, Iterator[String]] =
+  getContent(new URL("http://sap1ens.com")).right.map(_.getLines())
+
+// 2
+validateName(inputName).fold {
+  error => s"Validation failed: $error",
+  result => s"Validation succeeded: $result"
+}
+ 
+// 3 
+validateName(inputName) match {
+  case Left(error) => s"Validation failed: $error",
+  case Right(result) => s"Validation succeeded: $result"
+}
+
+getContent(new URL("http://sap1ens.com")).right.toOption
+```
+
+---
+
+class: center, middle
+
+# Scala Futures
+
+---
+
+# Scala Futures
+
+```scala
+object Future {
+  def apply[T](body: => T)(implicit execctx: ExecutionContext): Future[T]
+}
+```
+
+```scala
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.{Success, Failure}
+
+def fetchURL(url: String): Future[String] = Future {
+  scala.io.Source.fromURL(url).getLines.mkString
+}
+
+// 1
+fetchURL("http://sap1ens.com") onComplete {
+  case Success(body) => println(body)
+  case Failure(ex) => println("Sorry, couldn't fetch that")
+}
+
+// 2
+fetchURL("http://sap1ens.com") map { body => 
+  println(body)
+} recover { 
+  case ex => println("Sorry, couldn't fetch that")
+}
+```
+
+---
+
+# Scala Futures
+
+```scala
+Future.sequence(Seq(future1, future2, future3))
+```
+
+```scala
+val first = Future.successful("yeah")
+val second = Future.failed(new Exception("nope"))
+```
+
+```scala
+import scala.concurrent._
+import scala.concurrent.duration._
+
+val request = fetchURL("http://sap1ens.com")
+
+Await.result(request, 5 seconds)
+```
+
+```scala
+val usdQuote = Future { connection.getCurrentValue(USD) }
+val chfQuote = Future { connection.getCurrentValue(CHF) }
+val purchase = for {
+  usd <- usdQuote
+  chf <- chfQuote
+  if isProfitable(usd, chf)
+} yield connection.buy(amount, chf)
+purchase onSuccess {
+  case _ => println("Purchased " + amount + " CHF")
+}
+```
+
+---
+
+# SBT - Scala Build Tool 
+
+http://www.scala-sbt.org/download.html or just `brew install sbt`.
+
+Maven-like folder structure (created automatically by Intellij IDEA):
+```
+- project
+  - plugins.sbt
+- src 
+  - main
+    - resources
+    - scala
+      - com.sap1ens
+        - Service.scala
+  - test
+    - resources
+    - scala
+      - com.sap1ens
+- build.sbt      
+```
+
+Service.scala:
+```scala
+object Service extends App {
+// put some code here...
+}
+```
+
+---
+
+# SBT - Scala Build Tool 
+
+build.sbt:
+```scala
+name := """example-service"""
+
+version := "1.0"
+
+scalaVersion := "2.12.1"
+
+libraryDependencies ++= Seq(
+    "com.typesafe" % "config" % "1.3.1"
+)
+```
+
+Commands: 
+
+- `sbt run`
+- `sbt console`
+- `sbt test`
+
+---
+
+# Typesafe config
+
+https://github.com/typesafehub/config
+
+`application.conf` is a standard config file, should be located in `src/main/resources`: 
+
+```
+akka {
+  loggers = ["akka.event.slf4j.Slf4jLogger"]
+  loglevel = "DEBUG"
+}
+
+db.connection_string = ${MYSQL_CONNECTION_STRING}
+
+hostname = "0.0.0.0"
+port = 80
+```
+
+Use it like this:
+```scala
+val config = ConfigFactory.load() // it's a good idea to implement it like a trait
+val port = conf.getInt("port") 
+```
+
+
+---
+
+class: center, middle
+
+# Actor systems
+
+---
+
+# Actor systems
+
+An actor is a computational entity that, in response to a message it receives, can concurrently:
+
+- send a finite number of messages to other actors;
+- create a finite number of new actors;
+- designate the behavior to be used for the next message it receives.
+
+There is no assumed sequence to the above actions and they could be carried out in parallel.
+
+Key concepts:
+
+- Actor
+- Actor systems
+- Mailbox
+- Supervision strategy
+
+---
+
+# Actor systems - Example
+
+&nbsp;
+
+.left-column.column-50.text-bigger[
+📬 **Rachel**
+]
+
+.right-column.column-50.text-right.text-bigger[
+📬 **Alex**
+]
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+.center.text-bigger[
+📬 **Fred**
+]
+
+---
+
+# Actor systems - Supervision
+
+&nbsp;
+
+.center.text-bigger[
+📬 **Rachel**
+]
+
+&nbsp;
+
+.center.text-bigger[
+💰 ⬇️️
+]
+
+&nbsp;
+
+.center.text-bigger[
+📬 **Fred**
+]
+
+---
+
+# Actor systems - Supervision
+
+&nbsp;
+
+.center.text-bigger[
+📬 **Rachel**
+]
+
+&nbsp;
+
+.center.text-bigger[
+💰 ⬇️️ 
+]
+
+&nbsp;
+
+.center.text-bigger[
+📬 **Fred** ❌
+]
+
+---
+
+# Actor systems - Supervision
+
+&nbsp;
+
+.center.text-bigger[
+📬 **Rachel**
+]
+
+&nbsp;
+
+.center.text-bigger[
+💰 ⬇️️  ⬆️️
+]
+
+&nbsp;
+
+.center.text-bigger[
+📬 **Fred** ❌
+]
+
+---
+
+# Actor systems - Supervision
+
+Strategies: 
+
+- Resume the subordinate, keeping its accumulated internal state
+- Restart the subordinate, clearing out its accumulated internal state
+- Stop the subordinate permanently
+- Escalate the failure, thereby failing itself
+
+---
+
+# Actor systems - Patterns
+
+Since we're dealing with messages, most of the Enterprise Integration Patterns (EIP) are applicable, for example: 
+
+- Point-to-Point Channel (Actor communication)
+- Publish-Subscribe Channel
+- Scatter-Gather (Scheduler-Workers)
+- Pipes and Filters
+- ...
+
+We're going to explore more in the next section (Akka).
+
+---
+
+# Actor systems - Scheduler-Workers
+
+&nbsp;
+
+.center.text-bigger[
+📬 **Scheduler**
+]
+
+&nbsp;
+
+.center.text-bigger[
+⬇️️ 
+]
+
+&nbsp;
+
+.left-column.column-33.text-bigger[
+📬 **Worker1**
+]
+
+.right-column.column-33.text-bigger[
+📬 **Worker2**
+]
+
+.right-column.column-33.text-bigger[
+📬 **Worker3**
+]
+
+---
+
+# Actor systems - Communication styles
+
+- Fire and forget
+- Reply back
+- Pass original sender addresses
+- Keep addresses in the internal state
+
+---
+
+class: center, middle
+
+# Akka
+
+---
+
+# Akka 
+
+Akka is an open-source toolkit and runtime simplifying the construction of concurrent and distributed applications on the JVM. Akka supports multiple programming models for concurrency, but it emphasizes actor-based concurrency, with inspiration drawn from Erlang.
+
+---
+
+# Akka - Overview
+
+Why?
+
+- Concurrency and overall performance
+- Scalability 
+- Clean asynchronous programming model
+- Resilience
+- Simple distributed programming
+
+---
+
+# Akka - Reactive Manifesto
+
+.center[
+![](http://www.reactivemanifesto.org/images/reactive-traits.svg)
+]
+
+---
+
+# Akka - Concurrency
+
+Scripting languages like PHP, Ruby, Python – usually single-threaded
+
+C, C#, Java – explicit thread management
+
+Erlang, Haskell, Go – “green threads”, channels, etc.
+
+Scala: Akka – actors (“green threads”) + Java Virtual Machine
+
+---
+
+# Akka - Actors
+
+```scala
+case class Greeting(who: String)
+ 
+class GreetingActor extends Actor with ActorLogging {
+  def receive = {
+    case Greeting(who) => log.info("Hello " + who)
+  }
+}
+ 
+val system = ActorSystem("MySystem")
+val greeter = system.actorOf(Props[GreetingActor], name = "greeter")
+greeter ! Greeting("Charlie Parker")
+```
+
+&nbsp;
+
+- Immutability of messages
+- Messages are handled one by one
+- Stateful actors
+
+---
+
+class: center, middle
+
+![](http://doc.akka.io/docs/akka/2.4/_images/actor_lifecycle1.png)
+
+---
+
+# Akka - Actors
+
+Hooks:
+```scala
+def preStart()
+ 
+def postStop()
+ 
+def preRestart(reason: Throwable, message: Option[Any])
+ 
+def postRestart(reason: Throwable)
+```
+
+---
+
+# Akka - Props
+
+A proper way to create Actors with parameters: 
+
+```scala
+object DemoActor {
+  def props(magicNumber: Int): Props = Props(classOf[DemoActor], magicNumber)
+}
+ 
+class DemoActor(magicNumber: Int) extends Actor with ActorLogging {
+  def receive = {
+    case x: Int => log.info(x + magicNumber)
+  }
+}
+ 
+val demoActor = context.actorOf(DemoActor.props(42), "demo")
+```
+
+---
+
+# Akka - Communication
+
+```scala
+class HelloActor extends Actor with ActorLogging {
+  def receive = {
+    case who => sender() ! "Hello, " + who
+  }
+}
+
+object ConversationActor {
+  def props(fellowActor: ActorRef): Props = Props(classOf[ConversationActor], fellowActor)
+}
+
+class ConversationActor(fellowActor: ActorRef) extends Actor with ActorLogging {
+  def receive = {
+    case "start" => fellowActor ! "it's me!"
+    case message => log.info(message)
+  }
+}
+ 
+val system = ActorSystem("MySystem")
+
+val helloActor = system.actorOf(Props[HelloActor])
+val conversationActor = ConversationActor.props(helloActor)
+
+conversationActor ! "start"
+```
+
+---
+
+# Akka - Communication
+
+Ask: 
+```scala
+import scala.concurrent.duration._
+import akka.util.Timeout
+import akka.pattern.ask
+implicit val timeout = Timeout(5 seconds)
+val future = myActor ? "hello"
+```
+
+Forward:
+```scala
+target forward message
+```
+
+Kill:
+```scala
+import akka.actor.PoisonPill
+
+target ! PoisonPill
+```
+
+---
+
+# Akka - Behavior
+
+```scala
+class HotSwapActor extends Actor {
+  import context._
+  def angry: Receive = {
+    case "foo" => sender() ! "I am already angry?"
+    case "bar" => become(happy)
+  }
+ 
+  def happy: Receive = {
+    case "bar" => sender() ! "I am already happy :-)"
+    case "foo" => become(angry)
+  }
+ 
+  def receive = {
+    case "foo" => become(angry)
+    case "bar" => become(happy)
+  }
+}
+```
+
+---
+
+# Akka - Behavior
+
+```scala
+import akka.actor.Stash
+class ActorWithProtocol extends Actor with Stash {
+  def receive = {
+    case "open" =>
+      unstashAll()
+      context.become({
+        case "write" => // do writing...
+        case "close" =>
+          unstashAll()
+          context.unbecome()
+        case msg => stash()
+      }, discardOld = false) // stack on top instead of replacing
+    case msg => stash()
+  }
+}
+```
+
+
+---
+
+# Akka - Routing
+
+```scala
+val router: ActorRef = context.actorOf(RoundRobinPool(5).props(Props[Worker]), "router")
+```
+
+- RoundRobinRoutingLogic
+- RandomRoutingLogic
+- SmallestMailboxRoutingLogic
+- BroadcastRoutingLogic
+- ScatterGatherFirstCompletedRoutingLogic
+- TailChoppingRoutingLogic
+- ConsistentHashingRoutingLogic
+
+---
+
+# Akka - Mailboxes
+
+```
+control-aware-dispatcher {
+  mailbox-type = "akka.dispatch.UnboundedControlAwareMailbox"
+}
+```
+
+```scala
+val a = system.actorOf(Props(classOf[Logger], this).withDispatcher("control-aware-dispatcher"))
+```
+
+- **UnboundedMailbox**
+- SingleConsumerOnlyUnboundedMailbox
+- NonBlockingBoundedMailbox
+- UnboundedControlAwareMailbox
+- UnboundedPriorityMailbox
+- UnboundedStablePriorityMailbox
+- BoundedMailbox
+- BoundedPriorityMailbox
+- BoundedStablePriorityMailbox
+- BoundedControlAwareMailbox
+
+---
+
+# Akka - Event Stream
+
+```scala
+system.eventStream.subscribe(listenerActor, classOf[Message])
+```
+
+```scala
+system.eventStream.publish(Message("Hi!"))
+```
+
+For example:
+```scala
+import akka.actor.AllDeadLetters
+system.eventStream.subscribe(listener, classOf[AllDeadLetters])
+```
+
+or local Pub/Sub.
+
+---
+
+# Akka - Supervision
+
+```scala
+class Supervisor extends Actor {
+  override val supervisorStrategy =
+    OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1 minute) {
+      case _: ArithmeticException      ⇒ Resume
+      case _: NullPointerException     ⇒ Restart
+      case _: Exception                ⇒ Escalate
+    }
+ 
+  val worker = context.actorOf(Props[Worker])
+ 
+  def receive = {
+    case n: Int => worker forward n
+  }
+}
+```
+
+---
+
+# Akka - Actors &amp; Futures
+
+```scala
+implicit val timeout = Timeout(5 seconds)
+val future = actor ? msg
+
+// 1
+future onComplete {
+  case Success(result)  => doSomethingOnSuccess(result)
+  case Failure(failure) => doSomethingOnFailure(failure)
+}
+
+// 2
+future.map(result => doSomething(result))
+
+// 3
+for {
+  r <- future
+} yield doSomething(r)
+```
+
+---
+
+class: center, middle
+
+# Blocking Is Bad
+
+---
+
+# Akka and Application Architecture
+
+*We have actors. What are supposed to do with them? MVC? SOA? Something else? How about DI? How do we structure actor-based apps?*
+
+Let's talk about:
+
+- **DDD** (Domain-Driven Design)
+- **EIP** (Enterprise Integration Patterns)
+
+---
+
+# Akka and Application Architecture
+
+.left-column.column-45.text-right[
+![](https://images-na.ssl-images-amazon.com/images/I/5146azDZjmL._SX358_BO1,204,203,200_.jpg)
+]
+
+.right-column.column-45[
+![](https://images-na.ssl-images-amazon.com/images/I/51dGyfBYvuL._SX382_BO1,204,203,200_.jpg)
+]
+
+---
+
+# Akka and Application Architecture
+
+.left-column.column-50[
+Domain Driven Design: 
+
+- Value Object 
+- Entity 
+- Service
+- Repository
+- Domain Event
+- Event vs Command
+- ...
+]
+
+.right-column.column-50[
+Enterprise Integration Patterns:
+
+- Message
+- Point-to-Point
+- Publish-Subscribe
+- Pipes and Filters
+- Content-Based Router
+- Message Filter
+- Scatter-Gather
+- ...
+]
+
+---
+
+# Akka and Application Architecture
+
+.center[
+![](http://sap1ens-archive.s3-website-us-east-1.amazonaws.com/pictures/workshop_akka_design_example.png)
+]
+
+---
+
+# Akka and Application Architecture
+
+```scala
+object SynchronizationService {
+  // data model
+
+  sealed trait DocumentMetadata {
+    def version: String
+  }
+
+  case class DocumentMetadataV2(...) extends DocumentMetadata
+  case class DocumentMetadataV3(...) extends DocumentMetadata
+
+  // actions
+
+  case class SaveDocument(...)
+
+  case class StartSync(connection: Connection)
+
+  private case class CreateStatement(...)
+  private case class FindOrCreateStatementAccount(...)
+  private case class CreateStatementAccount(...)
+  private case class SaveAndUploadStatement(...)
+
+  // ...
+```
+
+---
+
+# Akka and Application Architecture
+
+```scala
+  // ...
+
+  // results
+
+  sealed trait DeliveryResult
+  case object Delivered extends DeliveryResult
+  case object Failed extends DeliveryResult
+  case object NotFound extends DeliveryResult
+
+  private case class SyncFailure(...)
+
+  def props(s3Service: ActorRef, exportService: ActorRef, connectionsResource: ConnectionsResourceLike, 
+    filestorePath: String): Props = 
+      Props(classOf[SynchronizationService], s3Service, exportService, connectionsResource, filestorePath)
+}
+```
+
+---
+
+# Akka and Application Architecture
+
+```scala
+class SynchronizationService(s3Service: ActorRef, exportService: ActorRef, 
+  connectionsResource: ConnectionsResourceLike, filestorePath: String)
+  extends Actor with ActorLogging {
+
+  def receive: Receive = {
+    case StartSync(connection) => // ...
+    case SaveDocument(metadata, file) => // ...
+    case action @ CreateStatement(...) => // ...
+    case FindOrCreateStatementAccount(action, connection, receiver) => // ...
+    case CreateStatementAccount(action, connection, receiver) => // ...
+    case SaveAndUploadStatement(action, connection, statementAccount, receiver) => // ...
+    case SyncFailure(error, action, receiver, deliveryResult) => // ...
+    case UploadResultOk(statement, receiver) => // ...
+    case UploadResultFailure(error, receiver) => // ...
+  }
+}
+```
+
+---
+
+# Akka and Application Architecture
+
+```scala
+trait CoreActors extends ConfigHolder {
+  // helpers
+
+  val integrationApiClient = new APIClient()
+
+  val s3Service = system.actorOf(S3Service.props(config.getString("s3.bucket"), config.getString("s3.accessKey"),
+    config.getString("s3.secretKey"), config.getInt("s3.maxRetries")
+  ), "S3Service")
+
+  val fileManager = system.actorOf(FileManager.props(config.getString("filestore"), s3Service), "FileManager")
+
+  // services
+  val exportService = system.actorOf(ExportService.props(
+    integrationApiClient,
+    fileManager,
+    Duration(config.getInt("export.interval"), MINUTES),
+    config.getBoolean("export.enabled"),
+    config.getInt("export.maxRetries")
+  ), "StatementsExportService")
+
+  val synchronizationService = system.actorOf(SynchronizationService.props(
+    s3Service,
+    exportService,
+    ConnectionsResource,
+    config.getString("filestore")
+  ), "SynchronizationService")
+}
+```
+
+---
+
+# Akka and Application Architecture
+
+We've just created Application **Core**. We can add more interfaces like **HTTP** and **messaging queues**.
+
+- HTTP, we'll look into Akka HTTP soon
+- Messaging queues, let's use Akka Camel
+
+---
+
+# ~~Akka~~ Apache Camel
+
+http://camel.apache.org
+
+"The most unknown coolest library out there" JM (c)
+
+*Apache Camel offers you the interfaces for the EIPs, the base objects, commonly needed implementations, debugging tools, a configuration system, and many other helpers which will save you a ton of time when you want to implement your solution to follow the EIPs.*
+
+```java
+from("direct:report")
+  .to("file:target/reports/?fileName=report.txt")
+
+from("twitter://search?...")
+  .to("websocket:camel-tweet?sendToAll=true")
+
+from("netty-http:http://0.0.0.0:8080")
+  .to("direct:name") 
+
+from("jms:invoices")
+  .setBody()
+  .groovy("new Invoice(request.body,currentTimeMillis())")
+  .to("mongodb:mongo?...operation=insert")
+```
+
+Hundreds of components for everything! https://camel.apache.org/components.html
+
+---
+
+# Akka Camel
+
+Akka Camel Consumer:
+```scala
+class OrdersConsumer extends Consumer {
+  def endpointUri = "activemq:queue:orders"
+ 
+  def receive = {
+    case msg: CamelMessage => { /* ... */ }
+    case _                 => { /* ... */ }
+  }
+}
+```
+
+Akka Camel Producer:
+```scala
+class OrdersProducer extends Actor with Producer {
+  def endpointUri = "activemq:queue:orders"
+}
+ 
+val orders = system.actorOf(Props[Orders])
+ 
+orders ! Order(...)
+```
+
+---
+
+# Akka and Application Architecture
+
+General guidelines: 
+- Set of Actors as a core layer
+- Additional layers for integration, persistence, etc.
+- Akka HTTP for REST API
+- Akka Camel for messaging queues
+
+---
+
+# Akka and Application Architecture
+
+Hexagonal architecture: 
+
+.center[
+![](http://alistair.cockburn.us/get/2301)
+]
+
+---
+
+# Akka and Application Architecture
+
+Hexagonal architecture: 
+
+.center[
+![](http://alistair.cockburn.us/get/2304)
+]
+
+---
+
+class: center, middle
+
+# It's time to code, again!
+
+---
+
+# It's time to code, again!
+
+Task: https://github.com/sap1ens/scala-akka-workshop (use this to start).
+
+Let's build a [job queue](https://en.wikipedia.org/wiki/Job_queue)! 
+ 
+In our case we're going to have `JobExecutor` actor that accepts incoming job requests and executes them using pool of `JobWorker` actors. If one of the `JobWorker` actors fails `JobExecutor` should restart failed job. Also `JobWorker`s should communicate results to `JobExecutor`.
+
+A job itself can be anything (read or write a file, calculate something, etc.), but I suggest to download a file from specified URL and save it to local disk with provided path. Ideally we should introduce a percent of failures, so we can see restarts as well.
+
+A few important things: 
+
+- All Akka dependencies are already included in build.sbt
+- You can run the application with `sbt run`
+- Use case classes to represent jobs
+- If you add `ActorLogging` trait to your actor you'll be able to print logging messages with `log.info(...)`, `log.error(...)`, etc.
+
+---
+
+# It's time to code, again!
+
+Solution: https://github.com/sap1ens/scala-akka-workshop/tree/solution/src/main/scala/com/sap1ens/workshop
+
+Solution with Futures: https://github.com/sap1ens/scala-akka-workshop/tree/solution-with-futures/src/main/scala/com/sap1ens/workshop
+
+---
+
+class: center, middle
+
+# Akka Streams
+
+---
+
+# Akka Streams
+
+http://www.reactive-streams.org
+
+Reactive Streams is an initiative to provide a standard for asynchronous stream processing with non-blocking back pressure. This encompasses efforts aimed at runtime environments (JVM and JavaScript) as well as network protocols.
+
+In summary, Reactive Streams is a standard and specification for Stream-oriented libraries for the JVM that
+- process a potentially unbounded number of elements
+- in sequence,
+- asynchronously passing elements between components,
+- with mandatory non-blocking backpressure.
+
+---
+
+# Akka Streams
+
+- Source
+- Flow
+- Sink
+
+and also Graphs!
+
+```scala
+implicit val actorSystem = ActorSystem("akka-streams-example")
+implicit val materializer = ActorMaterializer()
+
+val helloWorldStream: RunnableGraph[NotUsed] =
+  Source.single("Hello world")
+    .via(Flow[String].map(s => s.toUpperCase()))
+    .to(Sink.foreach(println))
+
+helloWorldStream.run()    
+```
+---
+
+# Akka Streams
+
+.left-column.column-33[
+Source stages: 
+- fromIterator
+- apply
+- single
+- repeat
+- cycle
+- tick
+- fromFuture
+- fromCompletionStage
+- unfold
+- unfoldAsync
+- empty
+- maybe
+- ...
+]
+
+.left-column.column-33[
+Simple Flow processing stages: 
+- map
+- mapConcat
+- statefulMapConcat
+- filter
+- filterNot
+- collect
+- grouped
+- sliding
+- scan
+- scanAsync
+- fold
+- foldAsync
+- ...
+]
+
+.left-column.column-33[
+Sink stages: 
+- head
+- headOption
+- last
+- lastOption
+- ignore
+- cancelled
+- seq
+- foreach
+- foreachParallel
+- onComplete
+- lazyInit
+- queue
+- ...
+]
+
+---
+
+# Akka Streams
+
+```scala
+implicit val system = ActorSystem("Sys")
+implicit val materializer = ActorMaterializer()
+val LoglevelPattern = """.*\[(DEBUG|INFO|WARN|ERROR)\].*""".r
+
+FileIO.fromPath(Paths.get("src/main/resources/logfile.txt"))  
+  // parse chunks of bytes into lines
+  .via(Framing.delimiter(ByteString(System.lineSeparator), maximumFrameLength = 512, allowTruncation = true)) 
+  .map(_.utf8String)
+  .map {
+    case line @ LoglevelPattern(level) => (level, line)
+    case line @ other                  => ("OTHER", line)
+  } 
+  .groupBy(5, _._1) // group them by log level
+  .fold(("", List.empty[String])) {
+    case ((_, list), (level, line)) => (level, line :: list)
+  }
+  .mapAsync(parallelism = 5) { // write lines of each group to a separate file
+    case (level, groupList) =>
+      Source(groupList.reverse)
+        .map(line => ByteString(line + "\n")).runWith(FileIO.toPath(Paths.get(s"target/log-$level.txt")))
+  }
+  .mergeSubstreams
+  .runWith(Sink.onComplete {
+    case Success(_) =>
+      system.terminate()
+    case Failure(e) =>
+      println(s"Failure: ${e.getMessage}")
+      system.terminate()
+  })
+```
+
+---
+
+# Akka Streams
+
+```scala
+val g = RunnableGraph.fromGraph(GraphDSL.create() { implicit builder: GraphDSL.Builder[NotUsed] =>
+  import GraphDSL.Implicits._
+  val in = Source(1 to 10)
+  val out = Sink.ignore
+ 
+  val bcast = builder.add(Broadcast[Int](2))
+  val merge = builder.add(Merge[Int](2))
+ 
+  val f1, f2, f3, f4 = Flow[Int].map(_ + 10)
+ 
+  in ~> f1 ~> bcast ~> f2 ~> merge ~> f3 ~> out
+  bcast ~> f4 ~> merge
+  ClosedShape
+})
+```
+
+---
+
+class: center, middle
+
+# Alpakka
+
+---
+
+# Alpakka
+
+https://github.com/akka/alpakka
+
+http://developer.lightbend.com/docs/alpakka/current/
+
+*Welcome to the home of the Alpakka initiative, which harbours various Akka Streams connectors, integration patterns, and data transformations for integration use cases.*
+
+Integrations so far:
+- amqp
+- cassandra
+- dynamodb
+- file
+- ftp
+- hbase
+- jms
+- mqtt
+- s3
+
+---
+
+# Alpakka
+
+File:
+
+```scala
+val fs = FileSystems.getDefault
+val lines: Source[String, NotUsed] = scaladsl.FileTailSource.lines(
+  path = fs.getPath(path),
+  maxLineSize = 8192,
+  pollingInterval = 250.millis
+)
+
+lines.runForeach(line => println(line))
+```
+
+```scala
+val fs = FileSystems.getDefault
+val changes = DirectoryChangesSource(fs.getPath(path), pollInterval = 1.second, maxBufferSize = 1000)
+changes.runForeach {
+  case (path, change) => println("Path: " + path + ", Change: " + change)
+}
+```
+
+---
+
+# Alpakka
+
+AMQP:
+
+```scala
+val queueName = "amqp-conn-it-spec-simple-queue"
+val queueDeclaration = QueueDeclaration(queueName)
+
+val amqpSink = AmqpSink.simple(
+  AmqpSinkSettings(DefaultAmqpConnection).withRoutingKey(queueName).withDeclarations(queueDeclaration)
+)
+
+val input = Vector("one", "two", "three", "four", "five")
+Source(input).map(s => ByteString(s)).runWith(amqpSink)
+```
+
+```scala
+val amqpSource = AmqpSource(
+  NamedQueueSourceSettings(DefaultAmqpConnection, queueName).withDeclarations(queueDeclaration),
+  bufferSize = 10
+)
+
+val result = amqpSource.map(_.bytes.utf8String).take(input.size).runWith(Sink.seq)
+```
+
+---
+
+# Alpakka
+
+S3 source code fragment: 
+
+```scala
+// ...
+SplitAfterSize(chunkSize)(Flow.apply[ByteString])
+  .via(getChunkBuffer(chunkSize)) //creates the chunks
+  .concatSubstreams
+  .zipWith(requestInfo) {
+    case (chunkedPayload, (uploadInfo, chunkIndex)) =>
+      //each of the payload requests are created
+      val partRequest =
+        HttpRequests.uploadPartRequest(uploadInfo, chunkIndex, chunkedPayload.data, chunkedPayload.size, region)
+      (partRequest, (uploadInfo, chunkIndex))
+  }
+  .mapAsync(parallelism) { case (req, info) => Signer.signedRequest(req, signingKey).zip(Future.successful(info)) }
+// ...  
+```
+
+---
+
+class: center, middle
+
+# Akka HTTP
+
+---
+
+# Akka HTTP
+
+- Reincarnation of the famous [Spray](http://spray.io) library
+- Akka-native (based on Akka Streams)
+- Very fast and performant
+- Very strict implementation
+- Has Server and Client APIs
+- Server APIs:
+  - Low-level (dealing with connections and streams)
+  - High-level (using routing and directives)
+- Client APIs:
+  - Low-level Connection API
+  - Low-level Host API
+  - High-level Request API
+
+---
+
+# Akka HTTP - High-level Server Example
+
+```scala
+import akka.actor.ActorSystem
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.model._
+import akka.http.scaladsl.server.Directives._
+import akka.stream.ActorMaterializer
+
+object WebServer {
+  def main(args: Array[String]) {
+
+    implicit val system = ActorSystem("my-system")
+    implicit val materializer = ActorMaterializer()
+
+    val route =
+      path("hello") {
+        get {
+          complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "<h1>Say hello to akka-http</h1>"))
+        }
+      }
+
+    Http().bindAndHandle(route, "localhost", 8080)
+  }
+}
+```
+
+---
+
+# Akka HTTP - More Routes
+
+```scala
+val route = {
+  path("orders") {
+    authenticateBasic(realm = "admin area", myAuthenticator) { user =>
+      get {
+        encodeResponseWith(Deflate) {
+          complete {
+            // marshal custom object with in-scope marshaller
+            retrieveOrdersFromDB
+          }
+        }
+      } ~
+      post {
+        // decompress gzipped or deflated requests if required
+        decodeRequest {
+          // unmarshal with in-scope unmarshaller
+          entity(as[Order]) { order =>
+            complete {
+              // ... write order to DB
+              "Order received"
+            }
+          }
+        }
+      }
+    }
+  }
+```
+
+---
+
+# Akka HTTP - More Routes
+
+```scala  
+val route = {
+  // extract URI path element as Int
+  pathPrefix("order" / IntNumber) { orderId =>
+    pathEnd {
+      put {
+        // form extraction from multipart or www-url-encoded forms
+        formFields(('email, 'total.as[Money])).as(Order) { order =>
+          complete {
+            // complete with serialized Future result
+            (myDbActor ? Update(order)).mapTo[TransactionResult]
+          }
+        }
+      }
+    } ~
+    path("items") {
+      get {
+        // parameters to case class extraction
+        parameters(('size.as[Int], 'color ?, 'dangerous ? "no"))
+          .as(OrderItem) { orderItem =>
+            // ... route using case class instance created from
+            // required and optional query parameters
+            complete("") // hide
+          }
+      }
+    }
+  }
+```
+  
+---
+
+# Akka HTTP - More Routes
+
+```scala  
+val route = {
+  pathPrefix("documentation") {
+    // optionally compresses the response with Gzip or Deflate
+    // if the client accepts compressed responses
+    encodeResponse {
+      // serve up static content from a JAR resource
+      getFromResourceDirectory("docs")
+    }
+  } ~
+  path("oldApi" / Remaining) { pathRest =>
+    redirect("http://oldapi.example.com/" + pathRest, MovedPermanently)
+  }
+}
+
+```
+
+---
+
+# Akka HTTP - The Routing Tree
+
+```scala
+val route =
+  a {
+    b {
+      c {
+        ... // route 1
+      } ~
+      d {
+        ... // route 2
+      } ~
+      ... // route 3
+    } ~
+    e {
+      ... // route 4
+    }
+  }
+```
+
+- Route 1 will only be reached if directives `a`, `b` and `c` all let the request pass through.
+- Route 2 will run if `a` and `b` pass, `c` rejects and `d` passes.
+- Route 3 will run if `a` and `b` pass, but `c` and `d` reject.
+
+---
+
+# Akka HTTP - Serialization
+
+```scala
+import akka.http.scaladsl.server.Directives
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
+import spray.json._
+
+final case class Item(name: String, id: xrLong)
+final case class Order(items: List[Item])
+
+trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
+  implicit val itemFormat = jsonFormat2(Item)
+  implicit val orderFormat = jsonFormat1(Order) // contains List[Item]
+}
+
+class MyJsonService extends Directives with JsonSupport {
+  val route =
+    get {
+      pathSingleSlash {
+        complete(Item("thing", 42)) // will render as JSON
+      }
+    } ~
+    post {
+      entity(as[Order]) { order => // will unmarshal JSON to Order
+        val itemsCount = order.items.size
+        val itemNames = order.items.map(_.name).mkString(", ")
+        complete(s"Ordered $itemsCount items: $itemNames")
+      }
+    }
+}
+```
+
+---
+
+# Akka HTTP - Low-level Server Example
+
+```scala
+implicit val system = ActorSystem()
+implicit val materializer = ActorMaterializer()
+implicit val executionContext = system.dispatcher
+
+val serverSource = Http().bind(interface = "localhost", port = 8080)
+
+val requestHandler: HttpRequest => HttpResponse = {
+  case HttpRequest(GET, Uri.Path("/"), _, _, _) =>
+    HttpResponse(entity = HttpEntity(ContentTypes.`text/html(UTF-8)`, "<html><body>Hello world!</body></html>"))
+
+  case HttpRequest(GET, Uri.Path("/ping"), _, _, _) =>
+    HttpResponse(entity = "PONG!")
+
+  case HttpRequest(GET, Uri.Path("/crash"), _, _, _) =>
+    sys.error("BOOM!")
+
+  case r: HttpRequest =>
+    r.discardEntityBytes() // important to drain incoming HTTP Entity stream
+    HttpResponse(404, entity = "Unknown resource!")
+}
+
+val bindingFuture: Future[Http.ServerBinding] =
+  serverSource.to(Sink.foreach { connection =>
+    println("Accepted new connection from " + connection.remoteAddress)
+
+    connection handleWithSyncHandler requestHandler
+  }).run()
+```
+
+---
+
+# Akka HTTP / Streams
+
+Akka HTTP is streaming *all the way through*, which means that the back-pressure mechanisms enabled by Akka Streams are exposed through all layers–from the TCP layer, through the HTTP server, all the way up to the user-facing `HttpRequest` and `HttpResponse` and their `HttpEntity` APIs.
+
+This has surprising implications if you are used to non-streaming / not-reactive HTTP clients. Specifically it means that: “*lack of consumption of the HTTP Entity, is signaled as back-pressure to the other side of the connection*”. This is a feature, as it allows one only to consume the entity, and back-pressure servers/clients from overwhelming our application, possibly causing un-necessary buffering of the entity in memory.
+
+---
+
+class: center, middle
+
+# Akka Persistence
+
+---
+
+# Akka Persistence - Overview
+
+.center[
+![](http://sap1ens-archive.s3-website-us-east-1.amazonaws.com/pictures/akka-persistence.jpg)
+]
+
+---
+
+# Akka Persistence - Overview
+
+- Event Sourcing
+- Journal
+- Persistent Actor
+- Persistent View
+
+Has plugins for JDBC (MySQL, Postgres, ...), MongoDB, Cassandra, Kafka, Redis and more.
+
+---
+
+# Akka Persistence - Example
+
+```scala
+case class Cmd(data: String)
+case class Evt(data: String)
+ 
+case class ExampleState(events: List[String] = Nil) {
+  def updated(evt: Evt): ExampleState = copy(evt.data :: events)
+  override def toString: String = events.reverse.toString
+}
+ 
+class ExamplePersistentActor extends PersistentActor {
+  override def persistenceId = "sample-id-1"
+ 
+  var state = ExampleState()
+ 
+  def updateState(event: Evt): Unit = 
+    state = state.updated(event)
+ 
+  val receiveRecover: Receive = {
+    case evt: Evt => updateState(evt)
+    case SnapshotOffer(_, snapshot: ExampleState) => state = snapshot
+  }
+ 
+  val receiveCommand: Receive = {
+    case Cmd(data) => persist(Evt(data))(updateState)
+    case "snap"  => saveSnapshot(state)
+    case "print" => println(state)
+  }
+}
+```
+
+---
+
+# Akka Persistence - Example
+
+```scala
+class MyView extends PersistentView {
+  override def persistenceId: String = "some-persistence-id"
+  override def viewId: String = "some-persistence-id-view"
+ 
+  def receive: Receive = {
+    case payload if isPersistent =>
+    // handle message from journal...
+    case payload                 =>
+    // handle message from user-land...
+  }
+}
+```
+
+---
+
+# Akka Persistence - Configuration
+
+```scala
+libraryDependencies += "com.github.dnvriend" %% "akka-persistence-jdbc" % "2.6.12"
+```
+
+```
+akka {
+  persistence {
+    journal.plugin = "jdbc-journal"
+    snapshot-store.plugin = "jdbc-snapshot-store"
+  }
+}
+akka-persistence-jdbc {
+  slick {
+    driver = "slick.driver.PostgresDriver"
+    db {
+      driver = "org.postgresql.Driver"
+      url = "jdbc:postgresql://localhost/db"
+      user = "postgres"
+      password = ""
+      keepAliveConnection = on
+      numThreads = 20
+      queueSize = 100
+    }
+  }
+  tables {
+    // ...
+  }
+  // ...
+}
+```
+
+---
+
+class: center, middle
+
+# Akka Clustering
+
+---
+
+# Akka Clustering - Overview
+
+.center[
+![](http://sap1ens-archive.s3-website-us-east-1.amazonaws.com/pictures/node-ring.png)
+]
+
+.left-column.column-50[
+- Cluster
+- Node
+- Leader
+]
+
+.right-column.column-50[
+- Gossip protocol
+- Seed nodes
+- Failure Detector
+]
+
+---
+
+# Akka Clustering - Overview
+
+&nbsp;
+
+.center[
+![](http://doc.akka.io/docs/akka/2.4/_images/member-states.png)
+]
+
+---
+
+# Akka Clustering - Setup
+
+```
+akka {
+  actor {
+    provider = cluster
+  }
+
+  remote {
+    netty.tcp {
+      hostname = "127.0.0.1"
+      port = 0
+    }
+  }
+ 
+  cluster {
+    seed-nodes = [
+      "akka.tcp://ClusterSystem@127.0.0.1:2551",
+      "akka.tcp://ClusterSystem@127.0.0.1:2552"
+    ]
+  }
+}
+```
+
+---
+
+# Akka Clustering - Setup
+
+```scala
+package sample.cluster.simple
+ 
+import akka.cluster.Cluster
+import akka.cluster.ClusterEvent._
+import akka.actor.ActorLogging
+import akka.actor.Actor
+ 
+class SimpleClusterListener extends Actor with ActorLogging {
+ 
+  val cluster = Cluster(context.system)
+ 
+  override def preStart(): Unit = cluster.subscribe(self, InitialStateAsEvents, classOf[MemberEvent])
+  
+  override def postStop(): Unit = cluster.unsubscribe(self)
+ 
+  def receive = {
+    case MemberUp(member) =>
+      log.info("Member is Up: {}", member.address)
+    case MemberRemoved(member, previousStatus) =>
+      log.info("Member is Removed: {} after {}",
+        member.address, previousStatus)
+    case _: MemberEvent =>
+  }
+}
+```
+
+---
+
+# Akka Clustering - Setup
+
+Real world example: https://github.com/sap1ens/akka-cluster-consul
+
+```scala
+val cluster = Cluster(system)
+
+val selfAddress = cluster.selfAddress
+
+val serviceAddresses = ConsulAPI.getServiceAddresses
+
+// http://doc.akka.io/docs/akka/2.4/scala/cluster-usage.html
+//
+// When using joinSeedNodes you should not include the node itself except for the node
+// that is supposed to be the first seed node, and that should be placed first
+// in parameter to joinSeedNodes.
+val serviceSeeds = serviceAddresses filter { address =>
+  address != selfAddress || address == serviceAddresses.head
+}
+
+cluster.joinSeedNodes(serviceSeeds)
+
+cluster registerOnMemberUp {
+// init system
+}
+```
+
+---
+
+# Akka Clustering - Actors
+
+3 nodes, 3 actors, but 9 messages:
+
+```
+INFO - Cluster Node [akka.tcp://demo-system@10.11.12.13:9102] - Member is Up [akka.tcp://demo-system@10.11.12.13:9101]
+INFO - Cluster Node [akka.tcp://demo-system@10.11.12.13:9101] - Member is Up [akka.tcp://demo-system@10.11.12.13:9102]
+INFO - Cluster Node [akka.tcp://demo-system@10.11.12.13:9103] - Member is Up [akka.tcp://demo-system@10.11.12.13:9103]
+INFO - Cluster Node [akka.tcp://demo-system@10.11.12.13:9101] - Member is Up [akka.tcp://demo-system@10.11.12.13:9101]
+INFO - Cluster Node [akka.tcp://demo-system@10.11.12.13:9103] - Member is Up [akka.tcp://demo-system@10.11.12.13:9102]
+INFO - Cluster Node [akka.tcp://demo-system@10.11.12.13:9102] - Member is Up [akka.tcp://demo-system@10.11.12.13:9103]
+INFO - Cluster Node [akka.tcp://demo-system@10.11.12.13:9101] - Member is Up [akka.tcp://demo-system@10.11.12.13:9103]
+INFO - Cluster Node [akka.tcp://demo-system@10.11.12.13:9102] - Member is Up [akka.tcp://demo-system@10.11.12.13:9102]
+INFO - Cluster Node [akka.tcp://demo-system@10.11.12.13:9103] - Member is Up [akka.tcp://demo-system@10.11.12.13:9101]
+```
+
+---
+
+# Akka Clustering - Singleton
+
+Why?
+
+- Single point of responsibility for certain cluster-wide consistent decisions, or coordination of actions across the cluster system
+- Single entry point to an external system
+- Single master, many workers
+- Centralized naming service, or routing logic
+
+But:
+
+- Cluster singleton may quickly become a performance bottleneck
+- You can not rely on the cluster singleton to be non-stop available — e.g. when the node on which the singleton has been running dies, it will take a few seconds for this to be noticed and the singleton be migrated to another node
+- In the case of a network partition appearing in a Cluster that is using Automatic Downing (see Auto Downing docs for Downing), it may happen that the isolated clusters each decide to spin up their own singleton, meaning that there might be multiple singletons running in the system, yet the Clusters have no way of finding out about them (because of the partition)
+
+---
+
+# Akka Clustering - Singleton
+
+Create Singleton: 
+
+```scala
+system.actorOf(
+  ClusterSingletonManager.props(
+    singletonProps = Props(classOf[Consumer], queue, testActor),
+    terminationMessage = End,
+    settings = ClusterSingletonManagerSettings(system)),
+  name = "consumer")
+```
+
+Call Singleton:
+
+```scala
+val consumer = system.actorOf(
+  ClusterSingletonProxy.props(
+    singletonManagerPath = "/user/consumer",
+    settings = ClusterSingletonProxySettings(system)),
+  name = "consumerProxy")
+
+consumer ! SomeMessage
+```
+
+---
+
+# Akka Clustering - Sharding
+
+Features:
+- One of the most powerful Akka features!
+- Allows to route messages across nodes in a cluster using a sharding function (actually two)
+- You don't need to know the physical location of an actor - cluster will forward message to a remote node if needed
+- Uses Akka Persistence internally (or brand-new Distributed Data)
+
+Concepts:
+- Coordinator
+- Shard Region
+- Entity
+
+Entities (actors) are "activated" by receiving a first message and can be "passivated" using `context.setReceiveTimeout`.
+
+???
+
+- Cluster has only one coordinator as a singleton
+- Ideal number of shards = max(nodes) * 10
+- Every shard contains set of entities
+
+---
+
+# Akka Clustering - Sharding
+
+Counter interface:
+
+```scala
+case object Increment
+case object Decrement
+final case class Get(counterId: Long)
+final case class EntityEnvelope(id: Long, payload: Any)
+ 
+case object Stop
+final case class CounterChanged(delta: Int)
+```
+
+---
+
+# Akka Clustering - Sharding
+
+Counter implementation:
+
+```scala
+class Counter extends PersistentActor { 
+  context.setReceiveTimeout(120.seconds)
+ 
+  override def persistenceId: String = "Counter-" + self.path.name
+ 
+  var count = 0
+ 
+  def updateState(event: CounterChanged): Unit =
+    count += event.delta
+ 
+  override def receiveRecover: Receive = {
+    case evt: CounterChanged ⇒ updateState(evt)
+  }
+ 
+  override def receiveCommand: Receive = {
+    case Increment      ⇒ persist(CounterChanged(+1))(updateState)
+    case Decrement      ⇒ persist(CounterChanged(-1))(updateState)
+    case Get(_)         ⇒ sender() ! count
+    case ReceiveTimeout ⇒ context.parent ! Passivate(stopMessage = Stop)
+    case Stop           ⇒ context.stop(self)
+  }
+}
+```
+
+---
+
+# Akka Clustering - Sharding
+
+Create a region on every node:
+
+```scala
+val counterRegion: ActorRef = ClusterSharding(system).start(
+  typeName = "Counter",
+  entityProps = Props[Counter],
+  settings = ClusterShardingSettings(system),
+  extractEntityId = extractEntityId,
+  extractShardId = extractShardId)
+```
+
+Sharding functions:
+
+```scala
+val extractEntityId: ShardRegion.ExtractEntityId = {
+  case EntityEnvelope(id, payload) ⇒ (id.toString, payload)
+  case msg @ Get(id)               ⇒ (id.toString, msg)
+}
+ 
+val numberOfShards = 100
+ 
+val extractShardId: ShardRegion.ExtractShardId = {
+  case EntityEnvelope(id, _) ⇒ (id % numberOfShards).toString
+  case Get(id)               ⇒ (id % numberOfShards).toString
+}
+```
+
+---
+
+class: center, middle
+
+# Akka Cluster Sharding + Persistence = ❤️️
+
+---
+
+class: center, middle
+
+# Stateless microservices with Akka
+
+---
+
+# Stateless microservices with Akka
+
+**Stateless** application: application that doesn't keep any state in *runtime*, but uses external services instead.
+  - External service: database, cache, API, etc.
+  - Examples: most of the web apps are stateless or build to be stateless (Django, Rails, Express, etc.). Even enterprise frameworks like Spring (Java).
+
+---
+
+# Stateless microservices with Akka
+
+Stateless microservice can be represented as a black-box with a set of inputs and outputs.
+
+Inputs: 
+- HTTP API (Akka HTTP)
+- Messaging queue (Akka Camel / Akka Streams)
+- RPC
+
+Outputs: 
+- Database (Slick)
+- Cache
+- Other API
+- Messaging queue
+- ...
+
+---
+
+# Stateless microservices with Akka
+
+.center[
+![](http://sap1ens-archive.s3-website-us-east-1.amazonaws.com/pictures/stateless-microservices.png)
+]
+
+---
+
+# Stateless microservices with Akka
+
+http://www.jamesward.com/2014/12/03/java-doesnt-suck-youre-just-using-it-wrong
+
+> Sticky sessions and server state are usually one of the best ways to kill your performance and resilience. Session state (in the traditional Servlet sense) makes it really hard to do Continuous Delivery and scale horizontally. If you want a session cache use a real cache system – something that was designed to deal with multi-node use and failure. e.g. Memcache, ehcache, etc. In-memory caches are fast but hard to invalidate in multi-node environments and are not durable across restarts – they have their place, like calculated / derived properties where invalidation and recalculation are easy.
+> 
+> Web apps should move state to the edges. UI-related state should live on the client (e.g. cookies, local storage, and in-memory) and in external data stores (e.g. SQL/NoSQL databases, Memcache stores, and distributed cache clusters). Keep those REST services 100% stateless or else the state monster will literally eat you in your sleep.
+
+---
+
+# Stateless microservices with Akka
+
+.center[
+![](http://sap1ens-archive.s3-website-us-east-1.amazonaws.com/pictures/nodes-with-lb.png)
+]
+
+---
+
+class: center, middle
+
+# Stateful microservices with Akka
+
+---
+
+# Stateful microservices with Akka
+
+**Stateful** application: application that keeps internal state in *runtime*, instead of relying on external services. 
+- Examples: actors *can* be stateful, so Akka and other actor-based systems (Erlang/OTP, Orleans) can be stateful. But it's also possible to create stateful applications in Node.js or Python, for example.
+
+&nbsp;
+
+"Building Scalable Stateful Services" by Caitie McCaffrey
+
+https://www.youtube.com/watch?v=H0i_bXKwujQ
+
+---
+
+# Stateful microservices with Akka
+
+Benefits:
+- Data locality => low latency, fast processing
+- Sticky consistency => "simple" and "cheap" consistency without using consensus protocols
+
+Biggest challenges: 
+- High availability 
+- Scaling out
+
+---
+
+# Stateful microservices with Akka
+
+.center[
+![](http://sap1ens-archive.s3-website-us-east-1.amazonaws.com/pictures/nodes-with-lb.png)
+
+Remember stateless: every request is routed randomly (by LB). Chaotic DB reads.  
+]
+
+---
+
+# Stateful microservices with Akka
+
+.center[
+![](http://sap1ens-archive.s3-website-us-east-1.amazonaws.com/pictures/consistent-hashing.png)
+
+Now stateful: consistent selection of reads. 
+]
+
+---
+
+# Stateful microservices with Akka
+
+.center[
+![](http://sap1ens-archive.s3-website-us-east-1.amazonaws.com/pictures/node-ring.png)
+
+&nbsp;
+
+**Akka Cluster Sharding + Akka Persistence / Distributed Data**
+]
+
+---
+
+# Stateful microservices with Akka
+
+Akka Cluster Sharding: 
+- Consistent hashing for all requests based on user-defined function
+- Automatic forwarding (from local to remote and vice versa)
+
+Akka Persistence: 
+- Keeping internal state
+- Easy and fast recovery (journal + snapshots)
+- Event-sourcing built-in
+
+Akka Distributed Data [experimental]: 
+- One of the options for Akka Persistence backend
+- Supports CRDTs like counters, sets and maps
+
+---
+
+# Stateful microservices with Akka
+
+Real-world example: "tracker" service. Complex state machine for multiple entities.
+
+Inputs: 
+- Domain Events via messaging queue (Akka Camel)
+
+Outputs: 
+- HTTP API (Akka HTTP)
+- Websockets (Akka HTTP)
+
+Every entity has a **clientId** and they never intersect - it's a perfect use-case for sharding (clientId as a sharding key).
+
+---
+
+# Stateful microservices with Akka
+
+```scala
+// model
+
+trait Message { def clientId: Long }
+trait EventMessage extends Message
+trait StateMessage extends Message
+
+case class BankAccountMessage(
+  clientId: Long,
+  eventType: EventName,
+  ledgerId: String,
+  ledgerName: String,
+  months: Seq[Month]
+) extends EventMessage
+
+// sharding configuration
+
+// ideal number of shards is 10x of number of nodes in future
+val numberOfShards = config.getInt("tracker.sharding.numShards")
+
+val extractEntityId: ShardRegion.ExtractEntityId = {
+  case msg: Message => (msg.clientId.toString, msg)
+}
+
+val extractShardId: ShardRegion.ExtractShardId = {
+  case msg: Message => (msg.clientId % numberOfShards).toString
+}
+```
+
+---
+
+# Stateful microservices with Akka
+
+```scala
+object TrackerService {
+  case class TrackerData(
+    accounts: Map[String, BankAccount] = Map[String, BankAccount](),
+    states: Map[Month, ClientState] = Map[Month, ClientState]()
+  ) {
+    def isEmpty = accounts.isEmpty && states.isEmpty
+  }
+}
+
+class TrackerService extends PersistentActor {
+  private var state = TrackerData()
+
+  private def handleMessage(message: EventMessage, notifySubscribers: Boolean) {
+    val maybeUpdatedState = message match {
+      case b: BankAccountMessage => handleBankMessage(b)
+      case c: ClientMessage => handleClientMessage(c)
+      case _ => None
+    }
+    maybeUpdatedState.foreach { updatedState =>
+      updateState(message.clientId, updatedState, notifySubscribers)
+    }
+  }
+
+  private def updateState(clientId: Long, updatedState: TrackerData) = {
+    state = state.copy(
+      accounts = (state.accounts ++ updatedState.accounts).filterNot(_._2.deleted),
+      states = state.states ++ updatedState.states
+    )
+  }
+}  
+```
+
+---
+
+# Stateful microservices with Akka
+
+Passivation is a big deal:
+
+```scala
+class TrackerService extends PersistentActor {
+
+  context.setReceiveTimeout(1 hour)
+
+  override def receiveCommand: Receive = {
+    case Stop =>
+      saveSnapshot(state)
+      context.stop(self)  
+  }
+}
+```
+
+Custom logic for snapshots: 
+
+```scala
+override def persist[A](event: A)(handler: (A) => Unit) = {
+  super.persist(event)(handler)
+  if (lastSequenceNr > 0 && lastSequenceNr % snapshotThreshold == 0) {
+    self ! CreateSnapshot
+  }
+}
+```
+
+---
+
+# Summary
+
+- Scala is great! And I hope you think the same 😉. It can be very concise, but flexible and efficient. Especially if you follow FP principles
+- Actors and Futures are better concepts to use for concurrency
+- Akka is a great toolkit for building distributed systems
+- Try various things! Akka can look very complicated, but it's not that scary when you try it
+- Read papers ;-)
+
+---
+
+class: center, middle
+
+# We did it! Thank you!
+
+Please answer quick servey: https://goo.gl/forms/Lh9MmiicFxTTdAv43
+
+
+    </textarea>
+    <script src="https://gnab.github.io/remark/downloads/remark-latest.min.js" type="text/javascript">
+    </script>
+    <script type="text/javascript">
+      var slideshow = remark.create({
+        ratio: '16:9'
+      });
+    </script>
+  </body>
+</html>
