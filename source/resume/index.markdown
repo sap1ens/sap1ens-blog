@@ -43,7 +43,11 @@ Vancouver, British Columbia, Canada.
 
 **Senior Software Engineer, Lead**, November 2016 - Present | Vancouver, BC, Canada
 
-I joined Mobify to work on Mobify Platform, which includes Progressive Mobile and Engagement Marketing solutions. More details can be found here: [https://www.mobify.com/platform/](https://www.mobify.com/platform/).
+Leading the new Platform team, responsible for core Platform infrastructure like DNS, CDN and content delivery, demo environments, location services and more. Heavily using AWS, Docker and Heroku. 
+
+Trying to invert the Conway's law and build unified Platform from a set of diverse products like Mobile Web, Apps, AMP, Push messaging and Analytics. 
+
+Also contributing to the realtime Engagement Engine (Scala, Kafka, Flink) and Progressive Mobile SDK (ES6, React).
 
 ### Bench Accounting
 
@@ -134,12 +138,12 @@ I’m also really excited about microservices, containers and DevOps tools and p
 
 - Scala: Akka (Actors, HTTP, Cluster, Persistence), Spray, Slick, SBT.
 - Java: Spring Framework (Context, Security, Data, Roo, MVC), Hibernate, Tomcat, Jersey, Struts, Camel, Maven.
-- JavaScript: ECMAScript3-6, CoffeeScript, Node.js, restify, npm.
+- JavaScript: ECMAScript3-6, CoffeeScript, Node.js, Express.js, restify, npm.
 - Python: Django, Flask.
 - PHP: Zend Framework, Code Igniter, Zencart, Magento, Wordpress.
-- Web: HTML/CSS, jQuery, Backbone.js, AngularJS.
+- Web: HTML/CSS, jQuery, Backbone.js, AngularJS, React.js.
 - Testing: Selenium, JUnit, TestNG, ScalaTest, Jasmine, Intern.js.
-- Misc: ActiveMQ, Postgres, MySQL, MongoDB, Redis, Ansible, Docker, Vagrant, Consul, nginx, Amazon Web Services (EC2, S3, RDS, ElastiCache, IAM, Lambda, CloudFormation, EB, ECS, …), Git, SVN, Bash, NewRelic, Datadog, PagerDuty, Splunk, Jenkins, CircleCI.
+- Misc: ActiveMQ, Postgres, MySQL, MongoDB, Redis, Ansible, Docker, Vagrant, Consul, nginx, Amazon Web Services (EC2, S3, RDS, ElastiCache, IAM, Lambda, CloudFormation, EB, ECS, …), Heroku, Git, SVN, Bash, NewRelic, Datadog, PagerDuty, Splunk, Jenkins, CircleCI.
 
 ### Tech I’ve not used professionally, but either studied or used in small projects
 
