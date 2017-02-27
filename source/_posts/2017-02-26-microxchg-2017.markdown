@@ -1,0 +1,160 @@
+---
+layout: post
+title: "Microxchg 2017"
+date: 2017-02-26 22:43:59 -0800
+comments: true
+categories: 
+- Microservices
+- Talk
+---
+
+Last week I had a pleasure visiting [Microxchg conference](http://microxchg.io/2017/) in Berlin. I was really excited, because I also conducted my first workshop there - [Building Microservices with Scala and Akka](http://sched.co/93us). 
+
+I think the event was truly successful and I'd like to share my thoughts and notes below for the most interesting talks I attended.
+
+The conference is dedicated to Microservices, as you can guess from its name. It's not new - originally started in 2015, it's been attracting top presenters from all around the world, including recognized experts like Sam Newman and Fred George.
+
+<!-- more -->
+
+## Day 0 - Workshop
+
+Just a few words about my workshop first... 
+
+Now I can say that workshop/training preparations take A LOT MORE time that you think :) I spent many evenings and weekends trying to prepare good material combined with some practical exercises and also make sure that it's going to fit in only one day. Very challenging! 
+
+I think I handled it well. Not great, rushing through topics sometimes or making mistakes, but it seems like in the end it was certainly helpful for all attendees! 
+
+And this is me promoting great Vaughn Vernon books as usual :)
+
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Our workshop by <a href="https://twitter.com/sap1ens">@sap1ens</a> is pulling through from scala basics until akka stream graphs &amp; spray <a href="https://twitter.com/hashtag/microxchg?src=hash">#microxchg</a> <a href="https://twitter.com/microXchg">@microxchg</a> <a href="https://t.co/Y3FLjobYOP">pic.twitter.com/Y3FLjobYOP</a></p>&mdash; Benjamin Nothdurft (@dataduke) <a href="https://twitter.com/dataduke/status/831878166708908032">February 15, 2017</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+## Day 1
+
+### The complexity that is hidden in Micro Services and Event Sourcing
+
+Satyajit Ranjeev, https://www.youtube.com/watch?v=yVUiA6gDhKU
+
+Satyajit shared some great real-world struggles and solutions during his work at [OptioPay](https://www.optiopay.com). 
+
+His team wasn't sure what's the best way to create boundaries between microservices and they used Domain Entities for that. As a result, they ended up with 73 (!) microservices for a relatively small team (5-10 people). 
+
+Finally they discovered one of my favourite DDD concepts - Bounded Contexts. It allowed them to reduce the number of services to only 5, which really helped to avoid a lot of operational costs. 
+
+OptioPay also uses Kafka as an event journal and Satyajit agreed that it was a wrong choice. They had to keep a lot of state in Kafka and "Datenschutz" (Data Protection) became a big issue. His team had to use Postgres for snapshots. 
+
+### Monitoring Bash Microservices At Scale
+
+Paul Bellamy, https://www.youtube.com/watch?v=mySSPh64kf8
+
+Paul had a great talk about his work at [Weaveworks](https://www.weave.works). They use Kubernetes, Prometheus, Grafana, Go, Ansible, Terraform and a bunch of other tools to manage containers.
+
+The main point he made is very straightforward, but often ignored by lots of vendors: every infrastructure tool must show execution plan before actually doing anything. Big red "YES, CONFIRM" button sometimes is also necessary before tricky changes.
+
+As a result they released [kubediff](https://github.com/weaveworks/kubediff) - simple tool to show differences between running state and version controlled configuration in Kubernetes.
+
+Check their [GitHub account](https://github.com/weaveworks) anyway, it has lots of cool stuff!  
+
+### Microservices and mobile
+
+Oleksii Fedorov, https://www.youtube.com/watch?v=JBsT8Ro-XLA
+
+Oleksii's talk has a weird name - how exactly would you mix microservices and mobile? :)
+
+He briefly explained the current state of mobile apps, mentioning responsive, progressive web apps, hybrid and native apps. Every approach has its pros and cons and he wanted to try something else. He mentioned release process and focused on time-to-deliver a feature. It still can take weeks or days before your changes are approved by App Store or Google Play, which doesn't make any sense if you use Agile, CI/CD and other modern practices.   
+
+His approach: mobile app fetches and parses some external file on a startup. That file contains simple event-based DSL that can be used to describe business logic. The DSL is used to create many small in-memory "services" connected via in-memory lightweight pub-sub, all inside your mobile app. So, probably closer to the old SOA rather than microservices. 
+
+### IoT and MicroServices in the Home
+
+Fred George, https://www.youtube.com/watch?v=J1eTutzcGFQ
+
+[Fred George](https://www.linkedin.com/in/fred-george-5965b5) is certainly a legend. I recommend to watch his talk (any talk really, they're all great). 
+
+I don't follow the IoT hype and expected his talk to be a bit boring, but it was awesome! He was actually talking about his own home and all the IoT experiments he's doing as a pet project. He has a bunch of devices, but let's speak about software :) 
+
+He uses small Ruby microservices connected via RabbitMQ (simple Pub/Sub, don't need Kafka) and running on Docker Swarm (simpler than Kubernetes). He also embraces just-in-time design, idempotency and behavior-oriented.
+
+Fred explained different tiers his microservices have (which is really amazing):
+ 
+- Tier 1: reading data from particular devices
+- Tier 2: combining multiple devices in "scenes"
+- Tier 3: coordinating "scenes" and everything else
+- Meta: monitoring, alerting, etc.
+
+## Day 2
+
+### Shrinking Microservices to Functions
+
+Adrian Cockcroft, https://www.youtube.com/watch?v=ZgxZCXouBkY
+
+Adrian has recently became VP Cloud Architecture Strategy at AWS and started his talk with introduction about his current job and responsibilities. It seems like his main focus nowadays is AWS Lambda and related products. 
+
+He explained his vision about Lambda, highlighting an importance of fast deployments. 
+
+A bit of history:
+
+- 10 years ago networks were slow and protocols were heavy (XML), as a result releases were made every 6-12 months
+- Now we have very fast network and performant protocols (binary RPC), so releases can happen every day
+
+Adrian also observed natural evolution of platforms:
+
+- Manual deployments, very slow and inefficient
+- Immutable infrastructure, minutes to deploy
+- Containers, seconds to deploy
+- And finally, functions (like Lambda), milliseconds to deploy
+
+It seems like AWS is investing a lot in making Lambdas to be a standard way to react on events happening in the infrastructure layer. Lambda@Edge is the latest feature - http://docs.aws.amazon.com/lambda/latest/dg/lambda-edge.html.
+
+### AliExpress' Way to Microservices
+
+Juven Xu, https://www.youtube.com/watch?v=wg09npO11AQ
+
+Juven presented AliExpress' (and Alibaba in general) journey to microservices. It wasn't easy! 
+
+4 years ago: 
+
+- Dozens of monoliths (Java 6, Spring)
+- Manual release (queue-based)
+- Hours to make a deploy
+- Can't start environment locally
+
+Now: 
+
+- Hundreds of microservices (Java 8, Spring Boot)
+- Docker! Great for local setup
+
+Their infrastructure follows pretty standard 4-tier architecture: Web, Service, Cache, Data. Surprising fact - AliExpress built its own Kafka-like queue, Redis-like cache and gRPC-like binary RPC protocol. Reason? These tools didn't exist or weren't very popular a few years ago. 
+
+A few more important things to notice:
+ 
+- No REST/HTTP internally, only binary RPC
+- Tooling is rich, but JVM focused. There is no way to create non-JVM microservices. Teams experiment with other JVM languages though (Groovy, Scala)
+
+### Beyond OAuth2: end to end microservice security
+
+Will Tran, https://www.youtube.com/watch?v=G7A6ftCbVQY
+
+Will is trying to solve very important problem: authorization in microservices. This is something very easy to miss and either skip completely (everything has access to everything internally) or rely on simple tokens. 
+
+He explains things like [JSON Web Tokens](https://jwt.io) (JWT) and [Javascript Object Signing and Encryption](http://jose.readthedocs.io/en/latest/) (JOSE). It's possible to sign and authorize every HTTP (or messaging) call in microservices architecture even with chaining (with multiple microservices calling each other) by using nested tokens. 
+
+### How to Properly Blame Things for Causing Latency: An Introduction to Distributed Tracing and Zipkin
+
+Adrian Cole, https://www.youtube.com/watch?v=VKqlzyAumnY
+
+Adrian made an introduction to [Zipkin](http://zipkin.io) and basic distributed tracing. Great talk if you're not familiar with the topic. 
+
+### Distributed Scheduler Hell
+
+Matthew Campbell, https://www.youtube.com/watch?v=mlNI7fYzckg
+
+Matthew shared some pain about choosing a proper Distributed Scheduler. His team at DigitalOcean went from Mesos to Kubernetes (briefly looking at Nomad) and attempted to run everything in containers. He talked about their failures (no stateful containers in the end) and wins (they ended up running most of the stateless apps in containers). 
+
+## Summary
+
+Overall I think that Microxchg is a great conference with variety of topics. The only recommendation I have: may be try to include more stacks and languages to make a schedule a bit more diverse, because it was very JVM heavy.  
+
+Also big thanks to organizers! Especially Dajana Günther and Anna Siegler - thank you very much! 
+
+I hope to return to Microxchg next year ;-)
