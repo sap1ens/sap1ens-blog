@@ -40,4 +40,4 @@ By the way, Bench [has recently closed](https://www.crunchbase.com/funding-round
 
 I decided to leave Bench in October 2016. I wrote a [blog post](/blog/2016/10/23/last-week-at-bench/#disqus_thread) about that. I joined [Mobify](https://www.mobify.com) as a Senior Software Engineer, Lead.
 
-You can find more in my [resume](/resume).
+You can find more in my [resume](/files/resume-yaroslav-tkachenko.pdf).
