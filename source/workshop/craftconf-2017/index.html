@@ -102,7 +102,7 @@ class: center, middle
 - Microservices
 - Distributed Systems
 - DevOps
-- ... [and more](http://sap1ens.com/resume/)
+- ... [and more](http://sap1ens.com/files/resume-yaroslav-tkachenko.pdf)
 
 ]
 
@@ -1221,6 +1221,15 @@ import akka.actor.PoisonPill
 
 target ! PoisonPill
 ```
+
+Watch:
+```scala
+actor watch target
+```
+
+???
+
+`ask` doesn't allow to receive messages about actor termination, `watch` is used instead.
 
 ---
 
