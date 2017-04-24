@@ -395,12 +395,12 @@ val orangeBox = new Box[Orange](new Orange)
 # Scala basics - Collections
 
 ```scala
-List(1, 2, 3)
-HashMap("x" -> 24, "y" -> 25, "z" -> 26)
-Set(Color.red, Color.green, Color.blue)
-(1, "localhost")
+val list = List(1, 2, 3)
+val map = HashMap("x" -> 24, "y" -> 25, "z" -> 26)
+val set = Set(Color.red, Color.green, Color.blue)
+val tuple = (1, "localhost")
 ```
-
+    
 - `foreach`
 - `map`
 - `filter`
@@ -412,6 +412,7 @@ Set(Color.red, Color.green, Color.blue)
 - `count`
 - `groupBy`
 - ...
+- by the way, you can access sequences as arrays using index (starting from 0), for example `list(0)`
 
 ---
 
@@ -516,7 +517,7 @@ Task:
 
 - Download [this file](https://raw.githubusercontent.com/jokecamp/FootballData/master/Euro%202012/Euro%202012%20stats%20TEAM.csv)
 - Create a case class to represent a team
-- Parse CSV file and keep results in memory
+- Parse CSV file and keep results in memory. Only use the columns you need (heads up - you'll need 0, 1 and 12)
 - Find:
   - Team with a biggest number of goals
   - Teams starting with 'G' or 'P' characters and more than 5 goals
@@ -524,9 +525,13 @@ Task:
 
 Tips:
 
-```scala
-val lines = scala.io.Source.fromFile("file.txt").getLines
-```
+- Try to only use Scala Collections API methods
+- Remember how to access elements of arrays using indexes 
+- Get lines from a file:
+    
+  ```scala
+  val lines = scala.io.Source.fromFile("file.txt").getLines
+  ```
 
 ---
 
@@ -1565,10 +1570,10 @@ trait CoreActors extends ConfigHolder {
 
 # Akka and Application Architecture
 
-We've just created Application **Core**. We can add more interfaces like **HTTP** and **messaging queues**.
+We've just created Application **Core**. We can add more interfaces like **HTTP** and **message queues**.
 
 - HTTP, we'll look into Akka HTTP soon
-- Messaging queues, let's use Akka Camel
+- Message queues, let's use Akka Camel
 
 ---
 
@@ -1633,7 +1638,7 @@ General guidelines:
 - Set of Actors as a core layer
 - Additional layers for integration, persistence, etc.
 - Akka HTTP for REST API
-- Akka Camel for messaging queues
+- Akka Camel for message queues
 
 ---
 
