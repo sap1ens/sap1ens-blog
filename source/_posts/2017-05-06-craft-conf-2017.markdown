@@ -1,0 +1,99 @@
+---
+layout: post
+title: "Craft Conf 2017"
+date: 2017-05-06 20:23:52 -0700
+comments: true
+categories: 
+- Microservices
+- Scala
+- Akka
+- Talk
+---
+
+Last week I attended Craft Conference in Budapest, Hungary. Here's the description of the event:
+
+> CRAFT is about software craftsmanship, presenting which tools, methods, practices should be part of the toolbox of a modern developer and company, and serving as compass on new technologies, trends. You can learn from the best speakers and practitioners in our community.
+
+It was definitely one of the best conferences I've ever been so far and I'm happy to share some highlights! 
+
+<!-- more -->
+
+## Workshop
+
+For me the conference started with another Scala/Akka workshop. I taught almost 20 people in a full-day workshop and we covered a bunch of topics - from Scala basics to Akka Clustering and Persistence.
+
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">My class is working on the first <a href="https://twitter.com/hashtag/scala?src=hash">#scala</a> assignment this morning <a href="https://t.co/eq0PRg6KrA">pic.twitter.com/eq0PRg6KrA</a></p>&mdash; Yaroslav Tkachenko (@sap1ens) <a href="https://twitter.com/sap1ens/status/856782928428314624">April 25, 2017</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+Big thanks to [Balabit](https://www.balabit.com) for hosting the workshop! By the way, they work on a really interesting product and use Scala, Akka and Spark - check the [Scala developer](https://career.balabit.com/job/412) position if you're in Budapest and interested in this stuff.
+
+## Conference
+
+The main event was hosted in the [Railroad museum](http://www.vasuttortenetipark.hu/en) and most of the participants arrived there on a private train! That's pretty much everything you need to know about the level of organizers ;)
+
+Just a few more photos for you to get the atmosphere: 
+
+<blockquote class="instagram-media" data-instgrm-captioned data-instgrm-version="7" style=" background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; max-width:658px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);"><div style="padding:8px;"> <div style=" background:#F8F8F8; line-height:0; margin-top:40px; padding:50% 0; text-align:center; width:100%;"> <div style=" background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAMAAAApWqozAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAMUExURczMzPf399fX1+bm5mzY9AMAAADiSURBVDjLvZXbEsMgCES5/P8/t9FuRVCRmU73JWlzosgSIIZURCjo/ad+EQJJB4Hv8BFt+IDpQoCx1wjOSBFhh2XssxEIYn3ulI/6MNReE07UIWJEv8UEOWDS88LY97kqyTliJKKtuYBbruAyVh5wOHiXmpi5we58Ek028czwyuQdLKPG1Bkb4NnM+VeAnfHqn1k4+GPT6uGQcvu2h2OVuIf/gWUFyy8OWEpdyZSa3aVCqpVoVvzZZ2VTnn2wU8qzVjDDetO90GSy9mVLqtgYSy231MxrY6I2gGqjrTY0L8fxCxfCBbhWrsYYAAAAAElFTkSuQmCC); display:block; height:44px; margin:0 auto -44px; position:relative; top:-22px; width:44px;"></div></div> <p style=" margin:8px 0 0 0; padding:0 4px;"> <a href="https://www.instagram.com/p/BTYebKHAnts/" style=" color:#000; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px; text-decoration:none; word-wrap:break-word;" target="_blank">#CraftConf is pretty crazy</a></p> <p style=" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; line-height:17px; margin-bottom:0; margin-top:8px; overflow:hidden; padding:8px 0 7px; text-align:center; text-overflow:ellipsis; white-space:nowrap;">A post shared by Yaroslav Tkachenko (@sap1ens) on <time style=" font-family:Arial,sans-serif; font-size:14px; line-height:17px;" datetime="2017-04-27T08:40:21+00:00">Apr 27, 2017 at 1:40am PDT</time></p></div></blockquote>
+<script async defer src="//platform.instagram.com/en_US/embeds.js"></script>
+
+Finally, some of the talks I really enjoyed: 
+
+### Dan North - Decisions Decisions
+https://www.ustream.tv/recorded/102892648
+
+Highly recommended to everyone! Dan gives some great examples about different trade offs in our industry. Do you think that automated tests are better than manual? How about deployment? It's not that simple... watch the talk!
+
+### Daniel Stenberg - HTTP/2, the good, the bad and what's next
+https://www.ustream.tv/recorded/102894021
+
+Danial made a nice HTTP/2 overview with a bunch of deep details. Wait until the questions, because those were great too.
+
+### Martin Thompson - High Performance Managed Languages
+https://www.ustream.tv/recorded/102861825
+
+Really interesting talk from Martin about some low-level details for building high-performance applications in languages like Java and JavaScript. Lots of deep technical knowledge.
+
+### Yaroslav Tkachenko - Why Actor-Based Systems Are The Best For Microservices
+https://www.ustream.tv/recorded/102894272
+
+Obviously, I want to mention my talk as well :) I was pretty nervous, since it probably was the biggest event I've ever spoken. 
+
+I explained that messaging and event-driven architectures are still very important in the microservices world, especially if you want to build reliable applications. Also talked about the way actors can be used to leverage asynchronous communication. 
+
+### Ashley McNamara & Steve Francia - Building amazing cross-platform command-line apps in Go
+
+
+This was the first hands-on session I attended. Really cool intro to Golang and [Cobra](https://github.com/spf13/cobra) - CLI tool behind Docker, etcd, Kubernetes and other Golang libraries. 
+
+Here's the slides, so you can try to build an app in Go yourself: https://docs.google.com/presentation/d/1rsc6Wxd4JEB3celr7sTs3y6vOwpKWAxn-n-q-mg-z5Y/edit?usp=sharing
+
+### Claudio Ortolina - Painlessly functional and concurrent: An introduction to Elixir  
+https://www.ustream.tv/recorded/102836446
+
+Another hands-on session I attended. Very basic introduction to Erlang/Elixir from concurrency perspective and an attempt to implement one of the main OTP patterns (gen_server) from scratch  - great content! Here's the slides if you want to do it yourself: https://www.dropbox.com/s/gf0iq0bv0rcra70/build-your-own-small-scale-otp.pdf?dl=0
+
+### Theo Schlossnagle - Better engineering via better discourse
+https://www.ustream.tv/recorded/102894526
+
+And finally, the last talk of the conference. Theo is a great speaker and he talked about the way we're all supposed to participate in conferences and get the maximum value from them. I wish it could the first talk, so we would apply the knowledge right away :) 
+
+Also, great story about travelling from him as a bonus. Don't miss it. 
+
+## Instead of a summary
+
+Unfortunately, one of the best talks wasn't recorded. Damian Conway is a true real wizard. 
+
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Damian Conway IS KILLING IT! Programming in Latin 😄 <a href="https://twitter.com/hashtag/CraftConf?src=hash">#CraftConf</a> <a href="https://t.co/gC8h30wk5O">pic.twitter.com/gC8h30wk5O</a></p>&mdash; Yaroslav Tkachenko (@sap1ens) <a href="https://twitter.com/sap1ens/status/857638473309859840">April 27, 2017</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+So, just think about this. He built a parser in Perl to execute code in Latin. Yes, full real language with loops and conditionals, a bunch of built-in functions and etc. 
+
+What's more important, Latin is an [inflected language](https://en.wikipedia.org/wiki/Fusional_language) and he was able to use it! 
+
+In his snippets, you can change the order of operators and arguments, for example, and the program stays valid!
+
+You can check this gem here: http://users.monash.edu/~damian/papers/HTML/Perligata.html
+
+On my way back to the hotel I had a chance to talk to Damian and I found out that it took him **just a few days** to build the grammar and the parser for the language (he knew Latin already). 
+
+That's what I call a true craftsmanship. 
