@@ -22,6 +22,6 @@ I love to travel, although not always have time for that. Currently [visited 11 
 
 I also love cooking and enjoying great healthy food. I've been a vegetarian for a few years and I really appreciate my choice.
 
-Mentoring and teaching is something I always excited to do, either in my current company via conversations, workshops, 1-to-1s and lunch & learns or public speaking. Writing is a big part of me too, at the moment I use my blog for that, but I hope that once I'll have time and expertise to write a book. That also means that I read A LOT, mostly [professional stuff](http://localhost:4000/blog/2014/10/13/how-and-what-i-read-as-a-software-engineer/), fiction (sci-fi, fantasy) and non-fiction (I like history and biographies).
+Mentoring and teaching is something I always excited to do, either in my current company via conversations, workshops, 1-to-1s and lunch & learns or public speaking. Writing is a big part of me too, at the moment I use my blog for that, but I hope that once I'll have time and expertise to write a book. That also means that I read A LOT, mostly [professional stuff](/blog/2014/10/13/how-and-what-i-read-as-a-software-engineer/), fiction (sci-fi, fantasy) and non-fiction (I like history and biographies).
 
 Manchester United FC fan since 2002 ;-)

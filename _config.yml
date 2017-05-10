@@ -6,7 +6,7 @@ url: http://sap1ens.com
 title: sap1ens blog
 subtitle: A few stories about software development and such.
 author: Yaroslav Tkachenko
-simple_search: http://google.com/search
+simple_search: https://google.com/search
 description: A few stories about software development and such.
 
 # Default date format is "ordinal" (resulting in "July 22nd 2007")
