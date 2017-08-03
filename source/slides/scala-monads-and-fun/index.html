@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Scala, monads and fun</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <style type="text/css">
+        @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+        @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+        @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+        body { font-family: 'Droid Serif'; }
+        h1, h2, h3 {
+            font-family: 'Yanone Kaffeesatz';
+            font-weight: normal;
+        }
+        .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+
+        /* Custom stuff */
+        h1 {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        .left-column {
+            width: 50%;
+            float: left;
+        }
+
+        .right-column {
+            width: 50%;
+            float: right;
+        }
+
+        .column-30 {
+            width: 30%;
+        }
+
+        .column-45 {
+            width: 45%;
+        }
+
+        .column-70 {
+            width: 70%;
+        }
+
+        .column-20 {
+            width: 20%;
+        }
+
+        .column-80 {
+            width: 80%;
+        }
+
+        .column-50 {
+            width: 50%;
+        }
+
+        .column-33 {
+            width: 33%;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-bigger {
+            font-size: 200%;
+        }
+
+        .image-bigger img {
+            width: 50%;
+        }
+    </style>
+</head>
+<body>
+<textarea id="source">
+
+class: center, middle
+
+# Scala, monads and fun
+
+## Yaroslav Tkachenko
+
+---
+
+# Why Scala?
+
+.center[
+![](http://sap1ens-archive.s3-website-us-east-1.amazonaws.com/pictures/scala.jpg)
+
+## Scala
+]
+
+---
+
+class: center, middle
+
+# Scala basics 
+
+---
+
+# Scala basics 
+
+## Scala
+
+- General-purpose
+- Object-oriented
+- Functional 
+- Static typing 
+- JVM runtime
+
+## Scala REPL
+
+\> scala
+
+---
+
+# Scala basics - Primitive types and functions
+
+**"Primitive"** types: Byte, Char, Short, Int, Long, Float, Double, Boolean, String...
+
+Variables can be **mutable** and **immutable**: `var` and `val`
+
+```scala
+val hey = "hey"
+
+val hello: String = "hello"
+```
+
+Functions are defined using `def`, for example: `def length(n: String): Int`
+
+&nbsp;
+
+Hello World!
+
+```scala
+object HelloWorld {
+  def main(args: Array[String]): Unit = {
+    println("Hello, world!")
+  }
+}
+```
+
+???
+
+Symbols are interned and can be compared in constant time (O(1))
+
+---
+
+# Scala basics - Conditionals and loops
+
+Everything is an expression (that's why we don't need `return`)! 
+
+```scala
+if (x > 0) 1
+else if (x == 0) 0 else -1
+```
+
+```scala
+for (i <- 1 to n)
+ r = r * i
+```
+
+```scala
+for (i <- 1 to 3; j <- 1 to 3 if i != j) print((10 * i + j) + " ")
+```
+
+```scala
+for (i <- 1 to 10) yield i % 3
+```
+
+```scala
+var sum = 0
+var i = 0
+while (i <= 1000 && sum <= 1000) { sum += 1; i += 1 }
+```
+
+???
+
+- No `break` or `continue` operators. There is `import scala.util.control.Breaks._` with `breakable` and `break`, using exceptions.
+- For comprehensions are translated in series of flatMaps and filters
+
+---
+
+# Scala basics - Pattern matching
+
+```scala
+def matchTest(x: Any, y: Int): String = x match {
+  case 1 => "one"
+  case "two" => "2"
+  case 3 | 4 | 5 => "3, 4, 5"
+  case "ten" if y > 100 => "10"
+  case z: Int => s"Int: $z"
+  case _ => "idk"
+}
+```
+
+```scala
+try {
+ process(new URL("http://sap1ens.com"))
+} catch {
+ case _: MalformedURLException => println("Bad URL: " + url)
+ case ex: IOException => ex.printStackTrace()
+}
+```
+
+---
+
+# Scala basics - Classes
+
+```scala
+class Point(var x: Int, var y: Int) {
+  def move(dx: Int, dy: Int): Unit = {
+    x = x + dx
+    y = y + dy
+  }
+  override def toString: String =
+    "(" + x + ", " + y + ")"
+}
+```
+
+```scala
+case class Point(x: Int, y: Int)
+// copy
+// toString
+// compare
+// ...
+
+
+def findX(p: Point): Int = p match {
+  case Point(x, _) => x
+}
+```
+
+---
+
+# Scala basics - Objects
+
+```scala
+object Helper {
+  def doSomething(thing: String): String = { /* ... */ }
+}
+```
+
+```scala
+class Event(var metadata: String)
+
+object Event {
+  def apply(): Event = new Event("")
+  def apply(metadata: String): Event = new Event(metadata)
+}
+```
+
+???
+
+Case classes behave like they have `apply` methods defined
+
+---
+
+# Scala basics - Traits
+
+```scala
+trait One {
+  def one(): String
+}
+
+trait Two {
+  def two(): String = "two"
+}
+
+class Three extends One with Two {
+  def one(): String = "one"
+}
+```
+
+```scala
+sealed trait Account
+case object Chequing extends Account
+case object Savings extends Account
+case class CreditCard(user: String) extends Account
+```
+---
+
+# Scala basics - Generics
+
+```scala
+class Stack[T] {
+  var elems: List[T] = Nil
+  def push(x: T) { elems = x :: elems }
+  def top: T = elems.head
+  def pop() { elems = elems.tail }
+}
+```
+
+```scala
+def count[A](l: List[A]) = l.size
+def count(l: List[_]) = l.size // "wildcard"
+```
+
+```scala
+class Box[F <: Fruit](aFruit: F) {
+               def fruit: F = aFruit
+               def contains(aFruit: Fruit) = fruit.name == aFruit.name
+}
+ 
+val appleBox = new Box[Apple](new Apple)
+val orangeBox = new Box[Orange](new Orange)
+```
+
+---
+
+class: center, middle
+
+# Functional programming in Scala
+
+---
+
+# Functional programming in Scala
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+.center.middle[
+http://www.lihaoyi.com/post/WhatsFunctionalProgrammingAllAbout.html
+]
+
+---
+
+# Functional programming in Scala
+
+Imperative recipe:
+```python
+def make_tiramisu(eggs, sugar1, wine, cheese, cream, fingers, espresso, sugar2, cocoa):
+    dissolve(sugar2, espresso)
+    mixture = whisk(eggs)
+    beat(mixture, sugar1, wine)
+    whisk(mixture) # over steam
+    whip(cream)
+    beat(cheese)
+    beat(mixture, cheese)
+    fold(mixture, cream)
+    assemble(mixture, fingers)
+    sift(mixture, cocoa)
+    refrigerate(mixture)
+    return mixture # it's now a tiramisu
+```
+
+---
+
+# Functional programming in Scala
+
+Functional recipe:
+```python
+def make_tiramisu(eggs, sugar1, wine, cheese, cream, fingers, espresso, sugar2, cocoa):
+    beat_eggs = beat(eggs)
+    mixture = beat(beat_eggs, sugar1, wine)
+    whisked = whisk(mixture)
+    beat_cheese = beat(cheese)
+    cheese_mixture = beat(whisked, beat_cheese)
+    whipped_cream = whip(cream)
+    folded_mixture = fold(cheese_mixture, whipped_cream)
+    sweet_espresso = dissolve(sugar2, espresso)
+    wet_fingers = soak2seconds(fingers, sweet_espresso)
+    assembled = assemble(folded_mixture, wet_fingers)
+    complete = sift(assembled, cocoa)
+    ready_tiramisu = refrigerate(complete)
+    return ready_tiramisu
+```
+
+???
+
+- No side-effects
+- Clear inputs and outputs
+- Easy to refactor and test
+- Easy to see dependencies (chain of calls) and missing variables
+
+---
+
+# Functional programming in Scala
+
+.center[
+![](http://sap1ens-archive.s3-website-us-east-1.amazonaws.com/pictures/TiramisuDiagram.png)
+
+&nbsp;
+
+![](http://sap1ens-archive.s3-website-us-east-1.amazonaws.com/pictures/DiagramGraph.png)
+]
+
+---
+
+# Functional programming in Scala
+
+
+- Functions are first class objects
+
+  - Collections: 
+    ```scala 
+    def filter(p: Int => Boolean): List[Int]
+    ```
+
+- Immutability, laziness, tail recursion
+
+  - Immutable collections, case classes, proper data types and algorithms
+
+  - Lazy vals:
+  ```scala
+  lazy val isReady = expensiveFunc()
+  ```
+
+  - Tail recursion
+  ```scala
+  @tailrec
+  ```
+
+- Types (*Category theory*)
+
+---
+
+# Scala basics - Collections
+
+.center[
+![](http://docs.scala-lang.org/resources/images/collections.png)
+]
+
+---
+
+# Scala basics - Collections
+
+```scala
+val list = List(1, 2, 3)
+val map = HashMap("x" -> 24, "y" -> 25, "z" -> 26)
+val set = Set(Color.red, Color.green, Color.blue)
+val tuple = (1, "localhost")
+```
+    
+- `foreach`
+- `map`
+- `filter`
+- `find`
+- `drop` / `dropWhile`
+- `foldRight` / `foldLeft`
+- `flatten`
+- `flatMap`
+- `count`
+- `groupBy`
+- ...
+
+---
+
+# Scala basics - Collections
+
+```scala
+List(1, 2, 3).foreach(element => println(element))
+```
+
+```scala
+List(1, 2, 3) foreach { element => println(element) }
+```
+
+```scala
+List(1, 2, 3).foreach(println(_))
+```
+
+```scala
+List(1, 2, 3).foreach { println(_) }
+```
+
+```scala
+List(1, 2, 3).foreach { println _ }
+```
+
+```scala
+List(1, 2, 3).foreach(println)
+```
+
+```scala
+List(1, 2, 3) foreach (println)
+```
+
+```scala
+List(1, 2, 3) foreach { println }
+```
+
+```scala
+List(1, 2, 3) foreach println
+```
+
+---
+
+# It's time to code!
+
+Task: 
+
+- Download [this file](https://raw.githubusercontent.com/jokecamp/FootballData/master/Euro%202012/Euro%202012%20stats%20TEAM.csv)
+- Create a case class to represent a team
+- Parse CSV file and keep results in memory. Only use the columns you need (heads up - you'll need 0, 1 and 12)
+- Find:
+  - Team with a biggest number of goals
+  - Teams starting with 'G' or 'P' characters and more than 5 goals
+  - Team that completed 1200 passes. Print its name if team exists, otherwise print "Nothing found"
+
+Tips:
+
+- Try to only use Scala Collections API methods
+- Remember how to access elements of arrays using indexes 
+- Get lines from a file:
+    
+  ```scala
+  val lines = scala.io.Source.fromFile("file.txt").getLines
+  ```
+
+---
+
+# It's time to code!
+
+```scala
+import scala.io.Source
+
+case class Team(name: String, goals: Int, passes: Int)
+
+val lines = Source.fromFile("/Users/sap1ens/Downloads/euro-stats.csv").getLines.toList.tail
+
+val teams: List[Team] = lines.map(line => {
+  val teamRaw = line.split(",")
+  Team(teamRaw(0), teamRaw(1).toInt, teamRaw(12).toInt)
+}
+
+val teamWithBiggestGoals: Team = teams.maxBy(_.goals)
+
+val teamsStartingWithGP: List[Team] = teams
+  .filter(team => team.name.startsWith("G") || team.name.startsWith("P"))
+  .filter(_.goals > 5)
+
+val teamWith1200CompletedPasses: Option[Team] = teams.find(_.passes == 1200)
+
+teamWith1200CompletedPasses match {
+  case Some(team) => println(team.name)
+  case None => println("Nothing found")
+}
+
+```
+
+---
+
+# Functional programming in Scala - Option type
+
+
+- Ever seen `NullPointerException`?
+- How about writing `foo?.bar?.baz`?
+- And 
+```javascript
+if(test.level1 && test.level1.level2 && test.level1.level2.level3) {
+  // ...
+}
+```
+?
+
+Scala's solution:
+
+```scala
+sealed trait Option
+case object None extends Option
+case class Some[T](value: T) extends Option
+```
+
+```scala
+val absentGreeting: Option[String] = Option(null) // absentGreeting will be None
+val presentGreeting: Option[String] = Option("Hello!") // presentGreeting will be Some("Hello!")
+```
+
+---
+
+# Functional programming in Scala - Option type
+
+```scala
+// 1
+optionVar match {
+  case Some(i) => println(i)
+  case None => println("That didn't work.")
+}
+
+// 2
+if(optionVar.isDefined) {
+  println(optionVar.get)
+} else {
+  println("That didn't work.")
+}
+
+// 3
+optionVar map { i => 
+  println(i)
+} getOrElse {
+  println("That didn't work.")
+}
+```
+
+---
+
+class: center, middle
+
+# Monads
+
+---
+
+class: center, middle
+
+A monad is just a monoid in the category of endofunctors.
+
+.text-bigger[
+😱
+]
+
+---
+
+# Monads
+
+**Monad** is simply a wrapper and a number of ways to interact with it.
+
+<br />
+<br />
+<br />
+
+.center[
+![](http://adit.io/imgs/functors/context.png)
+]
+
+---
+
+# Monads
+
+<br />
+
+.center[
+![](http://sap1ens-archive.s3-website-us-east-1.amazonaws.com/pictures/monad_just.png)
+]
+
+---
+
+# Monads
+
+```scala
+val option = Some(10)
+
+val newOption: Option[Integer] = option map { i => 
+  i + 1
+}
+
+val newOptionInOption: Option[Option[Integer]] = option map { i => 
+  Some(i + 2)
+}
+
+val flatNewOption: Option[Integer] = newOptionInOption.flatten
+
+val anotherOption: Option[Integer] = option flatMap { i => 
+  Some(i + 3)
+}
+```
+
+```scala
+val option1 = Some("Demonware!")
+val option2 = None
+
+def more(str: String): Option[String] = Some(str * 3)
+def uppercase(str: String): Option[String] = Some(str.toUpperCase)
+
+val result1: Option[String] = option1.flatMap(more).flatMap(uppercase) // Some(DEMONWARE!DEMONWARE!DEMONWARE!)
+val result2: Option[String] = option2.flatMap(more).flatMap(uppercase) // None
+```
+
+---
+
+# Monads
+
+```scala
+val option1 = Some("Demonware!")
+val option2 = None
+
+def more(str: String): Option[String] = Some(str * 3)
+def uppercase(str: String): Option[String] = Some(str.toUpperCase)
+
+val result1 = for {
+  value <- option1
+  increased <- more(value)
+  uppercased <- uppercase(increased)
+} yield uppercased 
+
+result1 // Some(DEMONWARE!DEMONWARE!DEMONWARE!)
+
+val result2 = for {
+  value <- option2
+  increased <- more(value)
+  uppercased <- uppercase(increased)
+} yield uppercased 
+
+result2 // None
+```
+
+---
+
+class: center, middle
+
+# Scala Futures
+
+---
+
+# Scala Futures
+
+```scala
+object Future {
+  def apply[T](body: => T)(implicit execctx: ExecutionContext): Future[T]
+}
+```
+
+```scala
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.{Success, Failure}
+
+def fetchURL(url: String): Future[String] = Future {
+  scala.io.Source.fromURL(url).getLines.mkString
+}
+
+// 1
+fetchURL("http://sap1ens.com") onComplete {
+  case Success(body) => println(body)
+  case Failure(ex) => println("Sorry, couldn't fetch that")
+}
+
+// 2
+fetchURL("http://sap1ens.com") map { body => 
+  println(body)
+} recover { 
+  case ex => println("Sorry, couldn't fetch that")
+}
+```
+
+---
+
+# Scala Futures
+
+```scala
+val purchase = for {
+  usd <- Future { connection.getCurrentValue(USD) }
+  chf <- Future { connection.getCurrentValue(CHF) }
+  if isProfitable(usd, chf)
+} yield connection.buy(amount, chf)
+purchase onSuccess {
+  case _ => println("Purchased " + amount + " CHF")
+}
+```
+
+```scala
+val usdQuote = Future { connection.getCurrentValue(USD) }
+val chfQuote = Future { connection.getCurrentValue(CHF) }
+val purchase = for {
+  usd <- usdQuote
+  chf <- chfQuote
+  if isProfitable(usd, chf)
+} yield connection.buy(amount, chf)
+purchase onSuccess {
+  case _ => println("Purchased " + amount + " CHF")
+}
+```
+
+---
+
+class: center, middle
+
+# That's it!
+
+Don't you ❤️ Scala now?
+
+---
+
+class: center, middle
+
+![](http://www.horstmann.com/scala/images/cover.png)
+
+
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+    var slideshow = remark.create({
+        ratio: '16:9'
+    });
+</script>
+</body>
+</html>

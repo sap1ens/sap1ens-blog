@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Akka Clustering</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <style type="text/css">
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body { font-family: 'Droid Serif'; }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+
+      /* Custom stuff */
+      h1 {
+        margin-top: 0;
+        margin-bottom: 10px;
+      }
+      
+      li {
+        margin-bottom: 10px;
+      }
+
+      .left-column {
+        width: 50%;
+        float: left;
+      }
+
+      .right-column {
+        width: 50%;
+        float: right;
+      }
+
+      .column-30 {
+        width: 30%;
+      }
+
+      .column-45 {
+        width: 45%;
+      }      
+
+      .column-70 {
+        width: 70%;
+      }   
+
+      .column-20 {
+        width: 20%;
+      }
+
+      .column-80 {
+        width: 80%;
+      } 
+
+      .column-50 {
+        width: 50%;
+      }  
+
+      .column-33 {
+        width: 33%;
+      }                      
+
+      .text-center {
+        text-align: center;
+      }
+
+      .text-right {
+        text-align: right;
+      }
+
+      .text-bigger {
+        font-size: 200%;
+      }
+
+      .image-bigger img {
+        width: 50%;
+      }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+# Akka Clustering
+## Yaroslav Tkachenko
+
+---
+
+class: center, middle
+
+# Actor systems
+
+---
+
+# Actor systems
+
+An actor is a computational entity that, in response to a message it receives, can concurrently:
+
+- send a finite number of messages to other actors;
+- create a finite number of new actors;
+- designate the behavior to be used for the next message it receives.
+
+There is no assumed sequence to the above actions and they could be carried out in parallel.
+
+Key concepts:
+
+- Actor
+- Actor systems
+- Mailbox
+- Supervision strategy
+
+---
+
+# Actor systems - Example
+
+&nbsp;
+
+.left-column.column-50.text-bigger[
+📬 **Rachel**
+]
+
+.right-column.column-50.text-right.text-bigger[
+📬 **Alex**
+]
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+.center.text-bigger[
+📬 **Fred**
+]
+
+---
+
+# Actor systems - Supervision
+
+Strategies: 
+
+- Resume the subordinate, keeping its accumulated internal state
+- Restart the subordinate, clearing out its accumulated internal state
+- Stop the subordinate permanently
+- Escalate the failure, thereby failing itself
+
+---
+
+# Actor systems - Patterns
+
+Since we're dealing with messages, most of the Enterprise Integration Patterns (EIP) are applicable, for example: 
+
+- Point-to-Point Channel (Actor communication)
+- Publish-Subscribe Channel
+- Scatter-Gather (Scheduler-Workers)
+- Pipes and Filters
+- ...
+
+---
+
+# Actor systems - Communication styles
+
+- Fire and forget
+- Reply back
+- Pass original sender addresses
+- Keep addresses in the internal state
+
+---
+
+class: center, middle
+
+# Akka
+
+---
+
+# Akka 
+
+Akka is an open-source toolkit and runtime simplifying the construction of concurrent and distributed applications on the JVM. Akka supports multiple programming models for concurrency, but it emphasizes actor-based concurrency, with inspiration drawn from Erlang.
+
+---
+
+# Akka - Overview
+
+Why?
+
+- Concurrency and overall performance
+- Scalability 
+- Clean asynchronous programming model
+- Resilience
+- Simple distributed programming
+
+---
+
+# Akka - Actors
+
+```scala
+case class Greeting(who: String)
+ 
+class GreetingActor extends Actor with ActorLogging {
+  def receive = {
+    case Greeting(who) => log.info("Hello " + who)
+  }
+}
+ 
+val system = ActorSystem("MySystem")
+val greeter = system.actorOf(Props[GreetingActor], name = "greeter")
+greeter ! Greeting("Charlie Parker")
+```
+
+&nbsp;
+
+- Immutability of messages
+- Messages are handled one by one
+- Stateful actors
+
+---
+
+# Akka - Props
+
+A proper way to create Actors with parameters: 
+
+```scala
+object DemoActor {
+  def props(magicNumber: Int): Props = Props(classOf[DemoActor], magicNumber)
+}
+ 
+class DemoActor(magicNumber: Int) extends Actor with ActorLogging {
+  def receive = {
+    case x: Int => log.info(x + magicNumber)
+  }
+}
+ 
+val demoActor = context.actorOf(DemoActor.props(42), "demo")
+```
+
+---
+
+# Akka - Communication
+
+```scala
+class HelloActor extends Actor with ActorLogging {
+  def receive = {
+    case who => sender() ! "Hello, " + who
+  }
+}
+
+object ConversationActor {
+  def props(fellowActor: ActorRef): Props = Props(classOf[ConversationActor], fellowActor)
+}
+
+class ConversationActor(fellowActor: ActorRef) extends Actor with ActorLogging {
+  def receive = {
+    case "start" => fellowActor ! "Demonware!"
+    case message => log.info(message)
+  }
+}
+ 
+val system = ActorSystem("MySystem")
+
+val helloActor = system.actorOf(Props[HelloActor])
+val conversationActor = ConversationActor.props(helloActor)
+
+conversationActor ! "start"
+```
+
+---
+
+# Akka - Communication
+
+Ask: 
+```scala
+import scala.concurrent.duration._
+import akka.util.Timeout
+import akka.pattern.ask
+implicit val timeout = Timeout(5 seconds)
+val future = myActor ? "hello"
+```
+
+Forward:
+```scala
+target forward message
+```
+
+Kill:
+```scala
+import akka.actor.PoisonPill
+
+target ! PoisonPill
+```
+
+---
+
+# Akka - Supervision
+
+```scala
+class Supervisor extends Actor {
+  override val supervisorStrategy =
+    OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1 minute) {
+      case _: ArithmeticException      ⇒ Resume
+      case _: NullPointerException     ⇒ Restart
+      case _: Exception                ⇒ Escalate
+    }
+ 
+  val worker = context.actorOf(Props[Worker])
+ 
+  def receive = {
+    case n: Int => worker forward n
+  }
+}
+```
+
+---
+
+class: center, middle
+
+# Akka Persistence
+
+---
+
+# Akka Persistence - Overview
+
+.center[
+![](http://sap1ens-archive.s3-website-us-east-1.amazonaws.com/pictures/akka-persistence.jpg)
+]
+
+---
+
+# Akka Persistence - Overview
+
+- Event Sourcing
+- Journal
+- Persistent Actor
+- Persistent View
+
+Has plugins for JDBC (MySQL, Postgres, ...), MongoDB, Cassandra, Kafka, Redis and more.
+
+---
+
+# Akka Persistence - Example
+
+```scala
+case class Cmd(data: String)
+case class Evt(data: String)
+ 
+case class ExampleState(events: List[String] = Nil) {
+  def updated(evt: Evt): ExampleState = copy(evt.data :: events)
+  override def toString: String = events.reverse.toString
+}
+ 
+class ExamplePersistentActor extends PersistentActor {
+  override def persistenceId = "sample-id-1"
+ 
+  var state = ExampleState()
+ 
+  def updateState(event: Evt): Unit = 
+    state = state.updated(event)
+ 
+  val receiveRecover: Receive = {
+    case evt: Evt => updateState(evt)
+    case SnapshotOffer(_, snapshot: ExampleState) => state = snapshot
+  }
+ 
+  val receiveCommand: Receive = {
+    case Cmd(data) => persist(Evt(data))(updateState)
+    case "snap"  => saveSnapshot(state)
+    case "print" => println(state)
+  }
+}
+```
+
+---
+
+# Akka Persistence - Example
+
+```scala
+class MyView extends PersistentView {
+  override def persistenceId: String = "some-persistence-id"
+  override def viewId: String = "some-persistence-id-view"
+ 
+  def receive: Receive = {
+    case payload if isPersistent =>
+    // handle message from journal...
+    case payload                 =>
+    // handle message from user-land...
+  }
+}
+```
+
+---
+
+# Akka Persistence - Configuration
+
+```scala
+libraryDependencies += "com.github.dnvriend" %% "akka-persistence-jdbc" % "2.6.12"
+```
+
+```
+akka {
+  persistence {
+    journal.plugin = "jdbc-journal"
+    snapshot-store.plugin = "jdbc-snapshot-store"
+  }
+}
+akka-persistence-jdbc {
+  slick {
+    driver = "slick.driver.PostgresDriver"
+    db {
+      driver = "org.postgresql.Driver"
+      url = "jdbc:postgresql://localhost/db"
+      user = "postgres"
+      password = ""
+      keepAliveConnection = on
+      numThreads = 20
+      queueSize = 100
+    }
+  }
+  tables {
+    // ...
+  }
+  // ...
+}
+```
+
+---
+
+class: center, middle
+
+# Akka Clustering
+
+---
+
+# Akka Clustering - Overview
+
+.center[
+![](http://sap1ens-archive.s3-website-us-east-1.amazonaws.com/pictures/node-ring.png)
+]
+
+.left-column.column-50[
+- Cluster
+- Node
+- Leader
+]
+
+.right-column.column-50[
+- Gossip protocol
+- Seed nodes
+- Failure Detector
+]
+
+---
+
+# Akka Clustering - Overview
+
+&nbsp;
+
+.center[
+![](http://doc.akka.io/docs/akka/2.4/_images/member-states.png)
+]
+
+---
+
+# Akka Clustering - Setup
+
+```
+akka {
+  actor {
+    provider = cluster
+  }
+
+  remote {
+    netty.tcp {
+      hostname = "127.0.0.1"
+      port = 0
+    }
+  }
+ 
+  cluster {
+    seed-nodes = [
+      "akka.tcp://ClusterSystem@127.0.0.1:2551",
+      "akka.tcp://ClusterSystem@127.0.0.1:2552"
+    ]
+  }
+}
+```
+
+---
+
+# Akka Clustering - Setup
+
+```scala
+package sample.cluster.simple
+ 
+import akka.cluster.Cluster
+import akka.cluster.ClusterEvent._
+import akka.actor.ActorLogging
+import akka.actor.Actor
+ 
+class SimpleClusterListener extends Actor with ActorLogging {
+ 
+  val cluster = Cluster(context.system)
+ 
+  override def preStart(): Unit = cluster.subscribe(self, InitialStateAsEvents, classOf[MemberEvent])
+  
+  override def postStop(): Unit = cluster.unsubscribe(self)
+ 
+  def receive = {
+    case MemberUp(member) =>
+      log.info("Member is Up: {}", member.address)
+    case MemberRemoved(member, previousStatus) =>
+      log.info("Member is Removed: {} after {}",
+        member.address, previousStatus)
+    case _: MemberEvent =>
+  }
+}
+```
+
+---
+
+# Akka Clustering - Setup
+
+Real world example: https://github.com/sap1ens/akka-cluster-consul
+
+```scala
+val cluster = Cluster(system)
+
+val selfAddress = cluster.selfAddress
+
+val serviceAddresses = ConsulAPI.getServiceAddresses
+
+// http://doc.akka.io/docs/akka/2.4/scala/cluster-usage.html
+//
+// When using joinSeedNodes you should not include the node itself except for the node
+// that is supposed to be the first seed node, and that should be placed first
+// in parameter to joinSeedNodes.
+val serviceSeeds = serviceAddresses filter { address =>
+  address != selfAddress || address == serviceAddresses.head
+}
+
+cluster.joinSeedNodes(serviceSeeds)
+
+cluster registerOnMemberUp {
+// init system
+}
+```
+
+---
+
+# Akka Clustering - Actors
+
+3 nodes, 3 actors, but 9 messages:
+
+```
+INFO - Cluster Node [akka.tcp://demo-system@10.11.12.13:9102] - Member is Up [akka.tcp://demo-system@10.11.12.13:9101]
+INFO - Cluster Node [akka.tcp://demo-system@10.11.12.13:9101] - Member is Up [akka.tcp://demo-system@10.11.12.13:9102]
+INFO - Cluster Node [akka.tcp://demo-system@10.11.12.13:9103] - Member is Up [akka.tcp://demo-system@10.11.12.13:9103]
+INFO - Cluster Node [akka.tcp://demo-system@10.11.12.13:9101] - Member is Up [akka.tcp://demo-system@10.11.12.13:9101]
+INFO - Cluster Node [akka.tcp://demo-system@10.11.12.13:9103] - Member is Up [akka.tcp://demo-system@10.11.12.13:9102]
+INFO - Cluster Node [akka.tcp://demo-system@10.11.12.13:9102] - Member is Up [akka.tcp://demo-system@10.11.12.13:9103]
+INFO - Cluster Node [akka.tcp://demo-system@10.11.12.13:9101] - Member is Up [akka.tcp://demo-system@10.11.12.13:9103]
+INFO - Cluster Node [akka.tcp://demo-system@10.11.12.13:9102] - Member is Up [akka.tcp://demo-system@10.11.12.13:9102]
+INFO - Cluster Node [akka.tcp://demo-system@10.11.12.13:9103] - Member is Up [akka.tcp://demo-system@10.11.12.13:9101]
+```
+
+---
+
+# Akka Clustering - Singleton
+
+Why?
+
+- Single point of responsibility for certain cluster-wide consistent decisions, or coordination of actions across the cluster system
+- Single entry point to an external system
+- Single master, many workers
+- Centralized naming service, or routing logic
+
+But:
+
+- Cluster singleton may quickly become a performance bottleneck
+- You can not rely on the cluster singleton to be non-stop available — e.g. when the node on which the singleton has been running dies, it will take a few seconds for this to be noticed and the singleton be migrated to another node
+- In the case of a network partition appearing in a Cluster that is using Automatic Downing (see Auto Downing docs for Downing), it may happen that the isolated clusters each decide to spin up their own singleton, meaning that there might be multiple singletons running in the system, yet the Clusters have no way of finding out about them (because of the partition)
+
+---
+
+# Akka Clustering - Singleton
+
+Create Singleton: 
+
+```scala
+system.actorOf(
+  ClusterSingletonManager.props(
+    singletonProps = Props(classOf[Consumer], queue, testActor),
+    terminationMessage = End,
+    settings = ClusterSingletonManagerSettings(system)),
+  name = "consumer")
+```
+
+Call Singleton:
+
+```scala
+val consumer = system.actorOf(
+  ClusterSingletonProxy.props(
+    singletonManagerPath = "/user/consumer",
+    settings = ClusterSingletonProxySettings(system)),
+  name = "consumerProxy")
+
+consumer ! SomeMessage
+```
+
+---
+
+# Akka Clustering - Sharding
+
+Features:
+- One of the most powerful Akka features!
+- Allows to route messages across nodes in a cluster using a sharding function (actually two)
+- You don't need to know the physical location of an actor - cluster will forward message to a remote node if needed
+- Uses Akka Persistence internally (or brand-new Distributed Data)
+
+Concepts:
+- Coordinator (cluster singleton)
+- Shard Region (node)
+- Shard (group of actors)
+- Entity (actor)
+
+Entities (actors) are "activated" by receiving a first message and can be "passivated" using `context.setReceiveTimeout`.
+
+???
+
+- Cluster has only one coordinator as a singleton
+- Ideal number of shards = max(nodes) * 10
+- Every shard contains set of entities
+
+---
+
+# Akka Clustering - Sharding
+
+Counter interface:
+
+```scala
+case object Increment
+case object Decrement
+final case class Get(counterId: Long)
+final case class EntityEnvelope(id: Long, payload: Any)
+ 
+case object Stop
+final case class CounterChanged(delta: Int)
+```
+
+---
+
+# Akka Clustering - Sharding
+
+Counter implementation:
+
+```scala
+class Counter extends PersistentActor { 
+  context.setReceiveTimeout(120.seconds)
+ 
+  override def persistenceId: String = "Counter-" + self.path.name
+ 
+  var count = 0
+ 
+  def updateState(event: CounterChanged): Unit =
+    count += event.delta
+ 
+  override def receiveRecover: Receive = {
+    case evt: CounterChanged ⇒ updateState(evt)
+  }
+ 
+  override def receiveCommand: Receive = {
+    case Increment      ⇒ persist(CounterChanged(+1))(updateState)
+    case Decrement      ⇒ persist(CounterChanged(-1))(updateState)
+    case Get(_)         ⇒ sender() ! count
+    case ReceiveTimeout ⇒ context.parent ! Passivate(stopMessage = Stop)
+    case Stop           ⇒ context.stop(self)
+  }
+}
+```
+
+---
+
+# Akka Clustering - Sharding
+
+Create a region on every node:
+
+```scala
+val counterRegion: ActorRef = ClusterSharding(system).start(
+  typeName = "Counter",
+  entityProps = Props[Counter],
+  settings = ClusterShardingSettings(system),
+  extractEntityId = extractEntityId,
+  extractShardId = extractShardId)
+```
+
+Sharding functions:
+
+```scala
+val extractEntityId: ShardRegion.ExtractEntityId = {
+  case EntityEnvelope(id, payload) ⇒ (id.toString, payload)
+  case msg @ Get(id)               ⇒ (id.toString, msg)
+}
+ 
+val numberOfShards = 100
+ 
+val extractShardId: ShardRegion.ExtractShardId = {
+  case EntityEnvelope(id, _) ⇒ (id % numberOfShards).toString
+  case Get(id)               ⇒ (id % numberOfShards).toString
+}
+```
+
+---
+
+# Akka Clustering - Sharding
+
+- Highly available
+- Highly scalabale, not restricted by a single-node capacity
+- Application-level sharding => Stateful applications
+
+---
+
+
+class: center, middle
+
+# That's it!
+
+Don't you ❤️ Akka now?
+
+---
+
+class: center, middle
+
+![](https://images-na.ssl-images-amazon.com/images/I/51RPJrLtNtL._SX378_BO1,204,203,200_.jpg)
+
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js" type="text/javascript">
+    </script>
+    <script type="text/javascript">
+      var slideshow = remark.create({
+        ratio: '16:9'
+      });
+    </script>
+  </body>
+</html>
