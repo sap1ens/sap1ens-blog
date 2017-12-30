@@ -8,6 +8,7 @@ categories:
 - Mobify
 - Me
 - Thoughts
+- Year-In-Review
 ---
 
 Here's my first attempt to summarize most important things happened in my professional life (mostly programming) this year, for future self. May be it'll be interesting for someone else too.
