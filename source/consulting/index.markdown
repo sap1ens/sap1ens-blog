@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Services
+title: Consulting
 comments: false
 sharing: false
 footer: true
