@@ -1,0 +1,74 @@
+---
+layout: post
+title: "2017 In Review"
+date: 2017-12-29 21:11:25 -0800
+comments: true
+categories:
+- Mobify
+- Demonware
+- Me
+- Thoughts
+- Year-In-Review
+---
+
+Another "Year in Review" post, again mostly focused on professional life & tech stuff (since it's a tech blog 😉). Check 2016 [here](https://sap1ens.com/blog/2016/12/30/2016-in-review/).
+
+<!-- more -->
+
+## Mobify -> Demonware (Activision)
+
+So, I've left Mobify and joined Demonware (which is a subsidiary of Activision or `Activision Blizzard, Inc.` to be more precise).
+
+Mobify is a great company that builds great products. I really enjoyed my work there, but I felt like the company's direction hasn't always matched with my skills very well.
+
+Demonware is probably one of a few companies in Vancouver that deal with really large-scale systems. I've been tackling very challenging projects so far, I wrote about it [here](https://sap1ens.com/blog/2017/11/15/6-months-at-demonware/), so I'm not going to repeat myself.
+
+## Interviews
+
+I've applied to 5+ companies before joining Demonware and I discovered that companies with great interview process and amazing recruiters are EVEN MORE RARE than companies doing DevOps right 😱
+
+I don't want to mention any names, but every single company where I applied is very well known around the world.
+
+Still, one recruiter completely disappeared and stopped answering me after rescheduling the initial interview a few times.
+
+Another recruiter couldn't reply to me in 8 DAYS (!!!) on the last stage (!) of the interview process (with a few emails from me during those 8 days), only returning to say that the head of engineering (who was supposed to do the final interview) is on vacation and we need to reschedule. You can say that 8 days is probably not horrible, but how are you going to get engineers if you're not Amazon/Google/Facebook in this case? It's very likely the engineer you'd want to hire already has a few offers, and she is not going to wait for many weeks.
+
+## Blog
+
+One of my resolutions was to write more in this blog. And I miserably failed 😞 In my defence I want to say that I was very successful at public speaking opportunities (also new job meant more time researching & reading).
+
+I'm pretty happy with the blog setup I implemented last year, now I can publish with a single `./deploy.sh` command (which distributes content over AWS CloudFront CDN within seconds).
+
+Some annual stats about the blog:
+
+- Pageviews: 15220
+- Average session duration: 42 seconds
+- Top 5 countries: USA, Canada, India, Germany, UK
+- New / Returning visitor ratio: 71 / 29
+
+## Conferences / Talks / Workshops
+
+A lot of events visited in 2017 (I highlighted all where I presented):
+
+- **Microxchg Conference (Berlin)**
+- **Craft Conf (Budapest)**
+- **Scala Up North (Vancouver)**
+- **AWS User Group (Vancouver)** x4
+- **Full Stack Conference (Toronto)**
+- Polyglot Unconference (Vancouver)
+- Kubernetes Meetup (Vancouver)
+- Erlang & Elixir Meetup (Vancouver)
+- ConFoo Conference (Vancouver)
+
+## Things I Learned
+
+- The borderline between server & client JavaScript is becoming thinner
+- Big Data tools is probably the biggest Scala driver
+- Java 8 is (surprisingly) a pretty usable and solid language
+- Anyone can learn bash scripting (even me)
+- Kubernetes Kubernetes Kubernetes
+- Knowing more about the Linux internals does make you a better software engineer
+- Properly designed microservices is not a sacred knowledge anymore
+- DevOps is still really hard. If you have a "DevOps team", then you're doing it wrong
+- Like: Kafka, Spark, Flink, Kubernetes, Redis, HTTP2
+- Dislike: Hadoop ecosystem
