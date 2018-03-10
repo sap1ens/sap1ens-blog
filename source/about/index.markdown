@@ -18,7 +18,7 @@ I also write a [blog](/blog/archives) and [participate](/talks) in conferences a
 
 ## A bit more
 
-I love to travel, although not always have time for that. Starting from 2012 I [visited 11 countries](http://ru.igotoworld.com/en/visited-map/9924.htm) and adding more. I'm an occasional [photographer](https://www.instagram.com/sap1ens/), especially during my trips.
+I love to travel, although not always have time for that. Starting from 2012 I [visited 12 countries](http://ru.igotoworld.com/en/visited-map/9924.htm) and adding more. I'm an occasional [photographer](https://www.instagram.com/sap1ens/), especially during my trips.
 
 I also love cooking and enjoying great healthy food. I've been a vegetarian for a few years and I really appreciate my choice.
 
