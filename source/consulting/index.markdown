@@ -27,4 +27,4 @@ When you hire me, you don't just get an additional software engineer or an archi
 
 ## Contact
 
-Sounds interesting? Just reach out via [email](sapiensy@gmail.com). FYI, I still enjoy my full-time job and usually can spend 5-10 hours a week for consulting.
+Sounds interesting? Just reach out via email (<sapiensy@gmail.com>). FYI, I still enjoy my full-time job and usually can spend 5-10 hours a week for consulting.
