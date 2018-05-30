@@ -21,7 +21,7 @@ I spent my first day at the `Stream Processing in the Modern Age` track hosted b
 
 **[Drivetribe: A Social Network on Streams](https://qconlondon.com/london2018/presentation/drivetribe-social-network-streams)**
 
-[Slides](https://qconlondon.com/system/files/presentation-slides/dt_2018.pdf) | Video (not yet available)
+[Presentation](https://www.infoq.com/presentations/drivetribe)
 
 Drivetribe is a popular motoring social network. Instead of relying on a classic 3-tier architecture or embracing microservices they decided to do something different. Drivetribe uses stream processing for generating all relevant content in write time. So, when you open a page everything was already precalculated before, including the number of likes and comments. How? They heavily rely on write time aggregation. Here's the high-level diagram of the system:
 
@@ -35,13 +35,13 @@ Drivetribe also employs various algebras to deal with duplicate and out of order
 
 **[Next Steps in Stateful Streaming with Apache Flink](https://qconlondon.com/london2018/presentation/next-steps-stateful-streaming-apache-flink)**
 
-[Slides](https://qconlondon.com/system/files/presentation-slides/stateful_streaming_apache_flink.pptx) | Video (not yet available)
+[Presentation](https://www.infoq.com/presentations/flink-stateful-streaming)
 
 Stephan Ewen talked about the stateful operations in Apache Flink and whether it's possible to combine Batch and Streaming APIs in one processor. Recommended for anyone who uses Apache Flink in production.
 
 **[Streaming SQL Foundations: Why I ❤ Streams+Tables](https://qconlondon.com/london2018/presentation/streaming-sql-foundations-why-i-%E2%9D%A4-streamstables)**
 
-[Slides](https://qconlondon.com/system/files/presentation-slides/foundations_of_streaming_sql_qcon_london_2018.pdf) | Video (not yet available)
+[Presentation](https://www.infoq.com/presentations/sql-streaming)
 
 Tyler Akidau did really great job explaining the Stream/Table duality, something that Kafka Streams implements as a first-class citizen. 
 
@@ -53,7 +53,7 @@ I spent most of my second day at the `Architectures You've Always Wondered About
 
 **[Inside a Self-Driving Uber](https://qconlondon.com/london2018/presentation/inside-self-driving-uber)**
 
-[Slides](https://qconlondon.com/system/files/presentation-slides/qcon_london_2018_3.pdf) | Video (not yet available)
+[Presentation](https://www.infoq.com/presentations/uber-self-drive)
 
 It seems like everybody wanted to attend this talk 😉 And it was definitely worth it! We learned a lot about the navigation systems, all kinds of sensors and various use-cases for Machine Learning: perception, prediction and planning. 
 
@@ -63,13 +63,13 @@ Testing self-driving cars is a tricky topic as well. We discovered pros and cons
 
 **[Logistics as a Service: Building the Ocado Smart Platform](https://qconlondon.com/london2018/presentation/logistics-service-building-ocado-smart-platform)**
 
-[Slides](https://qconlondon.com/system/files/presentation-slides/qcon2018buildingtheocadosmartplatform.pdf) | Video (not yet available)
+[Presentation](https://www.infoq.com/presentations/ocado)
 
 This presentation consisted from two parts. In the first part Paul Sweetman described how and why Ocado uses multiple clouds (AWS and GCP). The second part by Alex Harvey was really mind-blowing! Check this [short video](http://www.bbc.com/news/av/business-38897417/the-ocado-warehouse-run-by-robots), looks impressive, doesn't it? Alex actually talks about the infrastructure they use to power all that automation and robots. Great talk.
 
 **[Lambda Architectures: a Snapshot, a Stream, & a Bunch of Deltas](https://qconlondon.com/london2018/presentation/lambda-architectures-snapshot-stream-bunch-deltas)**
 
-[Slides](https://qconlondon.com/system/files/presentation-slides/qcon_lon_2018_-_adrian_trenaman_-_a_stream_a_snapshot_and_a_bunch_of_deltas.pdf) | Video (not yet available)
+[Presentation](https://www.infoq.com/presentations/lambda-streams-delta)
 
 I was really surprised to see another application built on top of stream processing. Lots of really interesting details about Hudson's Bay microservices setup with Lambda Architecture, caching pros & cons, Apache Kafka usage and more. Very practical and quite entertaining.
 
@@ -85,7 +85,7 @@ Probably one of the best introductions to actor systems and Akka (Java API) I've
 
 **[Cloud-Native and Scalable Kafka Architecture](https://qconlondon.com/london2018/presentation/cloud-native-and-scalable-kafka-architecture)**
 
-[Slides](https://qconlondon.com/system/files/presentation-slides/qcon_-_scaling_kafka.pdf) | Video (not yet available)
+[Presentation](https://www.infoq.com/presentations/cloud-native-kafka-netflix)
 
 This is a true gem of the conference for me, because, well, I deal with Apache Kafka clusters a lot. Netflix has the same problems with scaling Kafka clusters quickly up and down. Adding an extra broker to the existing cluster is not fast and a proper rebalancing can take days. 
 
@@ -118,13 +118,11 @@ He talked about [Aeron](https://github.com/real-logic/aeron), which is a high-pe
 
 {% img /images/posts/qcon-2018/qcon-2018-1.jpg 900 %}
 
-I had a chance to talk about the two of my most favourite topics (aside from the data pipelines) at the same time: actors and event-driven systems. You can find an article about my `Actors or Not: Async Event Architectures` presentation [here](https://www.infoq.com/news/2018/03/asynchronous-event-architectures) and the slides below:
+I had a chance to talk about the two of my most favourite topics (aside from the data pipelines) at the same time: actors and event-driven systems. You can find an article about my `Actors or Not: Async Event Architectures` presentation [here](https://www.infoq.com/news/2018/03/asynchronous-event-architectures), video [here](https://www.infoq.com/presentations/async-event-arch) and the slides below:
 
 <iframe src="//www.slideshare.net/slideshow/embed_code/key/zSt0T8CldF2BK" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe>
 
 In this presentation I talk about two different event-driven [micro]service environments: "classic" Pub/Sub in Python that we've been building at Demonware and actor-based messaging on top of message queue with some routing that we've designed and built at Bench Accounting a few years ago.
-
-BTW, the video should be available *eventually*, hopefully soon.
 
 My talk hasn't received very high ratings (¯\\_(ツ)_/¯), but I've got A LOT of questions after, which always feels good - people seem to be interested in learning best practices and adopting event-driven architecture more widely nowadays. 
 
