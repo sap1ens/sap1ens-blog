@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "QCon London 2018"
-date: 2018-03-12 22:08:46 -0700
+date: 2018-03-12 13:08:46 -0700
 comments: true
 categories: 
 - Talk
