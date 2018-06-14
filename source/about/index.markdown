@@ -6,7 +6,7 @@ sharing: false
 footer: true
 ---
 
-<img src="/images/pages/me_about_page.jpg" width="400" style="float: right; margin-left: 30px;" />
+<img src="/images/pages/me_about_page_speaking.jpg" width="400" style="float: right; margin-left: 30px;" />
 
 Hey, my name is Yaroslav (Slava) Tkachenko, I was born in Russia and I'm currently living in Vancouver, Canada.
 
