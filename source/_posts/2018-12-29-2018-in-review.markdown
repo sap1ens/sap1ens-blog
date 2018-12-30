@@ -1,0 +1,68 @@
+---
+layout: post
+title: "2018 In Review"
+date: 2018-12-29 16:08:21 -0800
+comments: true
+categories: 
+- Demonware
+- Activision
+- Me
+- Thoughts
+- Year-In-Review
+---
+
+Once again I'm writing a "Year in Review" post, mostly focused on professional life & tech stuff. Check 2017 [here](https://sap1ens.com/blog/2017/12/29/2017-in-review/).
+
+<!-- more -->
+
+## Demonware (Activision) -> Activision
+
+I really enjoyed [my time at Demonware](https://sap1ens.com/blog/2017/11/15/6-months-at-demonware/), but at the beginning of the year I had an opportunity to move to another team at Activision, Data Services. 
+
+My previous team at Demonware, Data Pipeline, is responsible for telemetry ingestion (as well as metrics and logs), but the data is mostly flowing through the pipes untouched. 
+
+My current team, Data Services, which is a part of Activision Central Tech, consumes that data and does quite a few things with it: parsing, enrichment, transformations, etc. We maintain Data Lake and Data Warehouse, build various APIs and services on top of the data we have. I still work with Kafka a lot, but also leverage Hadoop, Hive, Presto, Spark, Cassandra and other tools. All this tech handles billions of events per day / petabytes of files in S3 and powers data-driven decisions for the last 7 years of Call of Duty games.
+
+It's being a very hard, but rewarding year. I enjoyed it a lot!
+
+## Consulting / Training
+
+I started to seriously consider doing consulting & training part time. I explained what I can offer [here](https://sap1ens.com/consulting/). I have _some_ training experience, but not so much consulting one. It's going to be challenging, but I'm looking forward to it.
+
+## Blog
+
+Unfortunately I wasn't able to contribute to my blog as much as I wanted this year. I was _very_ busy at work, as well as working on my talks (more about this below). It just balanced out `¯\_(ツ)_/¯`.
+
+Some annual stats about the blog:
+
+- Pageviews: 21680
+- Average session duration: 38 seconds
+- Top 5 countries: USA, India, France, UK, Germany
+- New / Returning visitor ratio: 87 / 13
+
+## Conferences / Talks / Workshops
+
+Events visited in 2018 (I highlighted all where I presented):
+
+- **Apache Kafka Meetup (Vancouver)** x2
+- **QCon (London)**
+- **DevOps Days (Vancouver)**
+- **dotScale (Paris)**
+- **Open Source Summit North America (Vancouver)**
+- **Strata Data Conference (New York)**
+- AWS re:Invent (Las Vegas)
+- Microservices Meetup (Vancouver)
+- AWS User Group (Vancouver)
+- Hashicorp User Group (Vancouver)
+
+It seems to be the most successful year in terms of public speaking for me!
+
+## Things I Learned
+
+- [Test Pyramid](https://martinfowler.com/articles/practical-test-pyramid.html) is not going anywhere
+- Investing in tooling for developers can't be done adhoc, it's an ongoing process
+- Self-serve UIs provided by Platform-level teams become _the way_ for internal development teams to use Platforms
+- Kubernetes is great, but not everybody needs it
+- Big Data space is as diverse as Javascript frameworks (or even more)
+- Cassandra is _amazing_ if you partition your data right and absolutely _terrifying_ if you don't
+- A good way to tackle technical debt is two interns and a passionate senior engineer 😉
