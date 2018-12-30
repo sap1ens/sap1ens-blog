@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Consulting
+title: Consulting & Training
 comments: false
 sharing: false
 footer: true
@@ -15,8 +15,8 @@ You can find my resume [here](https://sap1ens.com/files/resume-yaroslav-tkachenk
 ## Main areas of expertise
 
 - Microservices. Building from scratch and transitioning from a monolith. Best practices including proper communication styles, infrastructure automation and CI/CD.
-- Data pipelines. Apache Kafka. Anything between data collection/ingestion and data warehousing including stream processing.
-- Messaging and event-driven systems. Apache Kafka, Apache ActiveMQ, Apache Camel, Enterprise Integration Patterns, Akka. Event Sourcing and CQRS.
+- Data pipelines. Apache Kafka, Spark, Hive. Anything between data collection/ingestion and data warehousing including batch and stream processing.
+- Messaging and event-driven systems. Apache Kafka, ActiveMQ, Camel, Enterprise Integration Patterns, Akka. Event Sourcing and CQRS.
 - Highly scalable and available online services. Load balancing, sharding, replication, failover, multi-DC deployments and self-healing services. From 0 requests/second to 100, 1000, 10000+.
 - Back-end programming. Primarily with Scala, Java, Python and Node.js (with a few major frameworks in each), but I'm a true polyglot and worked and experimented with a lot of languages (C#, Ruby, Erlang, Lisp, Go...). I'm also really passioned about clean code, SOLID and DRY principles, refactoring and testing. I respect Domain Driven Design, love functional and actor programming.
 - Cloud infrastructure automation, mostly Amazon Web Services. VMs, containers. 12-factor applications.
