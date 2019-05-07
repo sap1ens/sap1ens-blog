@@ -88,6 +88,10 @@
             width: 50%;
         }
 
+        h3#data-pipeline  {
+            margin-top: 0px;
+        }
+
         #kafka-fundamentals + table {
             width: 100%;
             margin-top: 15%;
@@ -160,9 +164,9 @@ class: center, middle
 
 ???
 
-Ask everyone for 10 seconds introductions
-Thank for participation
-Feel free to interrupt me anytime and ask questions
+- Ask everyone for 10 seconds introductions
+- Thank for participation
+- Feel free to interrupt me anytime and ask questions
 
 ---
 
@@ -184,7 +188,7 @@ Feel free to interrupt me anytime and ask questions
 
 # Important links
 
-- Slides: TODO https://sap1ens.com/workshop/craftconf-2019/
+- Slides: https://sap1ens.com/workshop/craftconf-2019
 - GitHub: https://github.com/sap1ens/kafka-workshop
 
 ---
@@ -277,8 +281,7 @@ Very different from a work queue:
 # Data Pipelines 101
 
 .center[
-<img src="https://docs.google.com/drawings/d/e/2PACX-1vQdRzsTIBKMqRdlevKwecCklsmEL5mr0C3iAhKtEc3pesQWoFPdkGtW0enE44mJjryG8l0aghjBnXgx/pub?w=900">
-
+![](http://sap1ens-archive.s3-website-us-east-1.amazonaws.com/workshop-data-pipelines/pipeline.png)
 ### Data Pipeline
 ]
 
@@ -382,7 +385,7 @@ Kafka cluster:
 - Consists from one or many **brokers**
 - Requires Zookeeper cluster for *discovery* and *metadata persistence*
 - One of the brokers is elected as a *controller*. It's just a role that can be assigned to anyone - Kafka doesn't really have a "master" or "leader" node, so there is no SPOF
-- Consumers and producers can use *any* broker to bootstrap. Once they discover full cluster topology they start to talk to the *right* broker(s)
+- Consumers and producers can use *any* broker to bootstrap. Once they discover full cluster topology they start talking to the *right* broker(s)
 
 ???
 
@@ -426,14 +429,14 @@ version: '2.1'
 services:
   zookeeper:
     container_name: zookeeper
-    image: 'confluentinc/cp-zookeeper:5.1.0'
+    image: 'confluentinc/cp-zookeeper:5.1.2'
     ports:
       - 2181:2181
     environment:
       - ZOOKEEPER_CLIENT_PORT=2181
   kafka:
     container_name: kafka
-    image: 'confluentinc/cp-kafka:5.1.0'
+    image: 'confluentinc/cp-kafka:5.1.2'
     ports:
       - 9092:9092
     depends_on:
@@ -443,6 +446,8 @@ services:
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
       - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
 ```
 
 ---
@@ -865,7 +870,7 @@ However, most of the concepts and operations described next would generally appl
 
 ---
 
-# Kafka Streams
+# Kafka Streams - Concepts
 
 It's possible to run one or many **applications**.
 
@@ -879,7 +884,7 @@ Each instance defines a **processor topology**:
 
 ---
 
-# Kafka Streams
+# Kafka Streams - Concepts
 
 ```java
 Properties props = new Properties();
@@ -899,7 +904,7 @@ streams.start();
 
 ---
 
-# Kafka Streams
+# Kafka Streams - Concepts
 
 ```java
 KStream<String, String> stream = builder.stream("input-topic");
@@ -925,7 +930,7 @@ Stateless transformations: *map, mapValues, flatMap, flatMapValues, filter, sele
 
 ---
 
-# Kafka Streams
+# Kafka Streams - Concepts
 
 The stream-table duality describes the close relationship between **streams** and **tables**:
 - Stream as Table: A stream can be considered a _changelog_ of a table, where each data record in the stream captures a state change of the table
@@ -933,17 +938,17 @@ The stream-table duality describes the close relationship between **streams** an
 
 ---
 
-# Kafka Streams
+# Kafka Streams - Concepts
 
 .center[
-<img src="https://docs.confluent.io/current/_images/streams-table-duality-03.jpg" width="600" />
+<img src="http://sap1ens-archive.s3-website-us-east-1.amazonaws.com/workshop-data-pipelines/stream-table-duality.png" width="600"/>
 ]
 
 ---
 
-# Kafka Streams
+# Kafka Streams - Concepts
 
-Simple counter implementation:
+Simple counter implementation, let's look at an example:
 
 ```java
 KStream<String, String> stream = builder.stream("input-topic");
@@ -961,7 +966,7 @@ Other aggregations: *aggregate, reduce*
 
 ---
 
-# Kafka Streams
+# Kafka Streams - Concepts
 
 Time in stream processing:
 - Event-time
@@ -981,7 +986,7 @@ public interface TimestampExtractor {
 
 ---
 
-# Kafka Streams
+# Kafka Streams - Concepts
 
 Windowing:
 - **Hopping**: fixed-size, overlapping windows
@@ -1007,7 +1012,7 @@ Session windows allow creating per-key sessions:
 
 ---
 
-# Kafka Streams
+# Kafka Streams - Concepts
 
 Now counter with windows:
 
@@ -1026,7 +1031,7 @@ aggregatedTable
 
 ---
 
-# Kafka Streams
+# Kafka Streams - Concepts
 
 How to handle out of order messages? Kafka Streams indtroduces grace window period:
 
@@ -1042,7 +1047,7 @@ More on this topic:
 
 ---
 
-# Kafka Streams
+# Kafka Streams - Concepts
 
 Finally, windowed counter with suppression of intermediate updates:
 
@@ -1062,7 +1067,7 @@ aggregatedTable
 
 ---
 
-# Kafka Streams
+# Kafka Streams - Concepts
 
 | Join operands           | Type         | (INNER) JOIN  | LEFT JOIN     | OUTER JOIN    |
 |-------------------------|--------------|---------------|---------------|---------------|
@@ -1074,7 +1079,7 @@ aggregatedTable
 
 ---
 
-# Kafka Streams
+# Kafka Streams - Concepts
 
 Joining mechanics:
 - Joins are performed on message keys. It's possible to select a different message key by using one of the following methods: *selectKey* (obviously), *map*, *flatMap*
@@ -1087,20 +1092,20 @@ KTable<String, Double> right = ...;
 
 KStream<String, String> joined = left.leftJoin(right,
     (leftValue, rightValue) -> "left=" + leftValue + ", right=" + rightValue,
-    Joined.keySerde(Serdes.String()).withValueSerde(Serdes.Long())
+    Joined.keySerde(Serdes.String()).withValueSerde(Serdes.String())
 );
 ```
 
 ---
 
-# Kafka Streams
+# Kafka Streams - Concepts
 
 - **At-least-once** semantics, enabled by default (`processing.guarantee="at_least_once"`). Rely on basic Kafka Producer & Consumer functionality 
 - **Exactly-once** semantics, has to be enabled explicitly (`processing.guarantee="exactly_once"`). Rely on Kafka transactions and idempotent producers (covered before)
 
 ---
 
-# Kafka Streams
+# Kafka Streams - Concepts
 
 Kafka Streams provides low-level API for defining:
 - **Transformers**, via either `Transformer` or `ValueTransformer` interface
@@ -1113,7 +1118,7 @@ Kafka Streams provides low-level API for defining:
 
 ---
 
-# Kafka Streams
+# Kafka Streams - Concepts
 
 ```java
 public class PageEmailNotificationAlert implements Processor<PageId, PageMetadata> {
@@ -1146,7 +1151,7 @@ Using in DSL:
 
 ---
 
-# Kafka Streams
+# Kafka Streams - Concepts
 
 Kafka Streams may create internal topics, typically following `<ApplicationId>-<operator name>-<suffix>` convention.
 
@@ -1157,15 +1162,15 @@ Kafka Streams may create internal topics, typically following `<ApplicationId>-<
 
 ---
 
-# Kafka Streams
+# Kafka Streams - Concepts
 
 .center[
-<img src="https://docs.confluent.io/current/_images/streams-architecture-overview.jpg" width="600"/>
+<img src="http://sap1ens-archive.s3-website-us-east-1.amazonaws.com/workshop-data-pipelines/streams-internal.png" width="600"/>
 ]
 
 ---
 
-# Kafka Streams
+# Kafka Streams - Concepts
 
 Kafka Streams uses the concepts of **stream partitions** and **stream tasks** as logical units of its parallelism model. There are close links between Kafka Streams and Kafka in the context of parallelism:
 
@@ -1177,25 +1182,48 @@ So, the maximum parallelism at which your application may run is bounded by the 
 
 ---
 
-# Kafka Streams
+# Kafka Streams - Concepts
 
 .center[
-<img src="https://docs.confluent.io/current/_images/streams-architecture-example-01.png" width="400"/>
+<img src="http://sap1ens-archive.s3-website-us-east-1.amazonaws.com/workshop-data-pipelines/stream-tasks-1.png" width="400"/>
 ]
 
 ---
 
-# Kafka Streams
+# Kafka Streams - Concepts
 
 .center[
-<img src="https://docs.confluent.io/current/_images/streams-architecture-example-02.png" width="500"/>
+<img src="http://sap1ens-archive.s3-website-us-east-1.amazonaws.com/workshop-data-pipelines/stream-tasks-2.png" width="550"/>
 ]
 
 ---
 
-# Kafka Streams
+# Kafka Streams - Example
 
-TODO: convert this https://github.com/confluentinc/kafka-streams-examples/blob/5.2.1-post/src/main/java/io/confluent/examples/streams/PageViewRegionLambdaExample.java to join a stream of user signups with user information (console) to get a windowed count per console. Use JSON
+Now let's combine what we learned together:
+
+```java
+KTable<String, User> users = builder.table("users");
+
+KStream<String, UserActivity> usersActivity = builder.stream("user_activity");
+
+KTable<Windowed<String>, Long> activityByConsole = usersActivity
+    .leftJoin(users, (activity, user) -> {
+        if (user != null) {
+            Map<String, String> headers = activity.getMetadata();
+            headers.put("console", user.getConsole().toString());
+        }
+        return activity;
+    })
+    .map((userId, activity) -> new KeyValue<>(activity.getMetadata().get("console"), activity))
+    .groupByKey()
+    .windowedBy(TimeWindows.of(Duration.ofSeconds(15)))
+    .count();
+
+activityByConsole
+    .toStream((windowedConsole, count) -> windowedConsole.toString())
+    .to("user_activity_by_console", Produced.with(Serdes.String(), Serdes.Long()));
+```
 
 ---
 
@@ -1221,8 +1249,11 @@ TODO: convert this https://github.com/confluentinc/kafka-streams-examples/blob/5
 # Kafka Streams - Applications in Data Pipelines
 
 - Data transformation
+    - ETL, analytics, ML
 - Deduplication
+    - Using custom state stores
 - Enrichment
+    - Using joins
 - Running aggregations
 
 ---
@@ -1236,7 +1267,7 @@ class: center, middle
 # Kafka Connect
 
 .center[
-<img src="https://www.confluent.io/wp-content/uploads/etl_mess.png" width="700"/>
+<img src="http://sap1ens-archive.s3-website-us-east-1.amazonaws.com/workshop-data-pipelines/integration-mess.png" width="700"/>
 ]
 
 ---
@@ -1244,7 +1275,7 @@ class: center, middle
 # Kafka Connect
 
 .center[
-![](https://www.confluent.io/wp-content/uploads/Kafka-Connect.png)
+![](http://sap1ens-archive.s3-website-us-east-1.amazonaws.com/workshop-data-pipelines/connect.png)
 ]
 
 ---
@@ -1288,7 +1319,7 @@ class: center, middle
 # Kafka Connect - Concepts
 
 .center[
-![](https://docs.confluent.io/current/_images/worker-model-basics.png)
+![](http://sap1ens-archive.s3-website-us-east-1.amazonaws.com/workshop-data-pipelines/workers.png)
 ]
 
 ---
@@ -1300,7 +1331,7 @@ class: center, middle
 - **Why?** In a truly generic system you don't want to implement JSON Elasticsearch connector or Avro S3 connector... If serialization format is generic enough, all connectors can be reused! And it makes possible to apply generic *Transforms*.
 
 .center[
-![](https://docs.confluent.io/current/_images/converter-basics.png)
+![](http://sap1ens-archive.s3-website-us-east-1.amazonaws.com/workshop-data-pipelines/connect-converters.png)
 ]
 
 ---
@@ -1321,27 +1352,22 @@ class: center, middle
 
 ---
 
-# Kafka Connect - Example 1
+# Kafka Connect - Example
 
 Let's use Kafka Connect and try to send a text file to and from Kafka. 
 
-Use `docker-compose.connect.yml` to start up everything that's required with `docker-compose -f docker-compose.connect.yml up`.
-
-TODO: rehearse
-
----
-
-# Kafka Connect - Example 2
-
-TODO: Realtime example with Avro, S3, etc.
+Use `docker-compose.connect.yml` to start up everything that's required with `docker-compose -f docker-compose.connect.yml up`
 
 ---
 
 # Kafka Connect - Applications in Data Pipelines
 
-- SQL and NoSQL *data capture* with **source** connectors 
+- SQL and NoSQL *data capture* with **source** connectors (*Change Data Capture*)
+    - Example: MySQL connector capturing and streaming updates for a set of tables
 - Delivering processed data to various destinations (Data Marts, BI, application integration) via **sink** connectors
+    - Example: using ElasticSearch connector for sending messages to run adhoc queries and search; using InfluxDB connector for sending metrics to build dashboards
 - Data *archival* with **sink** connectors
+    - Example: capturing and saving data after various transformations in the pipeline to AWS S3 or HDFS
 
 ---
 
@@ -1413,12 +1439,19 @@ class: center, middle
 
 # Data Pipelines 201
 
-TODO: 
-- topic naming conventions
-- on the importance of schemas (immutability, etc.)
-- data linage / discoverability / audit
-- data recovery / reprocessing
-- Hive streaming ingestion / small files problem
+---
+
+# Data Pipelines 201
+
+If we have time we can talk about:
+
+- Kafka topic naming conventions
+- Routing (merging and splitting, filtering)
+- Getting message schemas right is important!
+- Data governance and linage
+- Self-serve ("on-demand") streams
+- Data reprocessing and deduplication
+- Hive streaming ingestion; handling small files problem
 
 ---
 
