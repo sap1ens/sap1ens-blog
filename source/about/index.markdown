@@ -10,15 +10,15 @@ footer: true
 
 Hey, my name is Yaroslav (Slava) Tkachenko, I was born in Russia and I'm currently living in Vancouver, Canada.
 
-I'm a software engineer, at the moment Software Architect at [Activision](https://www.activision.com).
+I'm a software engineer & architect, at the moment Software Architect at [Activision](https://www.activision.com).
 
 I like functional programming and distributed systems, you can find more info about what I do below and in my [resume](/files/resume-yaroslav-tkachenko.pdf).
 
-I also write a [blog](/blog/archives) and [participate](/talks) in conferences and meetups.
+I also write a [blog](/blog/archives) and [present](/talks) at conferences and meetups.
 
 ## A bit more
 
-I love to travel, although not always have time for that. Starting from 2012 I [visited 14 countries](http://ru.igotoworld.com/en/visited-map/9924.htm) and adding more. I'm an occasional [photographer](https://www.instagram.com/sap1ens/).
+I love to travel! Starting from 2012 I [visited 16 countries](http://ru.igotoworld.com/en/visited-map/9924.htm) and adding more. I'm an occasional [photographer](https://www.instagram.com/sap1ens/).
 
 Mentoring and teaching is something I always excited to do, either in my current company via conversations, workshops, 1-to-1s and lunch & learns or public speaking. Writing is a big part of me too, at the moment I use my blog for that, but I hope that once I'll have time and expertise to write a book. That also means that I read A LOT, mostly [professional stuff](/blog/2014/10/13/how-and-what-i-read-as-a-software-engineer/), fiction (sci-fi, fantasy) and non-fiction (I like history and biographies).
 
