@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Java Concurrency in Practice</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <style type="text/css">
+        @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+        @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+        @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+        body { font-family: 'Droid Serif'; }
+        h1, h2, h3 {
+            font-family: 'Yanone Kaffeesatz';
+            font-weight: normal;
+        }
+        .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+
+        /* Custom stuff */
+        h1 {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        /* Nested lists */
+        li ul {
+            margin-top: 8px;
+        }
+
+        .left-column {
+            width: 50%;
+            float: left;
+        }
+
+        .right-column {
+            width: 50%;
+            float: right;
+        }
+
+        .column-30 {
+            width: 30%;
+        }
+
+        .column-45 {
+            width: 45%;
+        }
+
+        .column-70 {
+            width: 70%;
+        }
+
+        .column-20 {
+            width: 20%;
+        }
+
+        .column-80 {
+            width: 80%;
+        }
+
+        .column-50 {
+            width: 50%;
+        }
+
+        .column-33 {
+            width: 33%;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-bigger {
+            font-size: 150%;
+        }
+
+        .text-alot-bigger {
+            font-size: 200%;
+        }
+
+        .image-bigger img {
+            width: 50%;
+        }
+
+        h3#data-pipeline  {
+            margin-top: 0px;
+        }
+
+        #kafka-fundamentals + table {
+            width: 100%;
+            margin-top: 15%;
+        }
+
+        #kafka-fundamentals + table th {
+            height: 50px;
+            text-align: center;
+        }
+
+        #kafka-fundamentals + table td {
+            text-align: center;
+        }
+
+        #kafka-streams + table {
+            width: 100%;
+            margin-top: 15%;
+        }
+    </style>
+</head>
+<body>
+<textarea id="source">
+
+class: center, middle
+
+# Java Concurrency in Practice
+
+## Yaroslav Tkachenko
+
+---
+
+# Agenda
+
+- Intro to Multithreading in JVM
+- Building Blocks
+- Real-world Use-cases
+
+---
+
+class: center, middle
+
+# Intro to Multithreading in JVM
+
+---
+
+# Intro to Multithreading in JVM
+
+_A **thread** is a thread of execution in a program. The JVM allows an application to have multiple threads of execution running concurrently. In the Hotspot JVM there is a direct mapping between a Java Thread and a native operating system Thread._
+
+
+```java
+class CustomThread extends Thread {
+    public void run () {
+        // ...
+    }
+}
+
+CustomThread customThread = new CustomThread();
+customThread.start();
+```
+
+
+```java
+class CustomRunnable implements Runnable {
+    public void run() {
+        // ...
+    }
+}
+
+new Thread(new CustomRunnable());
+```
+
+```java
+(new Thread(() -> {
+    // ...
+})).start();
+```
+
+---
+
+# Intro to Multithreading in JVM
+
+```java
+public class ThreadExample {
+    private static Integer counter = 0;
+
+    public static void main(String[] args) {
+
+        class PlusThread extends Thread {
+            public void run () {
+                counter = 1;
+            }
+        }
+
+        class MinusThread extends Thread {
+            public void run () {
+                counter = -1;
+            }
+        }
+
+        PlusThread pt = new PlusThread();
+        MinusThread mt = new MinusThread();
+
+        pt.start();
+        mt.start();
+
+        System.out.println(counter);
+    }
+}
+```
+
+---
+
+# Intro to Multithreading in JVM
+
+`synchronized` to the resque!
+
+```java
+synchronized (someObject) {
+    // ...
+}
+```
+
+```java
+synchronized void updateMethod() {
+    // ...
+}
+
+someObject.updateMethod();
+```
+
+"synchronized done right": https://projectlombok.org/features/Synchronized
+
+More built-ins:
+
+```java
+volatile
+```
+
+```java
+wait();
+notify();
+```
+
+---
+
+class: center, middle
+
+# Building Blocks
+
+---
+
+# Building Blocks
+
+Executor & ExecutorService:
+
+```java
+Executor executor = Executors.newSingleThreadExecutor();
+executor.execute(() -> System.out.println("Hello World"));
+```
+
+```java
+ExecutorService executorService = Executors.newFixedThreadPool(10);
+Future<String> future = executorService.submit(() -> "Hello World");
+// some operations
+String result = future.get();
+```
+
+Types of Thread Pools:
+
+- Single Thread
+- Fixed
+- Cached
+- Scheduled (single and many threads)
+- ForkJoin
+
+---
+
+# Building Blocks
+
+CompletableFuture (Java 8+):
+
+```java
+CompletableFuture<String> completableFuture 
+  = CompletableFuture.supplyAsync(() -> "Hello")
+    .thenCompose(s -> CompletableFuture.supplyAsync(() -> s + " World"));
+ 
+assertEquals("Hello World", completableFuture.get());
+```
+
+```java
+CompletableFuture.runAsync()
+
+CompletableFuture.allOf()
+CompletableFuture.anyOf()
+```
+
+---
+
+# Building Blocks
+
+Not thread-safe:
+
+- ArrayList
+- HashMap
+- HashSet
+
+Thread-safe, but slow:
+
+- Collections.synchronizedList()
+- Collections.synchronizedMap()
+- Collections.synchronizedSet()
+
+Thread-safe, true concurrency:
+
+- CopyOnWriteArrayList (expensive writes)
+- ConcurrentHashMap (universal)
+- CopyOnWriteArraySet / ConcurrentHashMap.newKeySet()
+
+---
+
+# Building Blocks
+
+Most popular Atomic variables:
+
+- AtomicInteger
+- AtomicLong
+- AtomicBoolean
+- AtomicReference
+
+Leverage low-level atomic machine instructions such as compare-and-swap (CAS).
+
+```java
+public class SafeCounterWithoutLock {
+    private final AtomicInteger counter = new AtomicInteger(0);
+     
+    public int getValue() {
+        return counter.get();
+    }
+    public void increment() {
+        while(true) {
+            int existingValue = getValue();
+            int newValue = existingValue + 1;
+            if(counter.compareAndSet(existingValue, newValue)) {
+                return;
+            }
+        }
+    }
+}
+```
+
+---
+
+# Building Blocks
+
+LinkedBlockingQueue:
+
+```java
+BlockingQueue<Thingy> queue = new LinkedBlockingQueue<>();
+
+// thread 1
+
+queue.put(new Thingy(...));
+
+// thread 2
+
+Thingy thingy = queue.take(); // blocking
+```
+
+CountDownLatch:
+
+```java
+CountDownLatch latch = new CountDownLatch(2); 
+latch.await(); // blocking
+
+// other threads
+
+latch.countDown();
+```
+
+---
+
+class: center, middle
+
+# Real-world Use-cases
+
+---
+
+# Real-world Use-cases
+
+AtomicBoolean shutdown variables:
+
+```java
+private static final AtomicBoolean shutdown = new AtomicBoolean(false);
+
+while (!shutdown.get()) {
+    // ...
+}
+
+Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+    shutdown.set(true);
+    // ...
+}));
+```
+
+AtomicLong in ConsumerHealthCheck:
+
+https://git.dsops.activision.com/ds/ds-observability/blob/1cbe088846139ae975a8d5826325ee90f1daa0b0/src/main/java/com/activision/ds/observability/health/ConsumerHealthCheck.java#L15
+
+---
+
+# Real-world Use-cases
+
+ConcurrentHashMap of running queries in [table-creator](https://git.dsops.activision.com/ds/table-creator/blob/master/src/main/java/com/activision/ds/tablecreator/cache/RunningQueryCache.java#L19):
+
+```java
+private final Map<String, List<QueryInfo>> queryCache = new ConcurrentHashMap<>();
+```
+
+ConcurrentHashMap of existing locks in [etl-process-api](https://git.dsops.activision.com/ds/etl-process-api/blob/master/src/main/java/com/activision/ds/etlprocess/locks/LockManager.java#L19):
+
+```java
+private ConcurrentHashMap<String, Date> locks = new ConcurrentHashMap<>();
+```
+
+ds-cache uses [ScheduledExecutorService](https://git.dsops.activision.com/ds/ds-cache/blob/master/src/main/java/com/activision/ds/caching/Terminator.java) and [ConcurrentHashMap](https://git.dsops.activision.com/ds/ds-cache/blob/master/src/main/java/com/activision/ds/caching/expiry/ExpiryRegistry.java) for expiring local cache elements:
+
+```java
+private Map<String, ExpiryEntry> expiryEntries = new ConcurrentHashMap<>();
+
+private ScheduledExecutorService scheduledExecutorService = Executors
+    .newSingleThreadScheduledExecutor(new DaemonThreadFactory());
+
+scheduledExecutorService.scheduleAtFixedRate(this::deleteEntries, 1, interval, TimeUnit.SECONDS);
+
+// eviction
+
+ExpiryRegistry registry = localCache.getRegistry();
+for (ExpiryEntry entry : registry.getExpiryEntries()) {
+    if (entry.getExpirationTime() < System.currentTimeMillis()) {
+        localCache.remove(entry.getKey());
+        registry.deleteExpiryEntry(entry.getKey());
+    }
+}
+```
+
+---
+
+# Real-world Use-cases
+
+Inserting rows to Cassandra using list of Futures in [hot-path-populator-cassandra](https://git.dsops.activision.com/ds/hot-path-populator-cassandra/blob/master/src/main/java/com/activision/ds/cassandra/populator/cassandra/CassandraWriter.java):
+
+```java
+private List<ResultSetFuture> futureList = new ArrayList<>();
+
+futureList.add(...);
+
+for (ResultSetFuture future : futureList) {
+    while (!future.isDone()) {
+    }
+    future.get();
+}
+
+futureList.clear();
+``` 
+
+---
+
+# Real-world Use-cases
+
+Parallel processing with a ThreadPool Executor and CountDownLatch in [king-flinger](https://git.dsops.activision.com/ds/king-flinger-framework/blob/5c8c02bb33f276cbaa0bb8a794ed0f77ecff2682/src/main/java/com/activision/ds/kingflingerframework/processor/AbstractKingProcessor.java#L53-95):
+
+```java
+ExecutorService executor = Executors.newFixedThreadPool(UPLOAD_THREADS);
+AtomicBoolean isAtLeastOneFailed = new AtomicBoolean(false);
+
+genericRecordStream.forEach(this::handleRecord);
+
+List<List<String>> batches = Lists.partition(batchRequests, MAX_BATCH_SIZE);
+
+CountDownLatch countDownLatch = new CountDownLatch(batches.size());
+
+batches.forEach(e -> executor.submit(() -> {
+    try {
+        Optional<String> error = kingAPI.sendBatchRequest(e.toString());
+        if (error.isPresent()) {
+            isAtLeastOneFailed.set(true);
+        }
+    } catch (IOException e1) {
+        isAtLeastOneFailed.set(true);
+    } finally {
+        countDownLatch.countDown();
+    }
+}));
+
+countDownLatch.await(); // this will block until all BATCHES are finished
+
+if (isAtLeastOneFailed.get()) {
+    throw new RuntimeException("Failed to process");
+}
+```
+
+---
+
+# Real-world Use-cases
+
+[xhash-populator](https://git.dsops.activision.com/ds/xhash-populator) service:
+
+```java
+private final BlockingQueue<XHashUpdateRequest> workQueue = new LinkedBlockingQueue<>();
+
+// from api
+
+queue.put(new XHashUpdateRequest(type, Trigger.API));
+
+// from scheduler
+
+queue.put(new XHashUpdateRequest(RequestType.DIFF, Trigger.SCHEDULED));
+
+// from coordinator
+XHashUpdateRequest request = queue.take();
+process(request);
+```
+
+---
+
+# Real-world Use-cases
+
+Testing multithreading in [ds-cache](https://git.dsops.activision.com/ds/ds-cache/blob/master/src/test/java/com/activision/ds/caching/SerializationTest.java#L107-137):
+
+```java
+@Test
+public void testSafeInstancePerThread() throws InterruptedException {
+    int threads = 4;
+    CountDownLatch latch = new CountDownLatch(threads);
+    for (int i = 0; i < threads; i++) {
+        spawn(latch);
+    }
+    latch.await();
+}
+
+private void spawn(CountDownLatch latch) {
+    (new Thread(() -> {
+        String threadName = Thread.currentThread().getName();
+        Serialization serialization = new Serialization();
+        System.out.println(threadName + " started " + new Date().toString());
+        for (int i = 0; i < 1000; i++) {
+            String randomString = RandomStringUtils.random(1000);
+            byte[] serialized = serialization.serialize(randomString);
+            Assert.assertEquals(serialization.deserialize(serialized), randomString);
+        }
+        System.out.println(threadName + " finished " + new Date().toString());
+        latch.countDown();
+    })).start();
+}
+```
+
+---
+
+class: center, middle
+
+# We did it! Thank you!
+
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+    var slideshow = remark.create({
+        ratio: '16:9'
+    });
+</script>
+</body>
+</html>
