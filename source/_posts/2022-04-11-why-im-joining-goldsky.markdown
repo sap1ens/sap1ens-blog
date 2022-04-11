@@ -53,4 +53,4 @@ And I see how SQL becomes a standard for stream-processing right now. There are 
 
 Goldsky is not trying to be a solution to every web3 problem. Instead, we want to provide a solid platform for other companies to use blockchain data. Building high-quality web3 products is hard right now, partially because the tools and practices are so immature. But we see this as a great opportunity. 
 
-Finally, we’re hiring 😉. Ping me if you’re interested!
+Finally, [we’re hiring](https://goldsky.io/careers) 😉. Ping me if you’re interested!
