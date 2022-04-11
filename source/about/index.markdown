@@ -10,7 +10,7 @@ footer: true
 
 Hey, my name is Yaroslav (Slava) Tkachenko, I was born in Russia and I'm currently living in Vancouver, Canada.
 
-I'm a software engineer & architect, at the moment Staff Data Engineer at [Shopify](https://www.shopify.com).
+I'm a software engineer & architect, at the moment Principal Software Engineer at [Goldsky](https://goldsky.io).
 
 I like data engineering and distributed systems, you can find more info about what I do below and in my [resume](/files/resume-yaroslav-tkachenko.pdf).
 
