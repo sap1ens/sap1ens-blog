@@ -18,7 +18,7 @@ I also write a [blog](/blog/archives) and [present](/talks) at conferences and m
 
 ## A bit more
 
-I love to travel! Starting from 2012 I [visited 16 countries](http://ca.igotoworld.com/en/visited-map/9924.htm) and adding more. I'm an occasional [photographer](https://www.instagram.com/sap1ens/).
+I love to travel! Starting from 2012 I [visited 17 countries](http://ca.igotoworld.com/en/visited-map/9924.htm) and adding more. I'm an occasional [photographer](https://www.instagram.com/sap1ens/).
 
 Mentoring and teaching is something I always excited to do, either in my current company via conversations, workshops, 1-to-1s and lunch & learns or public speaking. Writing is a big part of me too, at the moment I use my blog for that, but I hope that once I'll have time and expertise to write a book. That also means that I read A LOT, mostly [professional stuff](/blog/2014/10/13/how-and-what-i-read-as-a-software-engineer/), fiction (sci-fi, fantasy) and non-fiction (I like history and biographies).
 
