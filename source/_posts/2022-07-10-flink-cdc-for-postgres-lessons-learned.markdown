@@ -140,7 +140,7 @@ I profiled a Flink CDC application that used `JsonDebeziumDeserializationSchema`
 
 {% img /images/posts/flink-cdc-json-flamegraph.png 900 %}
 
-Swapping standard Jackson library with other more efficient ones didn’t help much. I’ve realized that the most efficient way would be to avoid _any_ deserialization and process raw Debezium records as is (it uses Kafka Connect’s `SourceRecord`s). But, even if you don’t apply any deserialization explicitly, Flink will try to serialize and deserialize them for network exchange, and since these records are not POJOs, a slow Kryo deserialization would be chosen by default, which is also pretty slow. How can you avoid that?
+Swapping standard Jackson library with other more efficient ones didn’t help much. I’ve realized that the most efficient way would be to avoid _any_ deserialization and process raw Debezium records as is (it uses Kafka Connect’s `SourceRecord`s). But, even if you don’t apply any deserialization explicitly, Flink will try to serialize and deserialize them for network exchange, and since these records are not POJOs, Kryo deserialization would be chosen by default, which is also pretty slow. How can you avoid that?
 
 ## Designing an Efficient Flink CDC Source
 
