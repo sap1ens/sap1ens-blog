@@ -18,6 +18,6 @@ I also write a [blog](/blog/archives) and [present](/talks) at conferences and m
 
 ## A bit more
 
-I love to travel! Starting from 2012 I [visited 17 countries](http://ca.igotoworld.com/en/visited-map/9924.htm) and adding more. I'm an occasional [photographer](https://www.instagram.com/sap1ens/).
+I love to travel! Starting from 2012 I [visited 20 countries](http://ca.igotoworld.com/en/visited-map/9924.htm) and adding more. I'm an occasional [photographer](https://www.instagram.com/sap1ens/).
 
-I enjoy mentoring, writing, reading non-fiction, long walks, and watching european football.  
+I enjoy mentoring, writing, reading non-fiction, long walks, and european football.  
